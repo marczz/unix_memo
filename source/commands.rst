@@ -177,12 +177,17 @@ system information
 `rsync`_
 --------
 
-*Use the --dry-run option for testing and environment* `RSYNC_PARTIAL_DIR=.rsync-tmp` *to keep partial files separates.*
+*Use the --dry-run option for testing and environment*
+`RSYNC_PARTIAL_DIR=.rsync-tmp` *to keep partial files separates.*
 
 .. csv-table::
    :delim: %
    :widths: 50, 60
 
+   :man:`diff` -r  /path/to/dir1/ /path/to/dir2/%diff recursively two directories.
+   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/| :man:`sort`%list files that differs bitween two directories
+   :man:`rsync` -avn source-dir/ target-dir/%what files differs (size mod time) between two directories.
+   :man:`rsync` -avnc source-dir/ target-dir/%what files differs (checksum) between two directories.
    `rsync`_ -P rsync://rsync.server.com/path/to/file file%Use partial transfer, repeat for troublesome downloads.
    `rsync`_ --bwlimit=1000 fromfile tofile%Locally copy with rate limit. It's like nice for I/O
    `rsync`_ -az  --delete ~/public\_html/ remote.com:'~/public\_html'%Mirror web site (using compression and encryption)
@@ -253,24 +258,25 @@ networking
 sed
 ---
 
-Seed `sed manual <sed>`_ and `sed1line <http://sed.sourceforge.net/sed1line.txt>`_.
+See `sed manual <sed>`_ and
+`sed1line <http://sed.sourceforge.net/sed1line.txt>`_.
 
 .. csv-table::
    :delim: %
    :widths: 50, 60
 
-   sed -n '8,12p'%print lines 8 to 12
-   sed -n '/regexp/p'% print lines which match regular expression
-   sed '/regexp/d'% print lines which don't match regular expression
-   sed -n '/begregexp/,/endregexp/p'%print section of file between two regexp
-   sed '/begregexp/,/endregexp/d'%print file except section between two regexp
+   sed -n '8,12p'%Print lines 8 to 12
+   sed -n '/regexp/p'%Print lines which match regular expression
+   sed '/regexp/d'%Print lines which don't match regular expression
+   sed -n '/begregexp/,/endregexp/p'%Print section of file between two regexp
+   sed '/begregexp/,/endregexp/d'%Print file except section between two regexp
    sed '/^#/d; /^ *$/d'%Remove comments and blank lines
-   sed -i 's/[ \\t]*$//' file.txt%delete trailing space at end of lines
+   sed -i 's/[ \\t]*$//' file.txt%Delete trailing space at end of lines
    sed -e :a -e '/^\\n*$/{$d;N;ba' -e '}'%Delete blank lines at end of file.
    sed -i 42d ~/.ssh/known_hosts%Delete a particular line
    sed ':a; /\\\\$/N; s/\\\\\\n//; ta'%Concatenate lines with trailing \\
-   sed = filename | sed 'N;s/\\n/\\t/'%put a left count number on each line of a file
-   sed = filename | sed 'N; s/^/     /; s/ *\\(.\\{6,\\}\\)\\n/\\1  /'%put a right aligned count on each line
+   sed = filename | sed 'N;s/\\n/\\t/'%Put a left count number on each line of a file
+   sed = filename | sed 'N; s/^/     /; s/ *\\(.\\{6,\\}\\)\\n/\\1  /'%Put a right aligned count on each line
    sed 's/\\x0D$//'%Dos to unix eol
    sed 's/$/\\r/'%Unix to dos eol
 
@@ -310,7 +316,7 @@ Refs
 .. _find: http://www.gnu.org/software/findutils/manual/html_node/find_html/index.html
 .. _dirstack: http://www.gnu.org/software/bash/manual/html_node/Directory-Stack-Builtins.html
 .. _grep: http://www.gnu.org/software/grep/manual/html_node/index.html
-.. _sed:http://www.gnu.org/software/sed/manual/sed.html
+.. _sed: http://www.gnu.org/software/sed/manual/sed.html
 
 ..
    TODO: Complete with other commands from http://cb.vu/unixtoolbox.xhtml
