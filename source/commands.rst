@@ -100,13 +100,15 @@ process management
    :man:`ps` ax -orss=,args= | :coreutils:`:coreutils:`sort`` -b -k1,1n | :coreutils:`pr` -TW$COLUMNS%List processes by mem (KB) usage (see also top).
    :man:`ps` -C lighttpd -o pid=%pid of lighttpd
    :man:`pgrep` lighttpd%pid of lighttpd
+   :man:`pgrep` -l daemon%pid-name of all processes having 'daemon' in their name
    `pidof <http://linux.die.net/man/8/pidof>`_  lighttpd%pid of lighttpd
    :man:`ps` -C firefox-bin -L -o pid,tid,pcpu,state%List all threads for a particular process.
    :man:`ps` -p 666 -o etime=%List elapsed wall time for process id 666
+   :man:`ps` ew 666%show command and environment of process 666
    :coreutils:`kill` -9 1234%Send SIGKILL to process 1234
    :man:`killall` -s USR1 dd%Send signal USR1 to the dd program
    :bsdman:`pkill` -s USR1 dd%Send signal USR1 to the dd program
-
+   :man:`pmap` 1234%Memory map of process 1234
 
 monitoring, process admin
 -------------------------
@@ -117,6 +119,8 @@ monitoring, process admin
    :coreutils:`tail` -f /var/log/messages%Monitor messages in a log file.
    :man:`lsof` -p 666%List paths that process id 666 has open.
    :man:`lsof` /path/to/file%List processes that have specified path open.
+   :man:`fuser` -va 22/tcp%List processes using port 22
+   :man:`fuser` -va /home%List processes accessing the /home
    sudo `tcpdump`_ not port 22%Show network traffic except ssh.
    | sudo `tcpdump`_ -ni eth0 'dst 192.168.1.5 and tcp and port http'%all HTTP session to 192.168.1.5.
    :man:`last` reboot%Show system reboot history.
@@ -301,12 +305,16 @@ Refs
 ----
 
 -  This page is a fork of *pixelbeat*
-   `<http://www.pixelbeat.org/cmdline.html>`_
+   `command line reference <http://www.pixelbeat.org/cmdline.html>`_
    see also the `unix commands page
    <http://www.pixelbeat.org/docs/unix_commands/>`_,
    `More Linux commands <http://www.pixelbeat.org/docs/linux_commands.html>`_,
    the `programming notes <http://www.pixelbeat.org/programming/>`_,
    the `scripts <http://www.pixelbeat.org/scripts/>`_
+-  Other system command memos:
+   `Unix Toolbox <http://cb.vu/unixtoolbox.xhtm>`_,
+   `shell-fu <http://www.shell-fu.org/>`_.
+
 
 .. _wget: http://www.gnu.org/software/wget/manual/wget.html
 .. _gpg: http://www.gnupg.org/documentation/manuals/gnupg/
