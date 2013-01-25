@@ -17,6 +17,7 @@ To define variable ``a`` and ``b`` with respective values from the
    done
 
 Or in bash 4+ to define an associative array var with each value:
+
 .. code-block:: bash
 
    declare -A var
@@ -31,21 +32,8 @@ Or in bash 4+ to define an associative array var with each value:
        var[$1]=$2
    done
 
+
 A more complete function that does uudecode is given in
-`
-Reading query string
---------------------
-.. code-block:: bash
-
-    oldifs=$IFS
-    IFS="&"
-    set -- $QUERY
-    IFS=$oldifs
-    for l in $@; do
-        eval $l
-    done
-
-a more complete function that does uudecode is given in
 `Parsing Web Form Input in CGI Shell Scripts
 <http://cfajohnson.com/shell/articles/parse-query/>`_
 
