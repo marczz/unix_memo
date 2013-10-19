@@ -63,3 +63,73 @@ A more complete function that does uudecode is given in
        done
        set +f
    }
+
+Links
+-----
+
+Symlinks
+^^^^^^^^
+
+Symlinks store in an inode any path in the system hierarchy. The
+symlink act as a pointerto another file name. The path
+can be absolute or relative; existing or dangling.
+Permissions are ignored in symlink inodes.
+
+Unlike hard links, symbolic links can be made to directories or across
+file systems with no restrictions.
+
+You create symlinks with::
+
+   ln -s existing-path alias-or-directory
+   cp --symbolic-link name1 name2
+
+The value of a symlink is returned by::
+
+   readlink name
+
+and the absolute path stripped from any symbolic link component, any
+``.`` or ``..`` or repeated ``/`` is given by::
+
+   readlink --canonicalize name
+   readlink -f name
+
+Hardlinks
+^^^^^^^^^
+
+In POSIX systems, one file can have many names at the same time.
+Since hardlinks reference inodes directly, they're restricted to the
+same file system.
+
+Since they reference the same inode the owner and permissions of to
+hardlinks are always identical.
+
+You create hardlinks with::
+
+   ln  existing-path alias-or-directory
+   cp --link name1 name2
+
+
+
+Reflinks
+^^^^^^^^
+Reflinks are :wikipedia:`Copy-on-write` _COW_ of a file; they are available
+on :wikipedia:`OCFS2` and :wikipedia:`Btrfs` file systems. Reflinks
+creates a new inode that shares the same disk blocks as the original
+file. Reflinks works only inside the boundaries of a file system; but
+in contrast to hardlinks changes to a file are not reflected to the copy.
+
+You create hardlinks with::
+
+   cp --reflink name1 name2
+
+References
+^^^^^^^^^^
+
+See also:
+
+-   :coreutils:`ln`, :coreutils:`readlink`, :coreutils:`cp`.
+
+-   `libc manual: Symbolic Links
+    <http://www.gnu.org/savannah-checkouts/gnu/libc/manual/html_node/Symbolic-Links.html>`_,
+    `libc manual: Hardlinks
+    <http://www.gnu.org/savannah-checkouts/gnu/libc/manual/html_node/Hard-Links.html>`_
