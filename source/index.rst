@@ -14,6 +14,9 @@ Contents:
    commands.rst
    shell.rst
    swap.rst
+   cups.rst
+   ssh.rst
+   wpa.rst
 
 Indices and tables
 ==================
