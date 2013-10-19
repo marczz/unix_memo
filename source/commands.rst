@@ -41,7 +41,11 @@ File searching
    `find`_ -name '\*.[ch]' | xargs grep -E 'expr'%Search 'expr' in this dir and below.
    `find`_ -type f -print0 | xargs -r0 grep -F 'example'%Search all regular files for 'example' in this dir and below
    `find`_ -maxdepth 1 -type f | xargs grep -F 'example'%Search all regular files for 'example' in this dir
-   `find`_ -maxdepth 1 -type d | while `read <http://www.pixelbeat.org/programming/readline/>`_ dir; do echo $dir; echo cmd2; done%Process each item with multiple commands (in while loop)
+   `find`_ -maxdepth 1 -type d | while `read
+   <http://www.pixelbeat.org/programming/readline/>`_ dir; do echo
+   $dir; echo cmd2; done%Process each item with multiple commands (in
+   while loop)
+   `find`_. -xtype l%Find broken links
    `find`_ -type f ! -perm -444%Find files not readable by all (useful for web site)
    `find`_ -type d ! -perm -111%Find dirs not accessible by all (useful for web site)
    :bsdman:`locate` -r '*file*.txt'%Search cached path index for names.
@@ -96,8 +100,9 @@ process management
    :man:`ps` axuww%list all processes and resource used
    :man:`ps` axmu%list all processes and threads
    :man:`ps` axf -o pid,args%List processes in a hierarchy.
-   :man:`ps` ax -o pcpu,cpu,nice,state,cputime,args --sort pcpu | `sed`_ '/^ 0.0 /d'%List processes by  cpu rate (see also top).
-   :man:`ps` ax -orss=,args= | :coreutils:`:coreutils:`sort`` -b -k1,1n | :coreutils:`pr` -TW$COLUMNS%List processes by mem (KB) usage (see also top).
+   :man:`ps` ax -o pcpu,cpu,nice,state,cputime,args --sort -pcpu | :man:`sed` '/^ 0.0 /d'%List processes by  decreasing cpu rate (see also :man:`top`).
+   :man:`ps` ax -opid=,rss=,args= --sort=+rss | :man:`sed` '/^\s*0\>/d' | :coreutils:`pr` -TW$COLUMNS%List processes by mem (KB) usage (see also :man:`top`).
+   :man:`ps` -o user --sort user| :coreutils:`uniq` -c| :coreutils:`sort` -n -k1%number of processes per user.
    :man:`ps` -C lighttpd -o pid=%pid of lighttpd
    :man:`pgrep` lighttpd%pid of lighttpd
    :man:`pgrep` -l daemon%pid-name of all processes having 'daemon' in their name
@@ -257,7 +262,7 @@ networking
    `curl <http://curl.haxx.se/docs/manpage.html>`_ -I htps://github.org%Display the server headers for a web site.
    :man:`lsof` -i tcp:80%What's using port 80.
    sudo :man:`apache2ctl` -S%Display a list of apache virtual hosts
-   `curl <http://curl.haxx.se/docs/manpage.html>`_ -s http://www.pixelbeat.org/pixelbeat.asc|`gpg`_ --import%Import a gpg key from the web
+   `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc |`gpg`_ --import%Import a gpg key from the web
 
 sed
 ---
@@ -312,7 +317,7 @@ Refs
    the `programming notes <http://www.pixelbeat.org/programming/>`_,
    the `scripts <http://www.pixelbeat.org/scripts/>`_
 -  Other system command memos:
-   `Unix Toolbox <http://cb.vu/unixtoolbox.xhtm>`_,
+   `Unix Toolbox <http://cb.vu/unixtoolbox.xhtml>`_,
    `shell-fu <http://www.shell-fu.org/>`_.
 
 
