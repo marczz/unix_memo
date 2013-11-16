@@ -2,4 +2,10 @@
 ;;; For more information see (info "(emacs) Directory Variables")
 
 ((rst-mode
-  (ispell-local-dictionary . "english")))
+  (rst-indent-width . 4)
+  (rst-indent-field . 4)
+  (rst-indent-literal-normal . 4)
+  (rst-indent-comment . 4)
+  (ispell-local-dictionary . "english")
+  (eval magit-wip-save-mode)
+))
