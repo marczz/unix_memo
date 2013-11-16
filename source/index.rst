@@ -17,9 +17,12 @@ Contents:
    cups.rst
    ssh.rst
    wpa.rst
+   udev.rst
+   devices.rst
 
 Indices and tables
 ==================
+
 
 * :ref:`genindex`
 * :ref:`modindex`
