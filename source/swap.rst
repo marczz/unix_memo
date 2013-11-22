@@ -23,20 +23,20 @@ output::
    -/+ buffers/cache:     889     1113
    Swap:         2047       0     2047
 
-It means I have 2G ram 1.6G are used 889M actively by applications and
+It means you have 2G ram 1.6G are used 889M actively by applications and
 728M can be reclaimed 136M from buffers and 592M from cached data; the
 total amount of space that could be used is 1.1G
 
 2G of swap are unused.
 
 You can find more explanations `there
-<http://www.linuxatemyram.com/play.html>`_
+<http://www.linuxatemyram.com/play.html>`_.
 
 A very good ref is also
 `Tuning the Memory Management Subsystem
-<http://doc.opensuse.org/documentation/html/openSUSE/opensuse-tuning/cha.tuning.memory.html#cha.tuning.memory.usage>`_
+<http://doc.opensuse.org/documentation/html/openSUSE/opensuse-tuning/cha.tuning.memory.html#cha.tuning.memory.usage>`_.
 chapter 15 of `openSUSE System Analysis and Tuning Guide
-<http://doc.opensuse.org/documentation/html/openSUSE/opensuse-tuning/>`_
+<http://doc.opensuse.org/documentation/html/openSUSE/opensuse-tuning/>`_.
 
 Managing swap space
 -------------------
@@ -52,8 +52,8 @@ Swap Info
 
 The output is::
 
-  Filename	      Type		Size	Used	Priority
-  /dev/mapper/vg-swap   partition	        2097148 0       -1
+  Filename            Type		Size	Used	Priority
+  /dev/mapper/vg-swap   partition               2097148 0       -1
 
 or :ref:`free -m <free_mem>`
 
@@ -93,8 +93,10 @@ Then::
 Swappiness
 ~~~~~~~~~~
 
-Setting this parameter to a low value will reduce swapping from RAM,
-default is 60
+A low value of kernel swappiness parameter will reduce swapping from RAM,
+default is 60 and current value is::
+
+  $ cat /proc/sys/vm/swappiness
 
 To test swapiness::
 

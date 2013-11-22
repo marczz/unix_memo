@@ -158,10 +158,3 @@ An example of full session, adding a new AP is
    OK
    > save_config
    OK
-
-.. comment
-
-   Local Variables:
-   mode: rst
-   ispell-local-dictionary: "english"
-   End:

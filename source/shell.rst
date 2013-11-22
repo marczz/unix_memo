@@ -71,7 +71,7 @@ Symlinks
 ^^^^^^^^
 
 Symlinks store in an inode any path in the system hierarchy. The
-symlink act as a pointerto another file name. The path
+symlink act as a pointer to another file name. The path
 can be absolute or relative; existing or dangling.
 Permissions are ignored in symlink inodes.
 
@@ -112,7 +112,7 @@ You create hardlinks with::
 
 Reflinks
 ^^^^^^^^
-Reflinks are :wikipedia:`Copy-on-write` _COW_ of a file; they are available
+Reflinks are :wikipedia:`Copy-on-write` *COW* of a file; they are available
 on :wikipedia:`OCFS2` and :wikipedia:`Btrfs` file systems. Reflinks
 creates a new inode that shares the same disk blocks as the original
 file. Reflinks works only inside the boundaries of a file system; but
