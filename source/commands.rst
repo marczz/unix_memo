@@ -32,6 +32,7 @@ dir navigation
 
 File searching
 --------------
+
 .. csv-table::
    :delim: %
    :widths: 50, 60
@@ -194,7 +195,8 @@ system information
    :widths: 50, 60
 
    :man:`diff` -r  /path/to/dir1/ /path/to/dir2/%diff recursively two directories.
-   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/| :man:`sort`%list files that differs bitween two directories
+   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/|:man:`sort`%list files that differs between two directories
+   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/|:man:`diffstat`%summarize differences  between two directories
    :man:`rsync` -avn source-dir/ target-dir/%what files differs (size mod time) between two directories.
    :man:`rsync` -avnc source-dir/ target-dir/%what files differs (checksum) between two directories.
    `rsync`_ -P rsync://rsync.server.com/path/to/file file%Use partial transfer, repeat for troublesome downloads.
@@ -259,10 +261,11 @@ networking
    sudo `ss <http://linux.die.net/man/8/ss>`_ -tup%List active connections to/from system
    :man:`iptraf`%interactive ncurses colorful IP LAN monitor.
    :man:`vnstat`%Console hourly, daily and monthly network traffic.
+   :man:`lsof` -i tcp:443%What's using `port 443 <http://www.whatportis.com/443>`_.
    `curl <http://curl.haxx.se/docs/manpage.html>`_ -I htps://github.org%Display the server headers for a web site.
-   :man:`lsof` -i tcp:80%What's using port 80.
-   sudo :man:`apache2ctl` -S%Display a list of apache virtual hosts
    `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc |`gpg`_ --import%Import a gpg key from the web
+   `curl <http://curl.haxx.se/docs/manpage.html>`_ ifconfig.me%get your external address through `ifconfig.me <http://ifconfig.me>`_
+   sudo :man:`apache2ctl` -S%Display a list of apache virtual hosts
 
 sed
 ---
@@ -318,6 +321,7 @@ Refs
    the `scripts <http://www.pixelbeat.org/scripts/>`_
 -  Other system command memos:
    `Unix Toolbox <http://cb.vu/unixtoolbox.xhtml>`_,
+   `commandlinefu <http://www.commandlinefu.com/>`_,
    `shell-fu <http://www.shell-fu.org/>`_.
 
 
