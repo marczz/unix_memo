@@ -42,10 +42,7 @@ File searching
    `find`_ -name '\*.[ch]' | xargs grep -E 'expr'%Search 'expr' in this dir and below.
    `find`_ -type f -print0 | xargs -r0 grep -F 'example'%Search all regular files for 'example' in this dir and below
    `find`_ -maxdepth 1 -type f | xargs grep -F 'example'%Search all regular files for 'example' in this dir
-   `find`_ -maxdepth 1 -type d | while `read
-   <http://www.pixelbeat.org/programming/readline/>`_ dir; do echo
-   $dir; echo cmd2; done%Process each item with multiple commands (in
-   while loop)
+   `find`_ -maxdepth 1 -type d | while read dir; do echo $dir; echo cmd2; done%Process each item with multiple commands (in while loop)
    `find`_. -xtype l%Find broken links
    `find`_ -type f ! -perm -444%Find files not readable by all (useful for web site)
    `find`_ -type d ! -perm -111%Find dirs not accessible by all (useful for web site)
@@ -125,6 +122,9 @@ monitoring, process admin
    :coreutils:`tail` -f /var/log/messages%Monitor messages in a log file.
    :man:`lsof` -p 666%List paths that process id 666 has open.
    :man:`lsof` /path/to/file%List processes that have specified path open.
+   :man:`lsof` -u foo%Processes and files of user foo
+   :man:`lsof` -u foo%Processes no of user foo
+   :man:`lsof` -t -c  pcmanfm%files open by pcmanfm
    :man:`fuser` -va 22/tcp%List processes using port 22
    :man:`fuser` -va /home%List processes accessing the /home
    sudo `tcpdump`_ not port 22%Show network traffic except ssh.
@@ -261,7 +261,9 @@ networking
    sudo `ss <http://linux.die.net/man/8/ss>`_ -tup%List active connections to/from system
    :man:`iptraf`%interactive ncurses colorful IP LAN monitor.
    :man:`vnstat`%Console hourly, daily and monthly network traffic.
-   :man:`lsof` -i tcp:443%What's using `port 443 <http://www.whatportis.com/443>`_.
+   :man:`lsof` -i tcp:443%What tcp connection is using `port 443 <http://www.whatportis.com/443>`_.
+   :man:`lsof` -i :5800%What is using `port 5800 <http://www.whatportis.com/5800>`_.
+   :man:`lsof` -i @192.168.1.5:22%connections to host 192.168.1.5 port 22
    `curl <http://curl.haxx.se/docs/manpage.html>`_ -I htps://github.org%Display the server headers for a web site.
    `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc |`gpg`_ --import%Import a gpg key from the web
    `curl <http://curl.haxx.se/docs/manpage.html>`_ ifconfig.me%get your external address through `ifconfig.me <http://ifconfig.me>`_
