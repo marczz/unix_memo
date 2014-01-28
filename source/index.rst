@@ -19,7 +19,7 @@ Contents:
    wpa.rst
    udev.rst
    devices.rst
-   mysql.rst
+
 
 
 Indices and tables
