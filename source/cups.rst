@@ -1,95 +1,126 @@
+Printing with CUPS
+==================
+..  highlight:: shell-session
+
+
+The reference is :cups:`cups command-line printing and options on the cups.org
+site <options.html>` or on your
+cups:`local server <options.html>`.
+
+Refs:
+    :cups:`lpoptions(1) <man-lpoptions.html>` (:locups:`local <man-lpoptions.html>`),
+    :cups:`lpinfo(1) <man-lpinfo.html>` (:locups:`local <man-lpinfo.html>`),
+    :cups:`lpstat(1) <man-lpstat.html>` (:locups:`local <man-lpstat.html>`),
+    :cups:`lp(1) <man-lp.html>` (:locups:`local <man-lp.html>`),
+    :cups:`lpadmin(8) <man-lpadmin.html>` (:locups:`local <man-lpadmin.html>`),
+    :cups:`cancel(1) <man-cancel.html>` (:locups:`local <man-cancel.html>`),
+    :cups:`lpmove(8) <man-lpmove.html>` (:locups:`local <man-lpmove.html>`),
+    :cups:`cupsenable(8) <man-cupsenable.html>` (:locups:`local <man-cupsenable.html>`)
+
+
+
+Knowing about your printers
+---------------------------
+
+
+-   List the devices
+
+    ::
+
+        $ lpinfo -v
+
+-   List the drivers::
+
+        $ lpinfo -m
+
+-   To know the available options:
+
+    ::
+
+        $ lpoptions -d foo -l
+
 Printing
-========
+--------
 
-The reference is `cups command-line printing and options on the cups.org
-site <http://www.cups.org/documentation.php/options.html>`_ or on your
-`local server <http://localhost:631/help/options.html>`_.
+-   Get the lists of available sizes and use paper size of A3 and fit to
+    page, and print A3 page
 
--  To know the available options:
+    ::
 
-   ::
+        $ lpoptions -p foo -l| grep 'PageSize'
+        $ lp -d foo -o fitplot:PageSize=A3 /etc/motd
 
-        lpoptions -d foo -l
+-   get the lists of slots and use a separate Input slot for first page:
 
--  get the lists of available sizes and use paper size of A3 and fit to
-   page
+    ::
 
-   ::
+        $ lpoptions -p foo -l|grep -i slot
+        $ lp -d foo -o 1:InputSlot=UpperCassette -o InputSlot=LowerCassette
 
-       lpoptions -p foo -l| grep 'PageSize'
-       lp -d foo -o fitplot:PageSize=A3 /etc/motd
+-   watermarks ("Draft" ...) on even pages, gray color mode on odd:
 
--  get the lists of slots and use a separate Input slot for first page:
+    ::
 
-   ::
+        $ lp -d foo -o even:Watermark=on -o odd:ColorMode=Gray file
 
-       lpoptions -p foo -l|grep -i slot
-       lp -d foo -o 1:InputSlot=UpperCassette -o InputSlot=LowerCassette
+-   Print some pages, and page ranges:
 
--  watermarks ("Draft" ...) on even pages, gray color mode on odd:
+    ::
 
-   ::
+        $ lp -d foo1 -o 1,6-10,15,20- file
 
-       lp -d foo -o even:Watermark=on -o odd:ColorMode=Gray file
+-   Print multiple copies from a pipe output:
 
--  Print some pages, and page ranges:
+    ::
 
-   ::
+        $ program | lp -d foo -n 8
 
-       lp -d foo1 -o 1,6-10,15,20- file
+-   idem with collated copies
 
--  Print multiple copies from a pipe output:
+    ::
 
-   ::
+        $ program | lp -d foo -n 8 -o Collate=true
 
-       program | lp -d foo -n 8
+-   Print landscape, duplex with short side tumble:
 
--  idem with collated copies
+    ::
 
-   ::
+        $ lp -d foo  -o sides=two-sided-short-edge:landscape file
 
-       program | lp -d foo -n 8 -o Collate=true
+-   Print with a custom media size (example 624pts width, 312pts length)
 
--  Print landscape, duplex with short side tumble:
+    ::
 
-   ::
+        $ lp -d foo  -o media=Custom.624x312 file
 
-       lp -d foo  -o sides=two-sided-short-edge:landscape file
+    You can also use a predefined media size: Letter Legal A4 A5 A6 A7 A8
+    B5 B6 B7 B8 C5 C6 DL C7 C8 Custom.WIDTHxHEIGHT . WIDTHxHEIGHT is in
+    point or is suffixed with in, cm, mm
 
--  Print with a custom media size (example 624pts width, 312pts length)
+-   print one side (even with default duplex) and a banner (*standard*:
+    without label, *classified,unclassified, secret, topsecret*: with
+    corresponding label)
 
-   ::
+    ::
 
-       lp -d foo  -o media=Custom.624x312 file
+        $ lp -o sides=one-sided:job-sheets=standard
 
-   You can also use a predefined media size: Letter Legal A4 A5 A6 A7 A8
-   B5 B6 B7 B8 C5 C6 DL C7 C8 Custom.WIDTHxHEIGHT . WIDTHxHEIGHT is in
-   point or is suffixed with in, cm, mm
+-   Print 4-up (or 1,2,4,16) with double border (or single, single-thick,
+    double, double-thick), Bottom to top, left to right (btlr or btrl or
+    lrbt or rlbt or rltb or tblr or tbrl):
 
--  print one side (even with default duplex) and a banner (*standard*:
-   without label, *classified,unclassified, secret, topsecret*: with
-   corresponding label)
+    ::
 
-   ::
+        $ lp -o number-up=4:page-border=double:number-up-layout=btlr file
 
-       lp -o sides=one-sided:job-sheets=standard
+-   **pretty**\ printing 2 columns (or 3, 4, ...) with 12 char/inch
+    (default 10) and 8 lines/inch (default 6):
 
--  Print 4-up (or 1,2,4,16) with double border (or single, single-thick,
-   double, double-thick), Bottom to top, left to right (btlr or btrl or
-   lrbt or rlbt or rltb or tblr or tbrl):
+    ::
 
-   ::
+        $ lp -o prettyprint:columns=2:cpi=12:lpi=8 file
 
-       lp -o number-up=4:page-border=double:number-up-layout=btlr file
-
--  **pretty**\ printing 2 columns (or 3, 4, ...) with 12 char/inch
-   (default 10) and 8 lines/inch (default 6):
-
-   ::
-
-       lp -o prettyprint:columns=2:cpi=12:lpi=8 file
-
--  The borders can be forced by ``page-{left,right,bottom,top}``
+-   The borders can be forced by ``page-{left,right,bottom,top}``
 
 Managing printers
 -----------------
@@ -98,19 +129,19 @@ Choosing a printer:
 
 ::
 
-    lpstat -p -d
+    $ lpstat -p -d
 
 choosing a printer on another server
 
 ::
 
-    lpstat -h server -p -d
+    $ lpstat -h server -p -d
 
 setting the default printer:
 
 ::
 
-    lpoptions -d printer
+    $ lpoptions -d printer
 
 The user default printer and options are written in
 ``~/.cups/lpoptions``, which override system wide options in
@@ -120,13 +151,18 @@ Printer queue state:
 
 ::
 
-    lpstat -p foo
+    $ lpstat -p foo
 
 All printer states:
 
 ::
 
-    lpstat -p
+    $ lpstat -p
+
+Printer devices summary
+::
+
+    $ lpstat -s
 
 Physical devices connected to all printers
 
@@ -134,47 +170,58 @@ Physical devices connected to all printers
 
     lpstat -v
 
-All the sattus and defaults of printer *foo*
+All the status and defaults of printer *foo*
 
 ::
 
-    lpstat -l -p foo
+    $ lpstat -l -p foo
 
 
 List all jobs on printer *foo*
 
 ::
 
-    lpstat -o foo
-    lpq -P foo
+    $ lpstat -o foo
+    $ lpq -P foo
 
 Canceling job 12345 on printer *foo*:
 
 ::
 
-    cancel 12345 foo
+    $ cancel 12345 foo
 
 Canceling all jobs from printer *foo*:
 
 ::
 
-    cancel -a foo
+    $ cancel -a foo
 
 move job 123 to printer *bar*:
 
 ::
 
-    lpmove 123 bar
+    $ lpmove 123 bar
 
 Define the *device-uri* and *ppd file* for the windows printer *foo*
 shared thru samba
 
 ::
 
-    lpadmin -p foo -v smb://workgroup/user:mypass@windows-server/inkjet -P /root/inkjet.ppd
+    $ lpadmin -p foo -v \
+    smb://workgroup/user:mypass@windows-server/inkjet \
+    -P /root/inkjet.ppd
 
 Enable and accepts jobs on foo:
 
 ::
 
-    lpadmin -p foo -E
+    $ lpadmin -p foo -E
+
+or::
+
+    $ cupsenable foo
+
+
+Disable, i.e stop the *foo* printer::
+
+    $ cupsdiable foo
