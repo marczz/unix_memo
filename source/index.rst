@@ -19,8 +19,8 @@ Contents:
    wpa.rst
    udev.rst
    devices.rst
-
-
+   encrypt.rst
+   gnupg.rst
 
 Indices and tables
 ==================
