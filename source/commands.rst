@@ -1,3 +1,5 @@
+.. _linux_command_memo:
+
 Linux Commands Memo
 ===================
 
@@ -67,6 +69,30 @@ disk space
    sudo :man:`sgdisk` -p /dev/sda%Show disks partitions sizes and types (GUID part)
    :coreutils:`dd` bs=1 seek=2TB if=/dev/null of=ext3.test%Create a large sparse test file (taking no space).
    >| file%truncate data of file or create an empty file
+
+text handling
+-------------
+.. csv-table::
+   :delim: §
+   :widths: 50, 60
+
+   :coreutils:`tr` -dc '[:print:]' < /dev/urandom§Filter non printable characters
+   :coreutils:`tr` -s '[:blank:]' '\t' </proc/diskstats | :coreutils:`cut` -f4§cut fields separated by blanks
+   :coreutils:`tr` -s '[:blank:]' </proc/diskstats | :coreutils:`cut` -d' ' -f4§cut fields separated by blanks
+   :man:`dmesg`| :coreutils:`wc` -l§count lines (``w`` words, ``-b`` bytes)
+   :coreutils:`cut` -d: -f1 /etc/passwd | :coreutils:`sort`§Lists all usernames in alphabetical order.
+   :coreutils:`paste` -d ',:' file1 file2 file3§Merges given files line by line
+   :man:`mount` | :bsdman:`column` -t§table of mounted filesystems
+   :coreutils:`join` -t'\0' -a1 -a2 file1 file2§Union of sorted files
+   :coreutils:`join` -t'\0' file1 file2§Intersection of sorted files
+   :coreutils:`join` -t'\0' -v2 file1 file2§Difference of sorted files
+   :coreutils:`join` -t'\0' -v1 -v2 file1 file2§Symmetric Difference of sorted files
+   :bsdman:`column` -s, -t <tmp.csv§pretty print csv
+   :coreutils:`printf` "%03o\\n" "\'%"§octal code of ascii character ``%``
+   :coreutils:`printf` "Ox%02x\\n" "\'%"§hexacimal code of ascii character ``%``
+   :coreutils:`printf` "%d\\n" "\'%"§decimal code of ascii character ``%``
+   :man:`iconv` -f ISO8859-1 -t UTF-8 -o file.utf8 file.txt§convert encoding
+   :man:`iconv` -l§List known coded character sets
 
 archives and compression
 ------------------------
@@ -195,14 +221,16 @@ system information
    :widths: 50, 60
 
    :man:`diff` -r  /path/to/dir1/ /path/to/dir2/%diff recursively two directories.
-   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/|:man:`sort`%list files that differs between two directories
-   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/|:man:`diffstat`%summarize differences  between two directories
+   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/| :man:`sort`%list files that differs between two directories
+   :man:`diff` -rq /path/to/dir1/ /path/to/dir2/| :man:`diffstat`%summarize differences  between two directories
    :man:`rsync` -avn source-dir/ target-dir/%what files differs (size mod time) between two directories.
    :man:`rsync` -avnc source-dir/ target-dir/%what files differs (checksum) between two directories.
    `rsync`_ -P rsync://rsync.server.com/path/to/file file%Use partial transfer, repeat for troublesome downloads.
    `rsync`_ --bwlimit=1000 fromfile tofile%Locally copy with rate limit. It's like nice for I/O
    `rsync`_ -az  --delete ~/public\_html/ remote.com:'~/public\_html'%Mirror web site (using compression and encryption)
    `rsync`_ -auz  remote:/dir/ **.** && `rsync`_ -auz  **.** remote:/dir/%Synchronize current directory with remote one.
+
+.. _ssh_commands:
 
 :bsdman:`ssh`
 -------------
@@ -212,8 +240,9 @@ system information
 
    :bsdman:`ssh` $USER\@$HOST command%Run command on $HOST as $USER (default command=shell)
    :bsdman:`ssh` -f -Y $USER\@$HOSTNAME xterm%Run GUI command on $HOSTNAME as $USER
+   :bsdman:`ssh` -c arcfour128 -f -Y $USER\@$LANHOST xterm%Run GUI command on $LANHOST as $USER with :ref:`faster crypto <ssh_ciphers>`.
    :bsdman:`scp` -p -r -C $USER\@$HOST: file dir/%Copy with permissions to $USER's home directory on $HOST, compress  for slow links.
-   :bsdman:`scp` -c arcfour256 $USER\@$LANHOST: bigfile%Use `faster crypto <http://blog.famzah.net/2010/06/11/openssh-ciphers-performance-benchmark/>`_ for local LAN. Use `blowfish <http://en.wikipedia.org/wiki/Blowfish_(cipher)>`_ for a quick cypher stronger than `RC4  <http://en.wikipedia.org/wiki/RC4>`_.
+   :bsdman:`scp` -c arcfour128 $USER\@$LANHOST: bigfile%Use :ref:`faster crypto <ssh_ciphers>` for local LAN. Use `blowfish <http://en.wikipedia.org/wiki/Blowfish_(cipher)>`_ for a quick cypher stronger than `RC4  <http://en.wikipedia.org/wiki/RC4>`_.
    :bsdman:`ssh` -g -L 8080:localhost:80 root\@$HOST%Forward connections to $HOSTNAME:8080 out to $HOST:80
    :bsdman:`ssh` -R 1434\:imap\:143 root\@$HOST%Forward connections from $HOST:1434 in to imap\:143
    :bsdman:`ssh-copy-id` $USER\@$HOST%Install public key for $USER\@$HOST for password-less log in
@@ -265,7 +294,7 @@ networking
    :man:`lsof` -i :5800%What is using `port 5800 <http://www.whatportis.com/5800>`_.
    :man:`lsof` -i @192.168.1.5:22%connections to host 192.168.1.5 port 22
    `curl <http://curl.haxx.se/docs/manpage.html>`_ -I htps://github.org%Display the server headers for a web site.
-   `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc |`gpg`_ --import%Import a gpg key from the web
+   `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc | :man:`gpg` --import%Import a gpg key from the web
    `curl <http://curl.haxx.se/docs/manpage.html>`_ ifconfig.me%get your external address through `ifconfig.me <http://ifconfig.me>`_
    sudo :man:`apache2ctl` -S%Display a list of apache virtual hosts
 
@@ -277,22 +306,22 @@ See `sed manual <sed>`_ and
 
 .. csv-table::
    :delim: %
-   :widths: 50, 60
+   :widths: 55, 55
 
-   sed -n '8,12p'%Print lines 8 to 12
-   sed -n '/regexp/p'%Print lines which match regular expression
-   sed '/regexp/d'%Print lines which don't match regular expression
-   sed -n '/begregexp/,/endregexp/p'%Print section of file between two regexp
-   sed '/begregexp/,/endregexp/d'%Print file except section between two regexp
-   sed '/^#/d; /^ *$/d'%Remove comments and blank lines
-   sed -i 's/[ \\t]*$//' file.txt%Delete trailing space at end of lines
-   sed -e :a -e '/^\\n*$/{$d;N;ba' -e '}'%Delete blank lines at end of file.
-   sed -i 42d ~/.ssh/known_hosts%Delete a particular line
-   sed ':a; /\\\\$/N; s/\\\\\\n//; ta'%Concatenate lines with trailing \\
-   sed = filename | sed 'N;s/\\n/\\t/'%Put a left count number on each line of a file
-   sed = filename | sed 'N; s/^/     /; s/ *\\(.\\{6,\\}\\)\\n/\\1  /'%Put a right aligned count on each line
-   sed 's/\\x0D$//'%Dos to unix eol
-   sed 's/$/\\r/'%Unix to dos eol
+   ``sed -n '8,12p'``%Print lines 8 to 12
+   ``sed -n '/regexp/p'``%Print lines which match regular expression
+   ``sed '/regexp/d'``%Print lines which don't match regular expression
+   ``sed -n '/begregexp/,/endregexp/p'``%Print section of file between two regexp
+   ``sed '/begregexp/,/endregexp/d'``%Print file except section between two regexp
+   ``sed '/^#/d; /^ *$/d'``%Remove comments and blank lines
+   ``sed -i 's/[ \t]\*$//' file.txt``%Delete trailing space at end of lines
+   ``sed -e :a -e '/^\n*$/N;/\n$/ba'``%Delete blank lines at end of file.
+   ``sed -i 42d ~/.ssh/known_hosts``%Delete a particular line
+   ``sed ':a; /\\$/N; s/\\\n//; ta'``%Concatenate lines with trailing ``\``
+   ``sed = filename | sed 'N;s/\n/\t/'``%Put a left count number on each line of a file
+   ``sed = filename | sed 'N; s/^/     /; s/ *\(.\{6,\}\)\n/\1  /'``%Put a right aligned count on each line
+   ``sed 's/\x0D$//'``%Dos to unix eol
+   ``sed 's/$/\\r/'``%Unix to dos eol
 
 ACL and Extended Attributes
 ---------------------------
@@ -310,6 +339,19 @@ ACL and Extended Attributes
    :bsdman:`setcap` cap_net_raw+ep your_gtk_prog%Allow gtk program raw access to network
    `getfattr <http://linux.die.net/man/1/getfattr>`_ -m- -d%Show all extended attributes (includes selinux,acls,...)
    `setfattr <http://linux.die.net/man/1/getfattr>`_ -n "user.foo" -v "bar" .%Set arbitrary user attributes
+
+Desktop management
+------------------
+.. csv-table::
+   :delim: %
+   :widths: 50, 60
+
+   :man:`wmctrl` -l%List windows managed by the window manager.
+   :man:`wmctrl` -l -x%List managed windows with their ``WM_CLASS``.
+   :man:`wmctrl` -d%List desktops, current desktop has a ``*``
+   :man:`wmctrl` -s 3%switch to desktop 3
+   :man:`wmctrl` -a emacs%switch to emacs\' desktop and raise it.
+   :man:`wmctrl` -r emacs -t2%send emacs to third desktop
 
 Refs
 ----
