@@ -21,6 +21,8 @@ Contents:
    devices.rst
    encrypt.rst
    gnupg.rst
+   vi_cheatsheet
+   nano.rst
 
 Indices and tables
 ==================
