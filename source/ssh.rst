@@ -145,6 +145,7 @@ References
 
 ssh memo
 --------
+See the :ref:`ssh commands <ssh_commands>` in the :ref:`linux_command_memo`.
 
 -   You can fix the control path of your connections by putting in
     ``~/.ssh/config``
@@ -258,8 +259,25 @@ Ssh port forwarding
 
         $ sudo -u <user> $SHELL -c "xauth add $(xauth list :${DISPLAY##*:}); <xprogram>"
 
+.. _ssh_ciphers:
+
 Cipher Performances
 -------------------
+The list of supported symmetric **cipher**, supported message integrity
+codes (**MAC**), key exchange algorithms (**KEX**), and **key** types
+are displayed by using the ``-Q`` option::
+
+  ssh -Q cipher
+
+the result should contain :wikipedia:`triple DES <triple DES>`,
+:wikipedia:`blowfish <blowfish>`, :wikipedia:`cast128 <cast128>`,
+:wikipedia:`arcfour <RC4>` also spelled :wikipedia:`RC4 <RC4>`,
+:wikipedia:`aes <aes>`
+
+:wikipedia:`Arcfour <RC4>` is now known to be vulnerable  to some complex
+attacks, so it should not be used in exposed situations; but the speed
+of arcfour let him stand as a good candidate on firewalled local area networks.
+
 We find some tests in
 `ssh speed tests
 <http://www.damtp.cam.ac.uk/user/ejb48/sshspeedtests.html>`_
