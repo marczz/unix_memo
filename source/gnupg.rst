@@ -1,9 +1,11 @@
-GPG Memo
-========
-
-For all commands a running
-`gpg-agent <http://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html>`__
-avoid to enter again your passphrase in the same session.
+GnuPG Memo
+==========
+References:
+    -    `Using the GNU Privacy Guard
+         <http://www.gnupg.org/documentation/manuals/gnupg/>`_
+    -    `Invoking GPG
+         <http://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html>`_
+         is an online version of the gpg2(1) manual.
 
 Gpg commands by category
 ------------------------
@@ -12,6 +14,9 @@ Gpg commands by category
    :depth: 2
    :local:
 
+For all commands a running
+`gpg-agent <http://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html>`__
+avoid to enter again your passphrase in the same session.
 
 list of keys
 ~~~~~~~~~~~~
