@@ -101,7 +101,7 @@ archives and compression
    :delim: %
    :widths: 50, 60
 
-   `gpg`_ -c file%Encrypt file.
+   `gpg`_ -c file%Encrypt file. More commands in the :ref:`gnupg_memo`.
    `gpg`_ file.gpg%Decrypt file.
    :man:`tar` -cj dir/  > dir.tar.bz2%Make bzip2 compressed archive of dir/
    :man:`tar` -jxf dir.tar.bz2%Extract archive (replace **j**, by **z** for gzip, or `--lzip`)
@@ -234,6 +234,8 @@ system information
 
 :bsdman:`ssh`
 -------------
+More info in the :ref:`ssh section <ssh_section>`.
+
 .. csv-table::
    :delim: %
    :widths: 50, 60
@@ -241,8 +243,9 @@ system information
    :bsdman:`ssh` $USER\@$HOST command%Run command on $HOST as $USER (default command=shell)
    :bsdman:`ssh` -f -Y $USER\@$HOSTNAME xterm%Run GUI command on $HOSTNAME as $USER
    :bsdman:`ssh` -c arcfour128 -f -Y $USER\@$LANHOST xterm%Run GUI command on $LANHOST as $USER with :ref:`faster crypto <ssh_ciphers>`.
+   :man:`tar` -cf- src | :bsdman:`ssh` -q -c arcfour128 $LANHOST tar -xf- -Cdest% :ref:`quick directory transfer <ssh_file_transfer>`.
    :bsdman:`scp` -p -r -C $USER\@$HOST: file dir/%Copy with permissions to $USER's home directory on $HOST, compress  for slow links.
-   :bsdman:`scp` -c arcfour128 $USER\@$LANHOST: bigfile%Use :ref:`faster crypto <ssh_ciphers>` for local LAN. Use `blowfish <http://en.wikipedia.org/wiki/Blowfish_(cipher)>`_ for a quick cypher stronger than `RC4  <http://en.wikipedia.org/wiki/RC4>`_.
+   :bsdman:`scp` -c arcfour128 $USER\@$LANHOST: bigfile%Use :ref:`faster crypto <ssh_ciphers>` for local LAN, but :ref:`tar over ssh is to be preferred <ssh_file_transfer>`.
    :bsdman:`ssh` -g -L 8080:localhost:80 root\@$HOST%Forward connections to $HOSTNAME:8080 out to $HOST:80
    :bsdman:`ssh` -R 1434\:imap\:143 root\@$HOST%Forward connections from $HOST:1434 in to imap\:143
    :bsdman:`ssh-copy-id` $USER\@$HOST%Install public key for $USER\@$HOST for password-less log in
