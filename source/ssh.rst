@@ -1,3 +1,5 @@
+.. _ssh_section:
+
 SSH
 ===
 ..  highlight:: shell-session
@@ -60,14 +62,6 @@ References
     shows you how to use ssh-agent, ssh-add and keychain. The `third
     article <http://www-106.ibm.com/developerworks/linux/library/l-keyc3/>`_
     explains ssh-agent authentication forwarding mechanism.
--   Nick Burch has written a two parts tutorial `SSH Tips and Tricks Part
-    1 <http://www.torchbox.com/blog/ssh-tips-and-tricks-part-1>`_ and
-    `Part 2 <http://www.torchbox.com/blog/ssh-tips-and-tricks-part-2>`_;
-    it reminds us about the ``ControlMaster`` and ``ControlPath`` that
-    allow the connection sharing on the same socket.
--   `Suno Ano ssh pages <http://sunoano.name/ws/public_xhtml/ssh.html>`_
-    Includes detailled recipes for ssh daily use and daemon
-    configuration.
 -   Van Emery: `Useful OpenSSL
     Tricks <http://www.vanemery.com/Linux/Apache/openSSL.html>`_, `X over
     SSH <http://www.vanemery.com/Linux/XoverSSH/X-over-SSH2.html>`_
@@ -147,33 +141,18 @@ ssh memo
 --------
 See the :ref:`ssh commands <ssh_commands>` in the :ref:`linux_command_memo`.
 
--   You can fix the control path of your connections by putting in
-    ``~/.ssh/config``
+-   To get the public key from the private one::
 
-    ..  code:: cfg
+      $ openssl rsa -in rsa_key.priv -pubout
 
-        Host *
-        ControlPath ~/.ssh/sshsocket-%r@%h:%p
+authorized-keys
+~~~~~~~~~~~~~~~
 
-    then you can set first a master connection by adding the option
-    ``-M`` to your ssh command. The following connections will use the
-    same control socket. and will not ask for any authentication If you
-    don't want to use ``-M`` you can put in your ssh config
-
-    .. code:: cfg
-
-        Host *
-        ControlMaster auto
-
-    you can also use ``ask`` to be asked if you want to reuse an existing
-    connection and ``autoask`` to combine both options
--   If you use ``ControlMaster`` you need to specify
-    ``-o ControlMaster=no`` when using ssh to do ssh tunneling.
--   in the file ``authorized-keys`` protocol 2 public key consist of:
+-   The file ``authorized-keys`` protocol 2 public key consist of:
     options, keytype, base64-encoded key, comment. Where options are
     separated by a comma
 -   You can secure ssh when using a key without passphrase by putting
-    **options** in your authorized\_keys file. Options allow you to
+    **options** in your authorized_keys file. Options allow you to
     restrict to some clients, limit port forwarding, or force the use of
     a predefined command. The options are listed in the `SSHRC section of
     sshd man
@@ -190,9 +169,42 @@ See the :ref:`ssh commands <ssh_commands>` in the :ref:`linux_command_memo`.
         tunnel="0",command="sh /etc/netstart tun0" ssh-rsa AAAA...==  jane@example.net
 
 
--   To get the public key from the private one::
 
-      $ openssl rsa -in rsa_key.priv -pubout
+Connection sharing
+~~~~~~~~~~~~~~~~~~
+
+You can enable connection sharing over a single network connection
+by setting ``ControlMaster`` to ``yes``. **ssh** will listen for
+connections on a control socket specified using the ``ControlPath``
+argument.
+
+These feature are described in the
+:bsdman:`ssh_config(5) manual page <ssh_config>` under the
+``ControlMaster``, ``ControlPath`` and ``ControlPersist`` options.
+
+You can fix the control path of your connections by putting in
+``~/.ssh/config``
+
+..  code:: cfg
+
+    Host *
+    ControlPath ~/.ssh/sshsocket-%r@%h:%p
+
+then you can set first a master connection by adding the option
+``-M`` to your ssh command. The following connections will use the
+same control socket. and will not ask for any authentication If you
+don't want to use ``-M`` you can put in your ssh config
+
+.. code:: cfg
+
+    Host *
+    ControlMaster auto
+
+you can also use ``ask`` to be asked if you want to reuse an existing
+connection and ``autoask`` to combine both options
+
+If you use ``ControlMaster`` you need to specify
+``-o ControlMaster=no`` when using ssh to do ssh tunneling.
 
 Ssh port forwarding
 -------------------
@@ -293,7 +305,33 @@ For arcfour we have to
 `prefer arcfour128
 <http://security.stackexchange.com/questions/26765/what-are-the-differences-between-the-arcfour-arcfour128-and-arcfour256-ciphers>`_
 
+For extra security on wan we can use `blowfish <http://en.wikipedia.org/wiki/Blowfish_(cipher)>`_ for a quick cypher stronger than `RC4  <http://en.wikipedia.org/wiki/RC4>`_.
 
+.. _ssh_file_transfer:
+
+File transfer on a quick link
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The `ssh speed tests
+<http://www.damtp.cam.ac.uk/user/ejb48/sshspeedtests.html>`_
+article point out that for file transfer we get a better gain, no by
+only choosing a proper cipher, but mainly by using the appropriate
+method.
+
+This article compare *scp*, *tar over ssh*, *rsync*, *sshfs* when
+transferring compressible or incompressible data. He shows *tar over
+ssh* without compression at 100MB/S while scp at 10MB/s and sshfs at
+4MB/s.
+
+In this test with a gigabit connection, compression of the tar or scp
+decrease the speed; of course it would be no longer true with slow
+links, but even then we must care that bzip2 is too slow to be used
+for on-the-fly compression.
+
+The main conclusion is that to transfer a big directory on a fast lan the
+better is::
+
+  tar -cf- src | ssh -q -c arcfour128 lanhost tar -xf- -Cdest
 
 
 .. comment
