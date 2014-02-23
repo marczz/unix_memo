@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Unix Memo's documentation!
-=====================================
+Welcome to Unix Memo
+====================
 
 Contents:
 
@@ -23,6 +23,7 @@ Contents:
    gnupg.rst
    vi_cheatsheet
    nano.rst
+   network
 
 Indices and tables
 ==================
