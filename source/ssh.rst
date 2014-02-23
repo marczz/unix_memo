@@ -333,6 +333,106 @@ better is::
 
   tar -cf- src | ssh -q -c arcfour128 lanhost tar -xf- -Cdest
 
+sshd config
+~~~~~~~~~~~
+
+Match directive examples
+++++++++++++++++++++++++
+
+An example of overriding settings on a per-user basis
+from the sshd configuration example in the *openssh* package::
+
+    Match User anoncvs
+           X11Forwarding no
+           AllowTcpForwarding no
+           PermitTTY no
+           ForceCommand cvs server
+
+and older examples previously posted by Darren Tucker
+::
+
+    # allow anyone to authenticate normally from the local net
+    Match Address 192.168.0.0/24
+            RequiredAuthentications default
+
+    # allow admins from the dmz with pubkey and password
+    Match Group admins Address 1.2.3.0/24
+            RequiredAuthentications publickey,password
+
+    # deny untrusted and local users from any other net
+    Match Group untrusted,lusers
+            RequiredAuthentications deny
+
+    # anyone else gets normal behaviour
+    Match all
+            RequiredAuthentications default
+
+    There's also some potential for other things too:
+
+    Match User anoncvs
+            PermitTcpForwarding no
+
+    Match Group nosftp
+            Subsystem sftp /bin/false
+
+ssh config
+~~~~~~~~~~
+
+Match directive
++++++++++++++++
+
+The match directive is available also for the client since 6.4.
+
+I use it to detect local subnets like::
+
+    # faster ciphers for lan
+    Match exec "local_ip %h"
+         Ciphers arcfour128,blowfish-cbc,aes128-cbc
+    Match exec "local_ip --local '^129\.20\.233' %h"
+         Ciphers arcfour128,blowfish-cbc,aes128-cbc
+
+here local ip is a python function that match the ip associated with
+an hostname::
+
+    import socket
+    import re
+    import sys
+    private_re = r'^192\.168\.\d\d?\d?\.\d\d?\d?$'
+    private_re += '|' + r'10\.\d\d?\d?\.\d\d?\d?\.\d\d?\d?$'
+    private_re += '|'  + r'172\.(?:1[0-6]|2\d|3[0-1])\.\d\d?\d?.\d\d?\d?$'
+
+    def check_local(local_re, hostname):
+        local = re.compile(local_re)
+        hostip = socket.gethostbyname(hostname)
+        return local.match(hostip)
+
+    def main():
+        import argparse
+        parser = argparse.ArgumentParser(description='Match local ips.')
+        parser.add_argument('hostname', help='hostname or ip')
+        parser.add_argument('--local', dest='local_re', default=private_re)
+        args = parser.parse_args()
+        raise SystemExit(0 if check_local(args.local_re, args.hostname) else 1)
+
+    if __name__ == '__main__':
+        main()
+
+With these settings when I target a local subnet my settings are used,
+we can check it with the ``-v`` *verbose* option::
+
+    OpenSSH_6.5, OpenSSL 1.0.1f 6 Jan 2014
+    debug1: Reading configuration data /home/marc/.ssh/config
+    debug1: Executing command: 'local_ip 129.20.233.52'
+    debug1: permanently_drop_suid: 1206
+    debug1: Executing command: 'local_ip --local '^129\\.20\\.233' 129.20.233.52'
+    debug1: permanently_drop_suid: 1206
+    debug1: /home/marc/.ssh/config line 11: matched 'exec "local_ip --local '^129\\.20\\.233' 129.20.233.52"'
+    .....
+    debug1: SSH2_MSG_KEXINIT sent
+    debug1: SSH2_MSG_KEXINIT received
+    debug1: kex: server->client arcfour128 hmac-md5 none
+    debug1: kex: client->server arcfour128 hmac-md5 none
+
 
 .. comment
 
