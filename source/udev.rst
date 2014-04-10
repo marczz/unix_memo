@@ -1,10 +1,13 @@
+..  _udev:
+
 Udev device Management and usb devices
 ======================================
 
 -  :mzlinux:`MZlinux udev/hotplug Page </node/151>`
--  `lspci(8) <http://man.cx/lspci>`__,
-   `lshw <http://man.cx/lshw>`__ and `hwinfo <http://man.cx/hwinfo>`__
-
+-  :man:`lspci(8)`,
+   :man:`lshw(1)` and `hwinfo <https://github.com/openSUSE/hwinfo>`_.
+-  `lsusb(8) <http://linux.die.net/man/8/lsusb>`_.
+-  `udevadm(8) <http://linux.die.net/man/8/udevadm>`_.
 
 localrules
 ----------

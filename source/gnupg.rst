@@ -1,3 +1,5 @@
+.. _gnupg_memo:
+
 GnuPG Memo
 ==========
 References:
