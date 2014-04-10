@@ -3,6 +3,10 @@ Network commands
 
 nmap
 ----
+References:
+    `nmap home page: nmap.org <http://nmap.org/>`_, `nmap tutorial
+    <http://nmap.org/bennieston-tutorial/>`_,
+    `Nmap Reference Guide <http://nmap.org/book/man.html>` 
 
 Target Specification
 ~~~~~~~~~~~~~~~~~~~~
@@ -78,6 +82,25 @@ Probing Options
   | -PM           | Use ICMP Netmask Request           |
   +---------------+------------------------------------+
 
+
+Timing
+~~~~~~
+Time between packets.
+
++-----+---------------+
+| -T0 | -T paranoid   |
++-----+---------------+
+| -T1 | -T sneaky     |
++-----+---------------+
+| -T2 | -T polite     |
++-----+---------------+
+| -T3 | -T normal     |
++-----+---------------+
+| -T4 | -T aggressive |
++-----+---------------+
+| -T5 | -T insane     |
++-----+---------------+
+
 Examples
 ~~~~~~~~
 More details in `nmap.org examples <http://nmap.org/book/man-examples.html>`_
@@ -92,5 +115,5 @@ More details in `nmap.org examples <http://nmap.org/book/man-examples.html>`_
 +----------------------------------------------------+-----------------------------------------------------------+
 | nmap -sP -PS 198.116.1.0/24                        | Discover hosts with TCP SYN ping scans                    |
 +----------------------------------------------------+-----------------------------------------------------------+
-| nmap -T4 -n -Pn -p- 198.116.0.0/16                 | quick scan, no dns, no ping                               |
+| nmap -T4 -n -Pn -p- 198.116.0.0/16                 | quick scan: aggressive, no dns, no ping                             |
 +----------------------------------------------------+-----------------------------------------------------------+
