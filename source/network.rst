@@ -6,7 +6,7 @@ nmap
 References:
     `nmap home page: nmap.org <http://nmap.org/>`_, `nmap tutorial
     <http://nmap.org/bennieston-tutorial/>`_,
-    `Nmap Reference Guide <http://nmap.org/book/man.html>` 
+    `Nmap Reference Guide <http://nmap.org/book/man.html>`_.
 
 Target Specification
 ~~~~~~~~~~~~~~~~~~~~
@@ -68,19 +68,19 @@ Scan Types
 Probing Options
 ~~~~~~~~~~~~~~~
 
-  +---------------+------------------------------------+
-  | -Pn           | Don't probe                        |
-  +---------------+------------------------------------+
-  | -PB           | Default probe (TCP 80, 445 & ICMP) |
-  +---------------+------------------------------------+
-  | -PS<portlist> | probe TCP ports                    |
-  +---------------+------------------------------------+
-  | -PE           | Use ICMP Echo Request              |
-  +---------------+------------------------------------+
-  | -PP           | Use ICMP Timestamp Request         |
-  +---------------+------------------------------------+
-  | -PM           | Use ICMP Netmask Request           |
-  +---------------+------------------------------------+
++---------------+------------------------------------+
+| -Pn           | Don't probe                        |
++---------------+------------------------------------+
+| -PB           | Default probe (TCP 80, 445 & ICMP) |
++---------------+------------------------------------+
+| -PS<portlist> | probe TCP ports                    |
++---------------+------------------------------------+
+| -PE           | Use ICMP Echo Request              |
++---------------+------------------------------------+
+| -PP           | Use ICMP Timestamp Request         |
++---------------+------------------------------------+
+| -PM           | Use ICMP Netmask Request           |
++---------------+------------------------------------+
 
 
 Timing
@@ -115,5 +115,5 @@ More details in `nmap.org examples <http://nmap.org/book/man-examples.html>`_
 +----------------------------------------------------+-----------------------------------------------------------+
 | nmap -sP -PS 198.116.1.0/24                        | Discover hosts with TCP SYN ping scans                    |
 +----------------------------------------------------+-----------------------------------------------------------+
-| nmap -T4 -n -Pn -p- 198.116.0.0/16                 | quick scan: aggressive, no dns, no ping                             |
+| nmap -T4 -n -Pn -p- 198.116.0.0/16                 | quick scan: aggressive, no dns, no ping                   |
 +----------------------------------------------------+-----------------------------------------------------------+
