@@ -4,10 +4,12 @@ Udev device Management and usb devices
 ======================================
 
 -  :mzlinux:`MZlinux udev/hotplug Page </node/151>`
--  :man:`lspci(8)`,
-   :man:`lshw(1)` and `hwinfo <https://github.com/openSUSE/hwinfo>`_.
--  `lsusb(8) <http://linux.die.net/man/8/lsusb>`_.
--  `udevadm(8) <http://linux.die.net/man/8/udevadm>`_.
+-  :man:`udev(7)`
+-  :man:`lsusb(8)`.
+-  :man:`udevadm(8)`.
+-  to detect hardware including bus information :man:`lspci(8)`,
+   :man:`lshw(1)` and the *Suse* tool
+   `hwinfo <https://github.com/openSUSE/hwinfo>`_ (also in debian).
 
 localrules
 ----------
