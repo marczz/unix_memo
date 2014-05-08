@@ -41,9 +41,11 @@ File searching
 
    :coreutils:`ls` -lt%List files by date, newest first
    :coreutils:`ls` /usr/bin | :coreutils:`pr` -T9 -W$COLUMNS%Print in 9 columns to width of terminal
-   `find`_ -name '\*.[ch]' | xargs grep -E 'expr'%Search 'expr' in this dir and below.
-   `find`_ -type f -print0 | xargs -r0 grep -F 'example'%Search all regular files for 'example' in this dir and below
-   `find`_ -maxdepth 1 -type f | xargs grep -F 'example'%Search all regular files for 'example' in this dir
+   `find`_ -maxdepth 1 -type f -print0 | `xargs`_ -0 ls -lS --block-size=1k%List files by decreasing size
+   `find` -size +1M -ls%List files bigger than 1 Megabyte.
+   `find`_ -name '\*.[ch]' | `xargs`_ grep -E 'expr'%Search 'expr' in this dir and below.
+   `find`_ -type f -print0 | `xargs`_ -r0 grep -F 'example'%Search all regular files for 'example' in this dir and below
+   `find`_ -maxdepth 1 -type f | `xargs`_ grep -F 'example'%Search all regular files for 'example' in this dir
    `find`_ -maxdepth 1 -type d | while read dir; do echo $dir; echo cmd2; done%Process each item with multiple commands (in while loop)
    `find`_. -xtype l%Find broken links
    `find`_ -type f ! -perm -444%Find files not readable by all (useful for web site)
@@ -61,8 +63,9 @@ disk space
 
    :coreutils:`ls` -lkS%Show files by size in kb, biggest first.
    :coreutils:`ls` -lt%sort by modification time, newest first
-   :coreutils:`du` -s * | :coreutils:`sort` -k1,1rn | :coreutils:`head`%Show top disk users in current dir.
+   :coreutils:`du` -sh * | :coreutils:`sort` -k1,1rh | :coreutils:`head`%Show larger directories in current dir.
    sudo :coreutils:`du` -hs /home/* | :coreutils:`sort` -k1,1h%Sort paths by increasing use
+   :coreutils:`du` -ah --max-depth=0 * | :coreutils:`sort` -k1,1rh | :coreutils:`head` -n 15%Show 15 larger directories or files in current dir.
    :coreutils:`df` -h%Show free space on mounted filesystems
    :coreutils:`df` -i%Show free inodes on mounted filesystems
    sudo :man:`sfdisk` -l /dev/sda%Show disks partitions sizes and types (MBR part)
@@ -107,7 +110,7 @@ archives and compression
    :man:`tar` -jxf dir.tar.bz2%Extract archive (replace **j**, by **z** for gzip, or `--lzip`)
    :man:`tar` -c dir/ | gzip | `gpg`_ -c | :man:`ssh` user\@remote 'dd of=dir.tar.gz.gpg'%Make encrypted archive of dir/ on remote machine.
    `find`_ dir/ -name '\*.txt' | :man:`tar` -c --files-from=- | bzip2 > dir\_txt.tar.bz2%Make archive of subset of dir/ and below.
-   `find`_ dir/ -name '\*.txt' | xargs :coreutils:`cp` -a --target-directory=dir\_txt/ --parents%Make copy of subset of dir/ and below.
+   `find`_ dir/ -name '\*.txt' | `xargs`_ :coreutils:`cp` -a --target-directory=dir\_txt/ --parents%Make copy of subset of dir/ and below.
    ( :man:`tar` -c /dir/to/copy ) | ( cd /where/to/ && :man:`tar` -x -p )%Copy (with permissions) copy/ dir to /where/to/ dir
    ( cd /dir/to/copy && :man:`tar` -c **.** ) | ( cd /where/to/ && :man:`tar` -x -p )%Copy (with permissions) contents of copy/ dir to /where/to/
    ( :man:`tar` -c /dir/to/copy ) | :man:`ssh` -C user\@remote 'cd /where/to/ && :man:`tar` -x -p'%Copy (with permissions) copy/ dir to remote:/where/to/ dir
@@ -381,6 +384,7 @@ Refs
 .. _dirstack: http://www.gnu.org/software/bash/manual/html_node/Directory-Stack-Builtins.html
 .. _grep: http://www.gnu.org/software/grep/manual/html_node/index.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
+.. _xargs: http://www.gnu.org/software/findutils/manual/html_node/find_html/xargs-options.html
 
 ..
    TODO: Complete with other commands from http://cb.vu/unixtoolbox.xhtml
