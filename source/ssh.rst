@@ -11,8 +11,10 @@ References
    :mzlinux:`MzLinux: Security and Encryption section <155>`  and
    :mzlinux:`MzLinux: Strong Passwords <286>`
 
--  Introduction: :wikipedia:`Secure Shell`,
-   :wikipedia:`OpenSSH`, :wikipedia:`SSh tunnel`,
+-  Introduction:
+   Wikipedia: :wikipedia:`Secure Shell`,
+   :wikipedia:`OpenSSH`, :wikipedia:`SSh tunnel`.
+
    `Openssh susefaq how-to
    <http://susefaq.sourceforge.net/howto/openssh.html>`_,
    `OpenSSH FAQ <http://www.openssh.com/faq.html>`_
@@ -305,7 +307,8 @@ For arcfour we have to
 `prefer arcfour128
 <http://security.stackexchange.com/questions/26765/what-are-the-differences-between-the-arcfour-arcfour128-and-arcfour256-ciphers>`_
 
-For extra security on wan we can use `blowfish <http://en.wikipedia.org/wiki/Blowfish_(cipher)>`_ for a quick cypher stronger than `RC4  <http://en.wikipedia.org/wiki/RC4>`_.
+For extra security on wan we can use :wikipedia:`blowfish
+<Blowfish_(cipher)>` for a quick cypher stronger than :wikipedia:`RC4`.
 
 .. _ssh_file_transfer:
 

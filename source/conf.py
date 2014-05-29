@@ -341,7 +341,7 @@ extlinks = {
     'man':('http://manpages.debian.net/cgi-bin/man.cgi?query=%s', ''),
     'bsdman':('http://www.openbsd.org/cgi-bin/man.cgi?query=%s', ''),
     'coreutils':('http://www.gnu.org/software/coreutils/manual/html_node/%s-invocation.html', ''),
-    'wikipedia':('http://en.wikipedia.org/wiki/%s', 'Wikipedia: '),
+    'wikipedia':('http://en.wikipedia.org/wiki/%s', ''),
     'mzlinux':('http://www.mzlinux.org/node/%s', ''),
     'cups':('http://www.cups.org/documentation.php/%s', ''),
     'locups':('http://localhost:631/help/%s', ''),
