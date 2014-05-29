@@ -41,7 +41,7 @@ File searching
 
    :coreutils:`ls` -lt%List files by date, newest first
    :coreutils:`ls` /usr/bin | :coreutils:`pr` -T9 -W$COLUMNS%Print in 9 columns to width of terminal
-   `find`_ -maxdepth 1 -type f -print0 | `xargs`_ -0 ls -lS --block-size=1k%List files by decreasing size
+   `find`_ -maxdepth 1 -type f -print0 | `xargs`_ -0 ls -lS |min2|\ block-size=1k%List files by decreasing size
    `find` -size +1M -ls%List files bigger than 1 Megabyte.
    `find`_ -name '\*.[ch]' | `xargs`_ grep -E 'expr'%Search 'expr' in this dir and below.
    `find`_ -type f -print0 | `xargs`_ -r0 grep -F 'example'%Search all regular files for 'example' in this dir and below
@@ -65,7 +65,7 @@ disk space
    :coreutils:`ls` -lt%sort by modification time, newest first
    :coreutils:`du` -sh * | :coreutils:`sort` -k1,1rh | :coreutils:`head`%Show larger directories in current dir.
    sudo :coreutils:`du` -hs /home/* | :coreutils:`sort` -k1,1h%Sort paths by increasing use
-   :coreutils:`du` -ah --max-depth=0 * | :coreutils:`sort` -k1,1rh | :coreutils:`head` -n 15%Show 15 larger directories or files in current dir.
+   :coreutils:`du` -ah |min2|\ max-depth=0 * | :coreutils:`sort` -k1,1rh | :coreutils:`head` -n 15%Show 15 larger directories or files in current dir.
    :coreutils:`df` -h%Show free space on mounted filesystems
    :coreutils:`df` -i%Show free inodes on mounted filesystems
    sudo :man:`sfdisk` -l /dev/sda%Show disks partitions sizes and types (MBR part)
@@ -109,8 +109,8 @@ archives and compression
    :man:`tar` -cj dir/  > dir.tar.bz2%Make bzip2 compressed archive of dir/
    :man:`tar` -jxf dir.tar.bz2%Extract archive (replace **j**, by **z** for gzip, or `--lzip`)
    :man:`tar` -c dir/ | gzip | `gpg`_ -c | :man:`ssh` user\@remote 'dd of=dir.tar.gz.gpg'%Make encrypted archive of dir/ on remote machine.
-   `find`_ dir/ -name '\*.txt' | :man:`tar` -c --files-from=- | bzip2 > dir\_txt.tar.bz2%Make archive of subset of dir/ and below.
-   `find`_ dir/ -name '\*.txt' | `xargs`_ :coreutils:`cp` -a --target-directory=dir\_txt/ --parents%Make copy of subset of dir/ and below.
+   `find`_ dir/ -name '\*.txt' | :man:`tar` -c |min2|\ files-from=- | bzip2 > dir\_txt.tar.bz2%Make archive of subset of dir/ and below.
+   `find`_ dir/ -name '\*.txt' | `xargs`_ :coreutils:`cp` -a |min2|\ target-directory=dir\_txt/ |min2|\ parents%Make copy of subset of dir/ and below.
    ( :man:`tar` -c /dir/to/copy ) | ( cd /where/to/ && :man:`tar` -x -p )%Copy (with permissions) copy/ dir to /where/to/ dir
    ( cd /dir/to/copy && :man:`tar` -c **.** ) | ( cd /where/to/ && :man:`tar` -x -p )%Copy (with permissions) contents of copy/ dir to /where/to/
    ( :man:`tar` -c /dir/to/copy ) | :man:`ssh` -C user\@remote 'cd /where/to/ && :man:`tar` -x -p'%Copy (with permissions) copy/ dir to remote:/where/to/ dir
@@ -127,13 +127,14 @@ process management
    :man:`ps` axuww%list all processes and resource used
    :man:`ps` axmu%list all processes and threads
    :man:`ps` axf -o pid,args%List processes in a hierarchy.
-   :man:`ps` ax -o pcpu,cpu,nice,state,cputime,args --sort -pcpu | :man:`sed` '/^ 0.0 /d'%List processes by  decreasing cpu rate (see also :man:`top`).
-   :man:`ps` ax -opid=,rss=,args= --sort=+rss | :man:`sed` '/^\s*0\>/d' | :coreutils:`pr` -TW$COLUMNS%List processes by mem (KB) usage (see also :man:`top`).
-   :man:`ps` -o user --sort user| :coreutils:`uniq` -c| :coreutils:`sort` -n -k1%number of processes per user.
-   :man:`ps` -C lighttpd -o pid=%pid of lighttpd
-   :man:`pgrep` lighttpd%pid of lighttpd
-   :man:`pgrep` -l daemon%pid-name of all processes having 'daemon' in their name
-   `pidof <http://linux.die.net/man/8/pidof>`_  lighttpd%pid of lighttpd
+   :man:`ps` ax -o pcpu,cpu,nice,state,cputime,args |min2|\ sort -pcpu | :man:`sed` '/^ 0.0 /d'%List processes by  decreasing cpu rate (see also :man:`top`).
+   :man:`ps` ax -opid=,rss=,args= |min2|\ sort=+rss | :man:`sed` '/^\s*0\>/d' | :coreutils:`pr` -TW$COLUMNS%List processes by mem (KB) usage (see also :man:`top`).
+   :man:`ps` -o user |min2|\ sort user| :coreutils:`uniq` -c| :coreutils:`sort` -n -k1%number of processes per user.
+   :man:`ps` -C lighttpd -o pid=%pid of *lighttpd*.
+   :man:`pgrep` light%pid of processes having *light* in their name.
+   :man:`pgrep` -a daemon%pid/command-line of all processes having *daemon* in their name
+   `pidof <http://linux.die.net/man/8/pidof>`_  lighttpd%pid of *lighttpd*.
+   :man:`ps` uw -C lighttpd%user oriented list of process *lighttpd*.
    :man:`ps` -C firefox-bin -L -o pid,tid,pcpu,state%List all threads for a particular process.
    :man:`ps` -p 666 -o etime=%List elapsed wall time for process id 666
    :man:`ps` ew 666%show command and environment of process 666
@@ -229,8 +230,8 @@ system information
    :man:`rsync` -avn source-dir/ target-dir/%what files differs (size mod time) between two directories.
    :man:`rsync` -avnc source-dir/ target-dir/%what files differs (checksum) between two directories.
    `rsync`_ -P rsync://rsync.server.com/path/to/file file%Use partial transfer, repeat for troublesome downloads.
-   `rsync`_ --bwlimit=1000 fromfile tofile%Locally copy with rate limit. It's like nice for I/O
-   `rsync`_ -az  --delete ~/public\_html/ remote.com:'~/public\_html'%Mirror web site (using compression and encryption)
+   `rsync`_ |min2|\ bwlimit=1000 fromfile tofile%Locally copy with rate limit. It's like nice for I/O
+   `rsync`_ -az  |min2|\ delete ~/public\_html/ remote.com:'~/public\_html'%Mirror web site (using compression and encryption)
    `rsync`_ -auz  remote:/dir/ **.** && `rsync`_ -auz  **.** remote:/dir/%Synchronize current directory with remote one.
 
 .. _ssh_commands:
@@ -265,9 +266,9 @@ More info in the :ref:`ssh section <ssh_section>`.
    `wget`_ ftp://remote/file[1-9].iso/%FTP supports globbing directly
    `wget`_ -q -O-  http://www.example.com/page%cat to /dev/stdout
    echo '`wget`_ url' | at 01:00%Download url at 1AM to current dir
-   `wget`_ --limit-rate=20k url%Do a low priority download (limit to 20KB/s)
-   `wget`_ -nv --spider --force-html -i bookmarks.html%Check links in a file
-   `wget`_ --mirror http://www.example.com/%Efficiently update a local copy of a site (handy from cron)
+   `wget`_ |min2|\ limit-rate=20k url%Do a low priority download (limit to 20KB/s)
+   `wget`_ -nv |min2|\ spider |min2|\ force-html -i bookmarks.html%Check links in a file
+   `wget`_ |min2|\ mirror http://www.example.com/%Efficiently update a local copy of a site (handy from cron)
 
 networking
 ----------
@@ -277,7 +278,7 @@ networking
    :widths: 50, 60
 
    `ethtool <http://linux.die.net/man/8/ethtool>`_ eth0%Show status of ethernet interface eth0
-   `ethtool <http://linux.die.net/man/8/ethtool>`_ --change eth0 autoneg off speed 100 duplex full%Manually set ethernet interface speed
+   `ethtool <http://linux.die.net/man/8/ethtool>`_ |min2|\ change eth0 autoneg off speed 100 duplex full%Manually set ethernet interface speed
    :man:`iwconfig` eth1%Show status of wireless interface eth1
    :man:`iwconfig` eth1 rate 1Mb/s fixed%Manually set wireless interface speed
    :man:`iwlist` scan%List wireless networks in range
@@ -293,16 +294,34 @@ networking
    :man:`whois` mzlinux.org%Lookup whois info for hostname or ip address
    sudo :man:`netstat` -tupl%List internet services on a system
    sudo :man:`netstat` -tup%List active connections to/from system
-   sudo `ss <http://linux.die.net/man/8/ss>`_ -tup%List active connections to/from system
+   sudo :man:`ss` -tup%List tcp and udp active connections to/from system
    :man:`iptraf`%interactive ncurses colorful IP LAN monitor.
    :man:`vnstat`%Console hourly, daily and monthly network traffic.
    :man:`lsof` -i tcp:443%What tcp connection is using `port 443 <http://www.whatportis.com/443>`_.
    :man:`lsof` -i :5800%What is using `port 5800 <http://www.whatportis.com/5800>`_.
    :man:`lsof` -i @192.168.1.5:22%connections to host 192.168.1.5 port 22
    `curl <http://curl.haxx.se/docs/manpage.html>`_ -I htps://github.org%Display the server headers for a web site.
-   `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc | :man:`gpg` --import%Import a gpg key from the web
+   `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc | :man:`gpg` |min2|\ import%Import a gpg key from the web
    `curl <http://curl.haxx.se/docs/manpage.html>`_ ifconfig.me%get your external address through `ifconfig.me <http://ifconfig.me>`_
    sudo :man:`apache2ctl` -S%Display a list of apache virtual hosts
+
+
+network manager
+---------------
+.. csv-table::
+   :delim: %
+   :widths: 55, 55
+
+   :man:`nm-tool`%state of network-manager including Wireless Access Points
+   :man:`nmcli` dev status%status of all devices
+   :man:`nmcli` -p dev wifi list%list all availables wifi access points
+   :man:`nmcli` -p dev list iface *wlan0*%detailled list of device and APs
+   :man:`nmcli` con list%list of registered connections
+   :man:`nmcli` dev wifi connect *FreeWifi*%setup and activate a new connection
+   :man:`nmcli` dev wifi connect *apssid* name *conname* password *private*%new connection with name and password
+   :man:`nmcli` con status id *MyWifi*%details of connection
+   :man:`nmcli` con up id *MyWifi* password *mypasswd*%connect with password
+   curl -F login=\ *myid*  -F password=\ *mypasswd* *https://wifi.provider.org/Auth*%Connect to open spot
 
 sed
 ---
@@ -329,9 +348,11 @@ See `sed manual <sed>`_ and
    ``sed 's/\x0D$//'``%Dos to unix eol
    ``sed 's/$/\\r/'``%Unix to dos eol
 
-ACL and Extended Attributes
----------------------------
-*Note you may need to (re)mount with "acl" or "user_xattr" options. Or set the filesystem default with tune2fs*
+:wikipedia:`ACL` and :wikipedia:`Extended Attributes`
+-----------------------------------------------------
+*Note: for ext 2/3/4 fs you may need to (re)mount with "acl" or
+"user_xattr" options. Or set the filesystem default with tune2fs. On
+btrfs acl and xattr are enabled by default.*
 
 .. csv-table::
    :delim: %
@@ -340,7 +361,7 @@ ACL and Extended Attributes
    :man:`getfacl` .%Show ACLs for file.
    :man:`setfacl` -m u:nobody:r .%Allow a specific user to read file.
    :man:`setfacl` -x u:nobody .%Delete a specific user's rights to file.
-   :man:`setfacl` --default -m group:users:rw- dir/%Set umask for a for a specific dir.
+   :man:`setfacl` |min2|\ default -m group:users:rw- dir/%Set umask for a for a specific dir.
    :bsdman:`getcap` file%Show capabilities for a program.
    :bsdman:`setcap` cap_net_raw+ep your_gtk_prog%Allow gtk program raw access to network
    `getfattr <http://linux.die.net/man/1/getfattr>`_ -m- -d%Show all extended attributes (includes selinux,acls,...)
@@ -352,12 +373,18 @@ Desktop management
    :delim: %
    :widths: 50, 60
 
+   :man:`xwininfo`%Info of the window selected by mouse click.
+   :man:`xwininfo -name emacs`%Emacs window info.
+   :man:`xprop`%Xserver properties of the window selected by mouse click.
+   :man:`xdpyinfo`%Xserver dimension and resolution.
    :man:`wmctrl` -l%List windows managed by the window manager.
    :man:`wmctrl` -l -x%List managed windows with their ``WM_CLASS``.
    :man:`wmctrl` -d%List desktops, current desktop has a ``*``
    :man:`wmctrl` -s 3%switch to desktop 3
    :man:`wmctrl` -a emacs%switch to emacs\' desktop and raise it.
    :man:`wmctrl` -r emacs -t2%send emacs to third desktop
+   :man:`wmctrl` -r emacs -e 0,-1,-1,756,495%resize emacs to 756x495 pixels
+   :man:`xdotool` search |min2|\ onlyvisible |min2|\ class *emacs* windowsize |min2|\ usehints |percent|\ 1 *80 24*%resize emacs to 80 lines x 24 columns
 
 Refs
 ----
@@ -372,9 +399,12 @@ Refs
 -  Other system command memos:
    `Unix Toolbox <http://cb.vu/unixtoolbox.xhtml>`_,
    `commandlinefu <http://www.commandlinefu.com/>`_,
+
+
    `shell-fu <http://www.shell-fu.org/>`_.
 
-
+.. |percent| unicode:: 0x25 .. % sign
+.. |min2| unicode:: 0x2d 0x2d .. - -
 .. _wget: http://www.gnu.org/software/wget/manual/wget.html
 .. _gpg: http://www.gnupg.org/documentation/manuals/gnupg/
 .. _rsync: http://www.samba.org/ftp/rsync/rsync.html
