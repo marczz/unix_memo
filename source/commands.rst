@@ -18,6 +18,15 @@ basic
    :man:`time` command%See how long a command takes
    :man:`time` cat%Start stopwatch. Ctrl-d to stop.
 
+files
+-----
+.. csv-table::
+   :delim: %
+   :widths: 50, 60
+
+   :man:`rename` 's/.jpeg$/.jpg/' \*.jpeg%Mass rename
+   `find`_ ./ -type f -print | `xargs`_ :coreutils:`chmod` 640%Change permissions to 640 for all files in subtree.
+   `find`_ ./ -type d -print | `xargs`_ :coreutils:`chmod` 751%Change permissions to 751 for all sub-directories.
 
 dir navigation
 --------------
@@ -42,7 +51,7 @@ File searching
    :coreutils:`ls` -lt%List files by date, newest first
    :coreutils:`ls` /usr/bin | :coreutils:`pr` -T9 -W$COLUMNS%Print in 9 columns to width of terminal
    `find`_ -maxdepth 1 -type f -print0 | `xargs`_ -0 ls -lS |min2|\ block-size=1k%List files by decreasing size
-   `find` -size +1M -ls%List files bigger than 1 Megabyte.
+   `find`_ -size +1M -ls%List files bigger than 1 Megabyte.
    `find`_ -name '\*.[ch]' | `xargs`_ grep -E 'expr'%Search 'expr' in this dir and below.
    `find`_ -type f -print0 | `xargs`_ -r0 grep -F 'example'%Search all regular files for 'example' in this dir and below
    `find`_ -maxdepth 1 -type f | `xargs`_ grep -F 'example'%Search all regular files for 'example' in this dir
@@ -373,18 +382,24 @@ Desktop management
    :delim: %
    :widths: 50, 60
 
+   :man:`xset` q%display X user preferences.
+   :man:`xset -b`%Turn off system beep
+   :man:`xset -b`%Turn on system beep
    :man:`xwininfo`%Info of the window selected by mouse click.
    :man:`xwininfo -name emacs`%Emacs window info.
    :man:`xprop`%Xserver properties of the window selected by mouse click.
    :man:`xdpyinfo`%Xserver dimension and resolution.
-   :man:`wmctrl` -l%List windows managed by the window manager.
+   :man:`wmctrl` -lG%List managed windows with their geometry.
    :man:`wmctrl` -l -x%List managed windows with their ``WM_CLASS``.
    :man:`wmctrl` -d%List desktops, current desktop has a ``*``
    :man:`wmctrl` -s 3%switch to desktop 3
-   :man:`wmctrl` -a emacs%switch to emacs\' desktop and raise it.
+   :man:`wmctrl` -a emacs%switch to  desktop containing emacs and raise it.
    :man:`wmctrl` -r emacs -t2%send emacs to third desktop
    :man:`wmctrl` -r emacs -e 0,-1,-1,756,495%resize emacs to 756x495 pixels
-   :man:`xdotool` search |min2|\ onlyvisible |min2|\ class *emacs* windowsize |min2|\ usehints |percent|\ 1 *80 24*%resize emacs to 80 lines x 24 columns
+   :man:`xdotool` search |min2|\ onlyvisible |min2|\ class *emacs* windowsize |min2|\ usehints |percent|\ 1 *80 24*%resize emacs to 80 columns x 24 lines.
+   :man:`xwit` -columns 80 -rows 24 -names foo%resize  *foo* window.
+   :man:`xwit` -columns 80 -rows 24 -select%select and resize a window.
+   :man:`xwit` -rows 34 -columns 80 -property WM_CLASS -names emacs%resize all emacs windows.
 
 Refs
 ----
@@ -399,8 +414,6 @@ Refs
 -  Other system command memos:
    `Unix Toolbox <http://cb.vu/unixtoolbox.xhtml>`_,
    `commandlinefu <http://www.commandlinefu.com/>`_,
-
-
    `shell-fu <http://www.shell-fu.org/>`_.
 
 .. |percent| unicode:: 0x25 .. % sign
