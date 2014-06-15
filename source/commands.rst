@@ -401,6 +401,20 @@ Desktop management
    :man:`xwit` -columns 80 -rows 24 -select%select and resize a window.
    :man:`xwit` -rows 34 -columns 80 -property WM_CLASS -names emacs%resize all emacs windows.
 
+Images manipulation
+-------------------
+.. csv-table::
+   :delim: %
+   :widths: 50, 60
+
+
+   `identify <http://www.imagemagick.org/script/identify.php>`_ *photo.jpg*%information about an image file
+   `convert <http://www.imagemagick.org/script/convert.php>`_ *photo.png* -resize 2048x1536 -quality 80 *photo.jpg*%resize an image
+   `convert <http://www.imagemagick.org/script/convert.php>`_ *apple.jpg* -crop 128×128+50+50 *apple_crop.jpg*%crop an image
+   `convert <http://www.imagemagick.org/script/convert.php>`_ *lying.jpg* -rotate 90 *standing.jpg*%rotate an image
+   `import <http://www.imagemagick.org/script/import.php>`_ *snapshot.jpg*%Take a snapshot of a mouse selected desktop area.
+
+
 Refs
 ----
 
