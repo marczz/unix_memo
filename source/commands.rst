@@ -416,15 +416,19 @@ Desktop management
 
 Images manipulation
 -------------------
+You can use `ImageMagick`_ or
+`GraphicsMagick <http://www.graphicsmagick.org>`_ with similar syntax except that you prepend the command ``gm`` for GraphicsMagick, and the option for input come before the input file in GraphicsMagick and **after** for `ImageMagick`_.
+
 .. csv-table::
    :delim: %
    :widths: 50, 60
 
 
    `identify <http://www.imagemagick.org/script/identify.php>`_ *photo.jpg*%information about an image file
-   `convert <http://www.imagemagick.org/script/convert.php>`_ *photo.png* -resize 2048x1536 -quality 80 *photo.jpg*%resize an image
-   `convert <http://www.imagemagick.org/script/convert.php>`_ *apple.jpg* -crop 128×128+50+50 *apple_crop.jpg*%crop an image
-   `convert <http://www.imagemagick.org/script/convert.php>`_ *lying.jpg* -rotate 90 *standing.jpg*%rotate an image
+   `convert`_ *photo.png* -resize 2048x1536 -quality 80 *photo.jpg*%resize an image
+   `convert`_ *apple.jpg* -crop 128×128+50+50 *apple_crop.jpg*%crop an image
+   `convert`_ *lying.jpg* -rotate 90 *standing.jpg*%rotate an image
+   `convert`_ \*.jpg ouput.pdf%Create a single PDF from multiple images with `ImageMagick`_
    `import <http://www.imagemagick.org/script/import.php>`_ *snapshot.jpg*%Take a snapshot of a mouse selected desktop area.
 
 
@@ -446,7 +450,9 @@ Refs
 .. |percent| unicode:: 0x25 .. % sign
 .. |min2| unicode:: 0x2d 0x2d .. - -
 .. _wget: http://www.gnu.org/software/wget/manual/wget.html
+.. _convert: http://www.imagemagick.org/script/convert.php
 .. _gpg: http://www.gnupg.org/documentation/manuals/gnupg/
+.. _ImageMagick:  http://www.imagemagick.org
 .. _rsync: http://www.samba.org/ftp/rsync/rsync.html
 .. _tcpdump: http://www.tcpdump.org/tcpdump_man.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
