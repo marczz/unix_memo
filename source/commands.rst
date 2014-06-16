@@ -123,6 +123,11 @@ archives and compression
    ( :man:`tar` -c /dir/to/copy ) | ( cd /where/to/ && :man:`tar` -x -p )%Copy (with permissions) copy/ dir to /where/to/ dir
    ( cd /dir/to/copy && :man:`tar` -c **.** ) | ( cd /where/to/ && :man:`tar` -x -p )%Copy (with permissions) contents of copy/ dir to /where/to/
    ( :man:`tar` -c /dir/to/copy ) | :man:`ssh` -C user\@remote 'cd /where/to/ && :man:`tar` -x -p'%Copy (with permissions) copy/ dir to remote:/where/to/ dir
+   :man:`zip` -r /path/to/archive.zip dir%zip a directory
+   :man:`unzip` archive.zip%extract archive
+   :man:`unzip` -l archive.zip%list archive content
+   :man:`unzip` archive.zip file.txt%Extract one file from archive
+   :coreutils:`dd` if=/dev/vg0/vol0 of=/dev/vg1/vol1 bs=4096%Copy a partition to another one (bs must be a divider of volume blocksize)
    :coreutils:`dd` bs=1M if=/dev/sda | gzip | :man:`ssh` user\@remote 'dd of=sda.gz'%Backup harddisk to remote machine.
    :man:`killall` -s USR1 dd%Ask dd to print the state of the current transfer.
 
