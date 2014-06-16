@@ -322,9 +322,9 @@ networking
    :man:`lsof` -i tcp:443%What tcp connection is using `port 443 <http://www.whatportis.com/443>`_.
    :man:`lsof` -i :5800%What is using `port 5800 <http://www.whatportis.com/5800>`_.
    :man:`lsof` -i @192.168.1.5:22%connections to host 192.168.1.5 port 22
-   `curl <http://curl.haxx.se/docs/manpage.html>`_ -I htps://github.org%Display the server headers for a web site.
-   `curl <http://curl.haxx.se/docs/manpage.html>`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc | :man:`gpg` |min2|\ import%Import a gpg key from the web
-   `curl <http://curl.haxx.se/docs/manpage.html>`_ ifconfig.me%get your external address through `ifconfig.me <http://ifconfig.me>`_
+   `curl`_ -I htps://github.org%Display the server headers for a web site.
+   `curl`_ -s https://ftp-master.debian.org/keys/archive-key-7.0.asc | :man:`gpg` |min2|\ import%Import a gpg key from the web
+   `curl`_ ifconfig.me%get your external address through `ifconfig.me <http://ifconfig.me>`_
    sudo :man:`apache2ctl` -S%Display a list of apache virtual hosts
 
 
@@ -343,7 +343,7 @@ network manager
    :man:`nmcli` dev wifi connect *apssid* name *conname* password *private*%new connection with name and password
    :man:`nmcli` con status id *MyWifi*%details of connection
    :man:`nmcli` con up id *MyWifi* password *mypasswd*%connect with password
-   curl -F login=\ *myid*  -F password=\ *mypasswd* *https://wifi.provider.org/Auth*%Connect to open spot
+   `curl`_ -F login=\ *myid*  -F password=\ *mypasswd* *https://wifi.provider.org/Auth*%Connect to open spot
 
 sed
 ---
@@ -451,6 +451,7 @@ Refs
 .. |min2| unicode:: 0x2d 0x2d .. - -
 .. _wget: http://www.gnu.org/software/wget/manual/wget.html
 .. _convert: http://www.imagemagick.org/script/convert.php
+.. _curl: http://curl.haxx.se/docs/manpage.html
 .. _gpg: http://www.gnupg.org/documentation/manuals/gnupg/
 .. _ImageMagick:  http://www.imagemagick.org
 .. _rsync: http://www.samba.org/ftp/rsync/rsync.html
