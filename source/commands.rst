@@ -449,18 +449,18 @@ Refs
 
 .. |percent| unicode:: 0x25 .. % sign
 .. |min2| unicode:: 0x2d 0x2d .. - -
-.. _wget: http://www.gnu.org/software/wget/manual/wget.html
 .. _convert: http://www.imagemagick.org/script/convert.php
 .. _curl: http://curl.haxx.se/docs/manpage.html
+.. _dirstack: http://www.gnu.org/software/bash/manual/html_node/Directory-Stack-Builtins.html
+.. _find: http://www.gnu.org/software/findutils/manual/html_node/find_html/index.html
 .. _gpg: http://www.gnupg.org/documentation/manuals/gnupg/
+.. _grep: http://www.gnu.org/software/grep/manual/html_node/index.html
 .. _ImageMagick:  http://www.imagemagick.org
 .. _rsync: http://www.samba.org/ftp/rsync/rsync.html
+.. _sed: http://www.gnu.org/software/sed/manual/sed.html
 .. _tcpdump: http://www.tcpdump.org/tcpdump_man.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
-.. _find: http://www.gnu.org/software/findutils/manual/html_node/find_html/index.html
-.. _dirstack: http://www.gnu.org/software/bash/manual/html_node/Directory-Stack-Builtins.html
-.. _grep: http://www.gnu.org/software/grep/manual/html_node/index.html
-.. _sed: http://www.gnu.org/software/sed/manual/sed.html
+.. _wget: http://www.gnu.org/software/wget/manual/wget.html
 .. _xargs: http://www.gnu.org/software/findutils/manual/html_node/find_html/xargs-options.html
 
 ..
