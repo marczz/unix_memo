@@ -300,9 +300,17 @@ networking
    :man:`ip` link set dev eth0 name wan%Rename interface eth0 to wan
    :man:`ip` link set dev eth0 up%Bring interface eth0 up (or down)
    :man:`ip` addr show%List addresses for interfaces
-   :man:`ip` addr add 1.2.3.4/24 brd + dev eth0%Add (or del) ip and mask (255.255.255.0)
+   :man:`ip` addr add 1.2.3.4/24 dev eth0%Add (or del) ip and mask (255.255.255.0)
    :man:`ip` route show%List routing table
    :man:`ip` route add default via 1.2.3.254%Set default gateway to 1.2.3.254
+   :man:`ip` route add 192.168.16.0/28 via 192.168.31.254%route subnet
+   :man:`ifconfig` -a%List network interfaces
+   :man:`ifconfig` eth0 1.2.3.4 up%Bring interface eth0 up (or down)
+   :man:`ifconfig` eth0 1.2.3.4 netmask 255.255.255.0%Add first ip and mask
+   :man:`ifconfig` eth0:0 1.2.3.5 netmask 255.255.255.0%Add additional ip and mask
+   :man:`route` -n%List routing table
+   :man:`route` add default gw 1.2.3.254%Set default gateway to 1.2.3.254
+   :man:`route` add -net 192.168.16.0 netmask 255.255.240.0 gw 192.168.31.254%route subnet
    :bsdman:`host` github.com%Lookup DNS ip address for name or vice versa
    :man:`hostname` -i%Lookup local ip address (equivalent to host \`hostname\`)
    :man:`whois` mzlinux.org%Lookup whois info for hostname or ip address
