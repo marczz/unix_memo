@@ -115,8 +115,10 @@ archives and compression
 
    `gpg`_ -c file%Encrypt file. More commands in the :ref:`gnupg_memo`.
    `gpg`_ file.gpg%Decrypt file.
-   :man:`tar` -cj dir/  > dir.tar.bz2%Make bzip2 compressed archive of dir/
+   :man:`tar` -cjf dir.tar.bz2 dir/%Make bzip2 compressed archive of dir/
    :man:`tar` -jxf dir.tar.bz2%Extract archive (replace **j**, by **z** for gzip, or `--lzip`)
+   :man:`tar` -cxf dir.tgz --exclude '\*.o' --exclude '\*~' dir/
+   :man:`tar` -xf dir.tgz --to-stdout  dir/file.txt%Print file to stdout
    :man:`tar` -c dir/ | gzip | `gpg`_ -c | :man:`ssh` user\@remote 'dd of=dir.tar.gz.gpg'%Make encrypted archive of dir/ on remote machine.
    `find`_ dir/ -name '\*.txt' | :man:`tar` -c |min2|\ files-from=- | bzip2 > dir\_txt.tar.bz2%Make archive of subset of dir/ and below.
    `find`_ dir/ -name '\*.txt' | `xargs`_ :coreutils:`cp` -a |min2|\ target-directory=dir\_txt/ |min2|\ parents%Make copy of subset of dir/ and below.
