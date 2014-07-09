@@ -131,6 +131,8 @@ archives and compression
    :man:`unzip` archive.zip file.txt%Extract one file from archive
    :coreutils:`dd` if=/dev/vg0/vol0 of=/dev/vg1/vol1 bs=4096%Copy a partition to another one (bs must be a divider of volume blocksize)
    :coreutils:`dd` bs=1M if=/dev/sda | gzip | :man:`ssh` user\@remote 'dd of=sda.gz'%Backup harddisk to remote machine.
+   :coreutils:`dd` bs=4096 if=/dev/vgsource/root_snap| :man:`ssh` -c arcfour128 rootr\@remote dd  bs=4096 of=/dev/vgremote/root_copy%copy a partition to remote machine
+   :coreutils:`dd` bs=4096 if=/dev/vg0/root_snap| | :man:`ssh`-c arcfour128 root
    :man:`killall` -s USR1 dd%Ask dd to print the state of the current transfer.
 
 process management
