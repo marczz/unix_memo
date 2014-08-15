@@ -302,6 +302,7 @@ networking
    :man:`iwlist` scan%List wireless networks in range
    :man:`ip` link show%List network interfaces
    :man:`ip` link set dev eth0 name wan%Rename interface eth0 to wan
+   :man:`ip` link set dev eth0 address 00:80:c8:f8:be:ef%Change mac address.
    :man:`ip` link set dev eth0 up%Bring interface eth0 up (or down)
    :man:`ip` addr show%List addresses for interfaces
    :man:`ip` addr add 1.2.3.4/24 dev eth0%Add (or del) ip and mask (255.255.255.0)
