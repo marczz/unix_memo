@@ -339,8 +339,26 @@ better is::
 sshd config
 ~~~~~~~~~~~
 
+AllowUsers
+++++++++++
+
+To restrict to some users and hosts the ssh access, we can use the
+directives *Allowusers*, *AllowGroups*, *DenyUsers*, *DenyGroups*.
+
+*Allowusers* can use patterns that takes the form *USER@HOST* to
+restrict to some user on specific hosts.
+
+Example::
+
+  AllowUsers john root@119.20.143.62 root@119.20.143.116
+          maint@119.20.143.*
+
 Match directive examples
 ++++++++++++++++++++++++
+
+*Match* deirectives are more powerfull than the *Allowusers*,
+*AllowGroups*, *DenyUsers*, *DenyGroups* directive but need more care
+to setup properly.
 
 An example of overriding settings on a per-user basis
 from the sshd configuration example in the *openssh* package::
@@ -391,7 +409,7 @@ I use it to detect local subnets like::
     # faster ciphers for lan
     Match exec "local_ip %h"
          Ciphers arcfour128,blowfish-cbc,aes128-cbc
-    Match exec "local_ip --local '^129\.20\.233' %h"
+    Match exec "local_ip --local '^119\.20\.143' %h"
          Ciphers arcfour128,blowfish-cbc,aes128-cbc
 
 here local ip is a python function that match the ip associated with
@@ -425,11 +443,11 @@ we can check it with the ``-v`` *verbose* option::
 
     OpenSSH_6.5, OpenSSL 1.0.1f 6 Jan 2014
     debug1: Reading configuration data /home/marc/.ssh/config
-    debug1: Executing command: 'local_ip 129.20.233.52'
+    debug1: Executing command: 'local_ip 119.20.143.62'
     debug1: permanently_drop_suid: 1206
-    debug1: Executing command: 'local_ip --local '^129\\.20\\.233' 129.20.233.52'
+    debug1: Executing command: 'local_ip --local '^119\\.20\\.143' 119.20.143.62'
     debug1: permanently_drop_suid: 1206
-    debug1: /home/marc/.ssh/config line 11: matched 'exec "local_ip --local '^129\\.20\\.233' 129.20.233.52"'
+    debug1: /home/marc/.ssh/config line 11: matched 'exec "local_ip --local '^119\\.20\\.143' 119.20.143.62"'
     .....
     debug1: SSH2_MSG_KEXINIT sent
     debug1: SSH2_MSG_KEXINIT received
