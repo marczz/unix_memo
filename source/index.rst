@@ -13,6 +13,8 @@ Contents:
 
    commands.rst
    shell.rst
+   access_lists.rst
+   attributes.rst
    swap.rst
    cups.rst
    ssh.rst
