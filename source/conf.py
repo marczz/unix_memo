@@ -30,7 +30,8 @@ import os
 # ones.
 extensions = [
     'sphinx.ext.intersphinx',
-    'sphinx.ext.extlinks'
+    'sphinx.ext.extlinks',
+    'sphinx.ext.todo'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -203,8 +204,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'UnixMemos.ltx', 'Unix Memos Collection',
-   'Marc Zonzon', 'manual'),
+    ('index', 'UnixMemos.ltx', 'Unix Memos Collection',
+    'Marc Zonzon', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -340,7 +341,8 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 extlinks = {
     'man':('http://manpages.debian.net/cgi-bin/man.cgi?query=%s', ''),
     'bsdman':('http://www.openbsd.org/cgi-bin/man.cgi?query=%s', ''),
-    'coreutils':('http://www.gnu.org/software/coreutils/manual/html_node/%s-invocation.html', ''),
+    'coreutils':(
+        'http://www.gnu.org/software/coreutils/manual/html_node/%s-invocation.html', ''),
     'wikipedia':('http://en.wikipedia.org/wiki/%s', ''),
     'mzlinux':('http://www.mzlinux.org/node/%s', ''),
     'cups':('http://www.cups.org/documentation.php/%s', ''),
