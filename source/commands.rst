@@ -361,7 +361,7 @@ network manager
    :man:`nmcli` dev status%status of all devices
    :man:`nmcli` -p dev wifi list%list all availables wifi access points
    :man:`nmcli` -p dev list iface *wlan0*%detailled list of device and APs
-   :man:`nmcli` con list%list of registered connections
+   :man:`nmcli` con show%list of registered connections
    :man:`nmcli` dev wifi connect *FreeWifi*%setup and activate a new connection
    :man:`nmcli` dev wifi connect *apssid* name *conname* password *private*%new connection with name and password
    :man:`nmcli` con status id *MyWifi*%details of connection
