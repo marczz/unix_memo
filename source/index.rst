@@ -23,6 +23,7 @@ Contents:
    devices.rst
    encrypt.rst
    gnupg.rst
+   debian_package_memo.rst
    vi_cheatsheet
    nano.rst
    network
