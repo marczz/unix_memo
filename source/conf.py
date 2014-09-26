@@ -339,7 +339,7 @@ epub_copyright = '2012-2014 Marc Zonzon'
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
 extlinks = {
-    'man':('http://manpages.debian.net/cgi-bin/man.cgi?query=%s', ''),
+    'man':('http://manpages.debian.org/cgi-bin/man.cgi?query=%s', ''),
     'bsdman':('http://www.openbsd.org/cgi-bin/man.cgi?query=%s', ''),
     'coreutils':(
         'http://www.gnu.org/software/coreutils/manual/html_node/%s-invocation.html', ''),
