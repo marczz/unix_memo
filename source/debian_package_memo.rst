@@ -131,6 +131,8 @@ References
 -   :man:`apt-cache(8)`,
     :man:`apt-file(1)`
 -   :man:`apt-offline(8)`
+-   `Debian Reference: Debian package management
+    <https://www.debian.org/doc/manuals/debian-reference/ch02.en.html>`_
 -   `aptitude User Manual <http://aptitude.alioth.debian.org/doc/en/>`_,
     `command line use <http://aptitude.alioth.debian.org/doc/en/rn01.html>`_ and
     `aptitude Command-Line Reference
@@ -260,11 +262,13 @@ informations about packages
     aptitude show "?priority(standard)" aptitude show '~p standard'
     :sub:`~`
 
--   search patterns description is in `Debian Reference: The aptitude
-    regex
-    formula <http://www.debian.org/doc/manuals/debian-reference/ch02.en.html#_the_aptitude_regex_formula>`__
-    `Aptitude reference guide: search
-    patterns <http://localhost/doc/aptitude/html/en/ch02s04s05.html>`__
+-   search patterns description is in
+    `Debian Reference: The aptitude regex formula
+    <http://www.debian.org/doc/manuals/debian-reference/ch02.en.html#_the_aptitude_regex_formula>`_
+    and
+    `Aptitude reference guide: search  patterns
+    <http://aptitude.alioth.debian.org/doc/en/ch02s04.html>`_.
+
 
 +--------------+----------------+----------------------+-----------------+--------------------+------------+
 | key          | val            | key                  | val             | key                | val        |
@@ -293,8 +297,8 @@ informations about packages
 +--------------+----------------+----------------------+-----------------+--------------------+------------+
 
 
-<type\> is one of “depends”, “predepends”, “recommends”, “suggests”, “breaks”,
-“conflicts”, or “replaces”.
+<type\> is one of ``depends``, ``predepends``, ``recommends``,
+``suggests``, ``breaks``, ``conflicts``, or ``replaces``.
 
 -    package priority/dists information
 
@@ -475,16 +479,18 @@ importing a key
 ---------------
 Reference: :man:`apt-key(8)`
 
-::
+-    With :man:`apt-key` the command *adv* allow to use :man:`gpg` to
+     receive a key, you will use either the default keyserver or give
+     one explicitly::
 
-    sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com <missing key>
+       sudo apt-key adv --recv-keys --keyserver hkp://keys.gnupg.net <missing key>
 
-or::
+-   You can also directly provide the key in stdin::
 
-  wget -q http://fr.packages.medibuntu.org/medibuntu-key.gpg -O- | \
-  sudo apt-key add -
+      wget -q http://fr.packages.medibuntu.org/medibuntu-key.gpg -O- | \
+      sudo apt-key add -
 
-or::
+-   or put it in your keyring::
 
-  gpg --keyserver hkp://subkeys.pgp.net --recv-keys KEY_ID
-  gpg -a –export KEY_ID | sudo -H apt-key add -
+      gpg --keyserver hkp://subkeys.pgp.net --recv-keys KEY_ID
+      gpg -a –export KEY_ID | sudo -H apt-key add -
