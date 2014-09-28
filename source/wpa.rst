@@ -125,20 +125,20 @@ An example of full session, adding a new AP is
    OK
    > scan_result
    bssid / frequency / signal level / flags / ssid
-   de:ed:be:ef:70:e2	2422	-48	[WPA2-EAP-TKIP+CCMP][ESS]	FreeWifi_secure
-   de:ed:be:ef:70:e0	2422	-48	[WPA-PSK-CCMP][ESS]	Freebox-632F08
-   de:ed:be:ef:70:e1	2422	-60	[ESS]	FreeWifi
+   de:ad:be:ef:70:e2	2422	-48	[WPA2-EAP-TKIP+CCMP][ESS]	FreeAP_secure
+   de:ad:be:ef:70:e0	2422	-48	[WPA-PSK-CCMP][ESS]	AP-123456
+   de:ad:be:ef:70:e1	2422	-60	[ESS]	FreeAP
    > add_network
    0
-   > set_network 0 ssid "Freebox-632F08"
+   > set_network 0 ssid "AP-123456"
    OK
    > set_network 0 psk "mysecretpassword"
    OK
    > enable_network 0
    OK
    > status
-   bssid=de:ed:be:ef:70:e0
-   ssid=Freebox-632F08
+   bssid=de:ad:be:ef:70:e0
+   ssid=AP-123456
    id=0
    mode=station
    pairwise_cipher=CCMP
