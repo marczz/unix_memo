@@ -133,9 +133,9 @@ archives and compression
    :widths: 50, 60
 
    :man:`tar` -cjf dir.tar.bz2 dir/%Make bzip2 compressed archive of dir/
-   :man:`tar` -jxf dir.tar.bz2%Extract archive (replace **j**, by **z** for gzip, or `--lzip`)
-   :man:`tar` -cxf dir.tgz --exclude '\*.o' --exclude '\*~' dir/
-   :man:`tar` -xf dir.tgz --to-stdout  dir/file.txt%Print file to stdout
+   :man:`tar` -jxf dir.tar.bz2%Extract archive (replace **j**, by **z** for gzip, or lzip)
+   :man:`tar` -cxf dir.tgz |min2|\ exclude '\*.o' |min2|\ exclude '\*~' dir/
+   :man:`tar` -xf dir.tgz |min2|\ to-stdout  dir/file.txt%Print file to stdout
    :man:`tar` -c dir/ | gzip | `gpg`_ -c | :man:`ssh` user\@remote 'dd of=dir.tar.gz.gpg'%Make encrypted archive of dir/ on remote machine.
    `find`_ dir/ -name '\*.txt' | :man:`tar` -c |min2|\ files-from=- | bzip2 > dir\_txt.tar.bz2%Make archive of subset of dir/ and below.
    `find`_ dir/ -name '\*.txt' | `xargs`_ :coreutils:`cp` -a |min2|\ target-directory=dir\_txt/ |min2|\ parents%Make copy of subset of dir/ and below.
@@ -249,11 +249,11 @@ system information
    sudo :man:`hdparm` -i /dev/sda%Show info about disk sda
    :man:`dmesg`%Detected hardware and boot messages
 
-`rsync`_
---------
+:man:`rsync`
+------------
 
-*Use the --dry-run option for testing and environment*
-`RSYNC_PARTIAL_DIR=.rsync-tmp` *to keep partial files separates.*
+*Use the* |min2|\ dry-run *option for testing and environment*
+``RSYNC_PARTIAL_DIR=.rsync-tmp`` *to keep partial files separates.*
 
 .. csv-table::
    :delim: %
@@ -462,12 +462,17 @@ Pdf
 
    :man:`gs` -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -dFirstPage=2 -dLastPage=2 -sOutputFile=page2.pdf input.pdf%Extract a page from pdf document
    :man:`pdftk` input.pdf burst%Burst a  PDF document into pages and dump its data to doc_data.txt
-   :man:`pdfseparate` xx.pdf p--|percnt|d.pdf%separates xx.pdf into separate pages: p-1.pdf, p-2.pdf, ...
-   :man:`pdfseparate` -f 2 -l 3 xx.pdf p-|percnt|d.pdf%separates from page 2 to page 3: p-2.pdf, p-3.pdf
+   :man:`pdfseparate` input.pdf p-|percnt|d.pdf%separates xx.pdf into separate pages: p-1.pdf, p-2.pdf, ...
+   :man:`pdfseparate` -f 2 -l 3 input.pdf p-|percnt|d.pdf%separates from page 2 to page 3: p-2.pdf, p-3.pdf
+   :man:`pdfjam` intput.pdf '1,2' |min2|\ outfile output.pdf%separates pages 2 and 3
    :man:`gs` -q -sPAPERSIZE=a4 -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=all.pdf file1.pdf file2.pdf ...%Join many pdf files into one.
    :man:`pdftk` in1.pdf in2.pdf cat output out1.pdf%Join two pdf files
    :man:`pdfunite` n1.pdf in2.pdf out1.pdf%Join two pdf files
+   :man:`pdfjam` file1.pdf '-' file2.pdf '1,2' file3.pdf '2-' |min2|\ outfile output.pdf%merge all pages of file1.pdf, page 1 and 2 of file2.pdf and all pages up from page 2 of file3.pdf
    :man:`pdfimages` input.pdf img%extracts all images as impg-000.ppm, img-001.ppm,...
+   :man:`pdfcrop` |min2|\ margins ’5 10 20 30’ input.pdf output.pdf%crop a pdf with left, top, right and bottom margins of 5, 10, 20, and 30 pt
+   :man:`pdfjam` |min2|\ trim '1cm 2cm 1cm 2cm' |min2|\ clip true file1.pdf |min2|\ outfile output.pdf%crop a pdf with left, top, right and bottom margins of 1cm 2cm 1cm 2cm
+   :man:`pdfjam` |min2|\ nup 2x2 input.pdf |min2|\ outfile output.pdf%recombines the pdf file to contain 4 pages per page.
 
 Refs
 ----
