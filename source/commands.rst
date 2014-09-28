@@ -446,7 +446,6 @@ You can use `ImageMagick`_ or
    :delim: %
    :widths: 50, 60
 
-
    `identify <http://www.imagemagick.org/script/identify.php>`_ *photo.jpg*%information about an image file
    `convert`_ *photo.png* -resize 2048x1536 -quality 80 *photo.jpg*%resize an image
    `convert`_ *apple.jpg* -crop 128×128+50+50 *apple_crop.jpg*%crop an image
@@ -454,6 +453,21 @@ You can use `ImageMagick`_ or
    `convert`_ \*.jpg ouput.pdf%Create a single PDF from multiple images with `ImageMagick`_
    `import <http://www.imagemagick.org/script/import.php>`_ *snapshot.jpg*%Take a snapshot of a mouse selected desktop area.
 
+
+Pdf
+---
+.. csv-table::
+   :delim: %
+   :widths: 50, 60
+
+   :man:`gs` -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -dFirstPage=2 -dLastPage=2 -sOutputFile=page2.pdf input.pdf%Extract a page from pdf document
+   :man:`pdftk` input.pdf burst%Burst a  PDF document into pages and dump its data to doc_data.txt
+   :man:`pdfseparate` xx.pdf p--|percnt|d.pdf%separates xx.pdf into separate pages: p-1.pdf, p-2.pdf, ...
+   :man:`pdfseparate` -f 2 -l 3 xx.pdf p-|percnt|d.pdf%separates from page 2 to page 3: p-2.pdf, p-3.pdf
+   :man:`gs` -q -sPAPERSIZE=a4 -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=all.pdf file1.pdf file2.pdf ...%Join many pdf files into one.
+   :man:`pdftk` in1.pdf in2.pdf cat output out1.pdf%Join two pdf files
+   :man:`pdfunite` n1.pdf in2.pdf out1.pdf%Join two pdf files
+   :man:`pdfimages` input.pdf img%extracts all images as impg-000.ppm, img-001.ppm,...
 
 Refs
 ----
@@ -488,3 +502,4 @@ Refs
 
 ..
    TODO: Complete with other commands from http://cb.vu/unixtoolbox.xhtml
+   Use |percent| to include % in a command.
