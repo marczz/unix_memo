@@ -185,6 +185,7 @@ monitoring, process admin
    :widths: 50, 60
 
    :coreutils:`tail` -f /var/log/messages%Monitor messages in a log file.
+   :man:`less` +F /var/log/messages%Monitor messages in a log file.
    :man:`lsof` -p 666%List paths that process id 666 has open.
    :man:`lsof` /path/to/file%List processes that have specified path open.
    :man:`lsof` -u foo%Processes and files of user foo
@@ -193,7 +194,7 @@ monitoring, process admin
    :man:`fuser` -va 22/tcp%List processes using port 22
    :man:`fuser` -va /home%List processes accessing the /home
    sudo `tcpdump`_ not port 22%Show network traffic except ssh.
-   | sudo `tcpdump`_ -ni eth0 'dst 192.168.1.5 and tcp and port http'%all HTTP session to 192.168.1.5.
+   sudo `tcpdump`_ -ni eth0 'dst 192.168.1.5 and tcp and port http'%all HTTP session to 192.168.1.5.
    :man:`last` reboot%Show system reboot history.
    :man:`free` -m%Show amount of (remaining) RAM (-m displays in MB)
    :man:`watch` -n.1 'cat /proc/interrupts'%Watch changeable data continuously.
@@ -432,15 +433,17 @@ Desktop management
    :man:`wmctrl` -a emacs%switch to  desktop containing emacs and raise it.
    :man:`wmctrl` -r emacs -t2%send emacs to third desktop
    :man:`wmctrl` -r emacs -e 0,-1,-1,756,495%resize emacs to 756x495 pixels
-   :man:`xdotool` search |min2|\ onlyvisible |min2|\ class *emacs* windowsize |min2|\ usehints |percent|\ 1 *80 24*%resize emacs to 80 columns x 24 lines.
+   :man:`xdotool` search |min2|\ onlyvisible |min2|\ class *emacs* windowsize |min2|\ usehints |percnt|\ 1 80 24%resize emacs to 80 columns x 24 lines.
    :man:`xwit` -columns 80 -rows 24 -names foo%resize  *foo* window.
    :man:`xwit` -columns 80 -rows 24 -select%select and resize a window.
    :man:`xwit` -rows 34 -columns 80 -property WM_CLASS -names emacs%resize all emacs windows.
 
 Images manipulation
 -------------------
-You can use `ImageMagick`_ or
-`GraphicsMagick <http://www.graphicsmagick.org>`_ with similar syntax except that you prepend the command ``gm`` for GraphicsMagick, and the option for input come before the input file in GraphicsMagick and **after** for `ImageMagick`_.
+The syntax is given for `ImageMagick`_ . If you prefer
+`GraphicsMagick <http://www.graphicsmagick.org>`_ just put   ``gm`` before the
+operation. The the option related to an input file comme before the file name
+in GraphicsMagick and **after** in `ImageMagick`_.
 
 .. csv-table::
    :delim: %
@@ -462,17 +465,21 @@ Pdf
 
    :man:`gs` -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -dFirstPage=2 -dLastPage=2 -sOutputFile=page2.pdf input.pdf%Extract a page from pdf document
    :man:`pdftk` input.pdf burst%Burst a  PDF document into pages and dump its data to doc_data.txt
-   :man:`pdfseparate` input.pdf p-|percnt|d.pdf%separates xx.pdf into separate pages: p-1.pdf, p-2.pdf, ...
-   :man:`pdfseparate` -f 2 -l 3 input.pdf p-|percnt|d.pdf%separates from page 2 to page 3: p-2.pdf, p-3.pdf
-   :man:`pdfjam` intput.pdf '1,2' |min2|\ outfile output.pdf%separates pages 2 and 3
+   :man:`pdfseparate` input.pdf p-\ |percnt|\ d.pdf%separates xx.pdf into separate pages: p-1.pdf, p-2.pdf, ...
+   :man:`pdfseparate` -f 2 -l 3 input.pdf p-\ |percnt|\ d.pdf%separates from page 2 to page 3: p-2.pdf, p-3.pdf
+   :man:`pdfjam` intput.pdf '2,3' |min2|\ outfile output.pdf%separates pages 2 and 3
+   `qpdf`_ intput.pdf |min2|\ pages intput.pdf 1-3 |min2|\ output.pdf%separates pages 2 and 3
    :man:`gs` -q -sPAPERSIZE=a4 -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=all.pdf file1.pdf file2.pdf ...%Join many pdf files into one.
    :man:`pdftk` in1.pdf in2.pdf cat output out1.pdf%Join two pdf files
-   :man:`pdfunite` n1.pdf in2.pdf out1.pdf%Join two pdf files
+   :man:`pdfunite` in1.pdf in2.pdf out1.pdf%Join two pdf files
    :man:`pdfjam` file1.pdf '-' file2.pdf '1,2' file3.pdf '2-' |min2|\ outfile output.pdf%merge all pages of file1.pdf, page 1 and 2 of file2.pdf and all pages up from page 2 of file3.pdf
+   `qpdf`_ file1.pdf |min2|\ pages file1.pdf |min2|\ pages file2.pdf 1-2 |min2|\ pages file3.pdf 2- |min2| output.pdf%merge all pages of file1.pdf, page 1 and 2 of file2.pdf and all pages up from page 2 of file3.pdf
    :man:`pdfimages` input.pdf img%extracts all images as impg-000.ppm, img-001.ppm,...
    :man:`pdfcrop` |min2|\ margins ’5 10 20 30’ input.pdf output.pdf%crop a pdf with left, top, right and bottom margins of 5, 10, 20, and 30 pt
    :man:`pdfjam` |min2|\ trim '1cm 2cm 1cm 2cm' |min2|\ clip true file1.pdf |min2|\ outfile output.pdf%crop a pdf with left, top, right and bottom margins of 1cm 2cm 1cm 2cm
    :man:`pdfjam` |min2|\ nup 2x2 input.pdf |min2|\ outfile output.pdf%recombines the pdf file to contain 4 pages per page.
+   :man:`pdftk` secured.pdf input_pw *mypass* output public.pdf%save a public copy of a password protected file
+   `qpdf`_ |min2|\ password=\ *mypass* |min2|\ decrypt secured.pdf public.pdf%save a public copy of a password protected file
 
 Refs
 ----
@@ -489,7 +496,7 @@ Refs
    `commandlinefu <http://www.commandlinefu.com/>`_,
    `shell-fu <http://www.shell-fu.org/>`_.
 
-.. |percent| unicode:: 0x25 .. % sign
+.. |percnt| unicode:: 0x25 .. % sign
 .. |min2| unicode:: 0x2d 0x2d .. - -
 .. _convert: http://www.imagemagick.org/script/convert.php
 .. _curl: http://curl.haxx.se/docs/manpage.html
@@ -497,14 +504,14 @@ Refs
 .. _find: http://www.gnu.org/software/findutils/manual/html_node/find_html/index.html
 .. _gpg: http://www.gnupg.org/documentation/manuals/gnupg/
 .. _grep: http://www.gnu.org/software/grep/manual/html_node/index.html
-.. _ImageMagick:  http://www.imagemagick.org
+.. _ImageMagick: http://www.imagemagick.org
 .. _rsync: http://www.samba.org/ftp/rsync/rsync.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
 .. _tcpdump: http://www.tcpdump.org/tcpdump_man.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
 .. _wget: http://www.gnu.org/software/wget/manual/wget.html
 .. _xargs: http://www.gnu.org/software/findutils/manual/html_node/find_html/xargs-options.html
-
+.. _qpdf: http://qpdf.sourceforge.net/files/qpdf-manual.html#ref.using
 ..
    TODO: Complete with other commands from http://cb.vu/unixtoolbox.xhtml
-   Use |percent| to include % in a command.
+   Use |percnt| to include % in a command.
