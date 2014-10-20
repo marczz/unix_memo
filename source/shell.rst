@@ -1,6 +1,44 @@
 Shell Memo
 ==========
 
+.. index:
+   pair: shell; exit
+   pair: shell; return
+
+``exit`` and ``return``
+-----------------------
+
+Refs:
+    `Bash Reference Manual: Bourne Shell Builtins
+    <http://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html>`_
+
+return
+^^^^^^
+
+``return [n]`` return n or if not supplied the exit status of the last
+command. In a function it  return with the  value. When in a script
+being sourced with the ``.`` or ``source`` builtin terminate the
+script with the return value.
+
+Any command associated with the RETURN trap is executed before
+execution resumes after the function or script.
+
+A return outside of a function or sourced script, will not terminate
+the script nor return the value, it produces an error.
+If the shell is running with ``-e`` option, it interrupt the script
+with an error code.
+
+exit
+^^^^
+
+``exit [n]``: Exit the shell, returning a status of n to the shell’s
+parent. If n is omitted, the exit status is that of the last command
+executed. Any trap on EXIT is executed before the shell terminates.
+
+.. index:
+   query string
+   single: html; query
+
 Reading query string
 --------------------
 To define variable ``a`` and ``b`` with respective values from the
@@ -67,6 +105,9 @@ A more complete function that does uudecode is given in
 Links
 -----
 
+.. index:
+   symlink
+
 Symlinks
 ^^^^^^^^
 
@@ -93,6 +134,9 @@ and the absolute path stripped from any symbolic link component, any
    readlink --canonicalize name
    readlink -f name
 
+.. index:
+   hardlink
+
 Hardlinks
 ^^^^^^^^^
 
@@ -108,7 +152,8 @@ You create hardlinks with::
    ln  existing-path alias-or-directory
    cp --link name1 name2
 
-
+.. index:
+   reflink
 
 Reflinks
 ^^^^^^^^
