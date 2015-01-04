@@ -70,11 +70,6 @@ their model, revision and serial number by::
 
     $ udisksctl status
 
-You can get more info using the device entry, in many ways::
-
-    $ udisksctl info -b /dev/sdd
-    $ udisksctl info -p 'block_devices/sdd'
-
 but it will not give you a partition list like :ref:`lsblk <lsblk>`
 or :ref:`blkid <blkid>`
 which I find more informative for discovering new devices.
@@ -83,13 +78,18 @@ When you know your partitions, by using any mean like the
 :ref:`proc filesystem <devices_proc_sys_fs>`, the
 :ref:`dev filesystem <dev_fs>`, :man:`fdisk` or :man:`gdisk`
 
+You can get more info using the device entry:
+
 ::
 
-    $ udisksctl info -p 'block_devices/sdd1'
+    $ udisksctl info -b /dev/sdd
     $ udisksctl info -b '/dev/sdd1'
+    $ udisksctl info -p 'block_devices/sdd'
+    $ udisksctl info -p 'block_devices/sdd1'
 
 ``-p`` *is an abbrev for* ``--object-path`` *and* ``b`` *an abbrev
-for* ``--block-device``.
+for* ``--block-device``. In any case the *block-device* the
+*object-path* are told in the answer.
 
 Using the *udev* level for usb devices.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -130,8 +130,13 @@ If these command are not available you can work at low level with the
 Using the *dev* filesystem.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :ref:`udev <udev>` populate the *dev* filesystem, you can explore it with
-:man:`file -s <file>`:
+:man:`file` ``--special-files`` abridged in ``file -s``, as the
+`/dev` entry also used symlinks to find device by *label*, *id*,
+or *uuid*, you may need to use also the option  ``--dereference`` (``-L``).
 
+:man:`file` give you how the type of boot sector of device, the type
+of partition, it can detect also the physical volumes of *LVM* and
+their *UUID*.
 ::
 
     $ sudo file -s /dev/dm-*
@@ -154,7 +159,7 @@ You can still use :man:`mount` if the fstab has a ``user`` option for
 the device, but not for arbitrary plugged devices.
 
 The old way is to use :man:`pmount`, but if you have
-`udiskd daemon
+`udisdk daemon
 <http://udisks.freedesktop.org/docs/latest/udiskd.8.html>`_ running on your
 system, you should use `udisksctl
 <http://udisks.freedesktop.org/docs/latest/udisksctl.1.html>`_:
@@ -164,3 +169,14 @@ system, you should use `udisksctl
     $ udisksctl mount -b /dev/sdd1
     $ udisksctl unmount -b /dev/sdd1
     $ udisksctl power-off -b /dev/sdd1
+
+Front ends
+----------
+You may also want to have some frontend that allows to alleviate the
+burden of remembering the commands or to read the manual, *but which add
+the the load of remembering the frontend api and make you depend on
+the presence of an added software piece*.
+
+-   `udiskie <https://github.com/coldfix/udiskie>`_
+    *(MIT License)* is an automounter for usb devices written in
+    python. It uses the dbus interface through *udisks*.
