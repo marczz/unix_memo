@@ -213,6 +213,26 @@ Publish a key on a keyserver (mandatory key id)::
 
     gpg --keyserver keys.gnupg.net --send-key FE8512E1
 
+If you need to export a secret key *for using on an other computer*::
+
+    gpg --output /tmp/mygpgkey_sec.gpg --armor --export-secret-key  FE8512E1
+
+The secrete key is a very sensible data, exporting in cleartext should
+only be done on a secure computer, and the file must be shreded (
+:man:`shred(1)`)  after use.
+
+`shred` does not work on some filesystem like *brtfs*, if your */tmp/*
+is a *tmpfs* file system, you are safe to use it but you have still the problem to
+protect your file during transport and on the other computer.
+
+You can better symmetric encrypt the exported private key::
+
+    gpg --export-secret-key  FE8512E1 | \
+    gpg --symmetric --armor --output  /tmp/mygpgkey_sec.asc
+
+You are then asked for a password for symmetric encryption, and you
+private key stay protected.
+
 importing a key
 ~~~~~~~~~~~~~~~
 ::
@@ -230,13 +250,22 @@ Or choose a key by name regexp::
 If there are multiple strings matching ``somebody`` gpg
 will present you a menu to choose one specific key".
 
+
+To import a previously exported secret key::
+
+    gpg --allow-secret-key-import --import /tmp/mygpgkey_sec.gpg
+
+If you follow the advice to symetric encrypt the secret key::
+
+    gpg --decrypt   /tmp/mygpgkey_sec.asc | gpg --allow-secret-key-import --import
+
+
 Editing your keys
 ~~~~~~~~~~~~~~~~~
 ::
 
     gpg --edit-key me@example.com
     gpg --edit-key FE8512E1
-
 
 present a menu with many key management related tasks, you get a
 list with ``help``, among which:
