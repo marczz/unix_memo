@@ -283,14 +283,27 @@ are displayed by using the ``-Q`` option::
 
   ssh -Q cipher
 
-the result should contain :wikipedia:`triple DES <triple DES>`,
+the result may contain :wikipedia:`aes <aes>`,
+:wikipedia:`triple DES <triple DES>` *superseded by aes*,
 :wikipedia:`blowfish <blowfish>`, :wikipedia:`cast128 <cast128>`,
 :wikipedia:`arcfour <RC4>` also spelled :wikipedia:`RC4 <RC4>`,
-:wikipedia:`aes <aes>`
+:wikipedia:`chacha20 <Salsa20#ChaCha_variant>`, ...
+
 
 :wikipedia:`Arcfour <RC4>` is now known to be vulnerable  to some complex
 attacks, so it should not be used in exposed situations; but the speed
-of arcfour let him stand as a good candidate on firewalled local area networks.
+of arcfour let him stand as a good candidate on firewalled local area
+networks *when chacha20 is still unavailable*.
+
+.. _cipher_compatibility:
+
+Note that you can only use it if the server allow this cipher
+otherwise you will get an answer of::
+
+  $ ssh -c arcfour128 server.example.com
+  no matching cipher found: client arcfour128 \
+  server aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr
+
 
 We find some tests in
 `ssh speed tests
@@ -301,14 +314,30 @@ and
 
 I did some speed tests from my pc to my NAS 1GB connection.
 I found that 3des is 2.5MB/s, the many aes are around 5MB/s,
-blowfish and cast128 8MB/s, the many arcfour 12.5MB.
+blowfish and cast128 8MB/s, the many arcfour and chacha20 12.5MB.
 
 For arcfour we have to
 `prefer arcfour128
 <http://security.stackexchange.com/questions/26765/what-are-the-differences-between-the-arcfour-arcfour128-and-arcfour256-ciphers>`_
 
 For extra security on wan we can use :wikipedia:`blowfish
-<Blowfish_(cipher)>` for a quick cypher stronger than :wikipedia:`RC4`.
+<Blowfish_(cipher)>` for a quick cypher, stronger than :wikipedia:`RC4`.
+
+.. _chacha20_cipher:
+
+The new :wikipedia:`chacha20 <Salsa20#ChaCha_variant>` has also be
+conceived `to replace RC4 and be fast on devices that don’t have
+AES hardware acceleration
+<http://googleonlinesecurity.blogspot.fr/2014/04/speeding-up-and-strengthening-https.html>`_
+the previous paper contains also some speed tests.
+
+More details on this new cipher in the
+`ietf draft
+<https://tools.ietf.org/id/draft-agl-tls-chacha20poly1305-01.html>`_.
+
+
+When it is available it should replace weaker RC4 and blowfish which
+cant now be considered as outdated.
 
 .. _ssh_file_transfer:
 
@@ -335,6 +364,9 @@ The main conclusion is that to transfer a big directory on a fast lan the
 better is::
 
   tar -cf- src | ssh -q -c arcfour128 lanhost tar -xf- -Cdest
+
+As set :ref:`above <chacha20_cipher>` we should replace ``arcfour128`` with
+``chacha20-poly1305@openssh.com`` whenever it is available.
 
 sshd config
 ~~~~~~~~~~~
@@ -396,6 +428,22 @@ and older examples previously posted by Darren Tucker
     Match Group nosftp
             Subsystem sftp /bin/false
 
+Testing new configuration
++++++++++++++++++++++++++
+
+If we administer a server where the only access is through ssh we
+should be very careful when changing sshd configuration, or we can be
+locked out with no way to get in.
+
+I use to test my configuration on the server with::
+
+  $ /usr/sbin/sshd -p 10000 -f /etc/ssh/sshd_config.new -d
+
+which I test on a client with::
+
+  $ ssh -p 10000 -vvv server.example.com
+
+
 ssh config
 ~~~~~~~~~~
 
@@ -408,9 +456,9 @@ I use it to detect local subnets like::
 
     # faster ciphers for lan
     Match exec "local_ip %h"
-         Ciphers arcfour128,blowfish-cbc,aes128-cbc
+         Ciphers chacha20-poly1305@openssh.com,arcfour128,blowfish-cbc,aes128-ctr
     Match exec "local_ip --local '^119\.20\.143' %h"
-         Ciphers arcfour128,blowfish-cbc,aes128-cbc
+         Ciphers chacha20-poly1305@openssh.com,arcfour128,blowfish-cbc,aes128-ctr
 
 here local ip is a python function that match the ip associated with
 an hostname::
@@ -454,6 +502,29 @@ we can check it with the ``-v`` *verbose* option::
     debug1: kex: server->client arcfour128 hmac-md5 none
     debug1: kex: client->server arcfour128 hmac-md5 none
 
+Note that if you use some special cipher for a client, you should make
+sure that your list include one
+:ref:`server compatible <cipher_compatibility>` cipher, it is why the
+well known `aes128-ctr` is included above, as a server may want to
+disable less secure cipher, the defaults of openssh 6.7 do not allow
+arcfour or blowfish, it does allow *chacha20* but it is unknown by older
+releases and most alternate servers.
+
+If you administer an openssh server you can
+tune your ciphers, in accordance with your security and speed needs.
+
+When connecting to a small server like
+:wikipedia:`Dropbear <Dropbear_(software)>` the choice of ciphers,
+MACs and key exchange algorithms is limited.
+
+Dropbear can only support AES128, AES256, 3DES, TWOFISH256,
+TWOFISH128, BLOWFISH *disabled ny default*;
+look at `options.h in source tree
+<https://github.com/mkj/dropbear/blob/master/options.h>`_ for details.
+
+When dropbear is `built for a small server
+<https://github.com/mkj/dropbear/blob/5cf83a7212c0f353e7367766cc4bbf349e83ff0b/SMALL>`_
+some of these ciphers may be disabled.
 
 .. comment
 
