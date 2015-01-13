@@ -26,6 +26,8 @@ Which gives a schema like this::
     └─sdd1                 part vfat           3.7G
     sr0                    rom                1024M DVD+-RW GSA-T11N
 
+You can also use the simpler ``lsblk -f`` with less columns.
+
 .. _blkid:
 
 Using ``blkid``.
@@ -90,6 +92,14 @@ You can get more info using the device entry:
 ``-p`` *is an abbrev for* ``--object-path`` *and* ``b`` *an abbrev
 for* ``--block-device``. In any case the *block-device* the
 *object-path* are told in the answer.
+
+You can also use ``udisksctl monitor`` to monitor devices
+before connecting the device and see the
+device entry attributed by udev.
+
+It is also shown in your kernel messages, and can be read with
+:man:`dmesg` but it is quite laborious to find the proper line.
+
 
 Using the *udev* level for usb devices.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -177,6 +187,64 @@ burden of remembering the commands or to read the manual, *but which add
 the the load of remembering the frontend api and make you depend on
 the presence of an added software piece*.
 
+-   `bashmount <https://github.com/jamielinux/bashmount/>`__ is a bash
+    script to help mounting with *udisks2*.
+-   `lightweight device mounter
+    (ldm) <https://github.com/LemonBoy/ldm>`_ (MIT License)
+    is a lightweight daemon that mounts removable devices
+    automatically. Ut requires only libudev, libmount and libusb. The
+    daemon uses 3.3M resident with 2.5M shared. There are few
+    configuration options as it relies on fstab for mounting
+    partitions. There is no easy way to configure what you want to be
+    mounted by the daemon and my regular partitions yet mounted on a
+    system path get mounted again under ``/mnt``.
+-   `triggerhappy <https://github.com/wertarbyte/triggerhappy>`_ (GPL)
+    is a hotkey daemon developed for small and embedded systems. It
+    attaches to the input device files and executes scripts on events. It
+    is packaged in Debian.  *Last commit 2012*
+-   `udisk-glue <https://github.com/fernandotcl/udisks-glue>`_
+    (BSD Licence) is a daemon that can perform user-configurable
+    actions when a certain udisks event is detected. It can be
+    configured to automatically mount devices. It is packaged in
+    Debian.
 -   `udiskie <https://github.com/coldfix/udiskie>`_
     *(MIT License)* is an automounter for usb devices written in
     python. It uses the dbus interface through *udisks*.
+    It comes with optional mount notifications and gtk
+    tray icon and a command-line client ``udiskie-mount``.
+-   `UDisksEvt <https://github.com/dpx-infinity/udisksevt>`__ (GPL) by
+    Vladimir Matveev is a daemon written ih haskell which listens for
+    D-Bus signals emitted by UDisks daemon and execute configured
+    actions. *Last commit 2011*
+-   `udevil <http://ignorantguru.github.io/udevil/>`_
+    is a command line program which mounts
+    and unmounts removable devices. Udevil is written in C with libudev
+    and glib without dependency on udisks or gvfs. It is part of the
+    Spacefm project whose development stopped in April 2014.
+-   `usbmount <http://usbmount.alioth.debian.org/>`_
+    automatically mounts USB mass storage devices when they are
+    plugged in, and unmounts them when they are removed. The
+    mountpoints (``/media/usb[0-7]`` by default), filesystem types to
+    consider, and mount options are configurable. If the device
+    provides a model name, a symlink ``/var/run/usbmount/MODELNAME``
+    pointing to the mountpoint is automatically created.
+    `usbmount git source
+    <https://alioth.debian.org/scm/browser.php?group_id=30641>`_
+    The old home page set that *usbmount* is unmaintained since 2007
+    at release 0.0.14.1, but development continued to 2012 release
+    0.0.22 which is packaged in Debian.
+-   `udisksvm <https://github.com/berbae/udisksvm>`__ is a small (280
+    loc) python GUI oriented script to automount removable medias using udisks.
+-   `udisks_functions <https://gist.github.com/ledti/838039>`_
+    are bash functions to help mounting and unmounting with udisks2.
+
+All modern file managers can automount devices for lxde desktops see
+`PCManFM <http://wiki.lxde.org/en/PCManFM>`_
+
+Udisks references
+-----------------
+
+-   `ArchWiki: Udisks <https://wiki.archlinux.org/index.php/Udisks>`_.
+-   `Gentoo: Udisks <http://wiki.gentoo.org/wiki/Udisks>`_.
+-   `Introduction to Udisks
+    <http://blog.fpmurphy.com/2011/08/introduction-to-udisks.html>`_.
