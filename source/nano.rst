@@ -227,5 +227,5 @@ Toggles
 +----------+------------------------------+
 
 
-`Nano reference <http://www.nano-editor.org/dist/v2.2/nano.html>`_ is
+`Nano reference <http://www.nano-editor.org/dist/latest/nano.html>`_ is
 also available as an *info* manual.
