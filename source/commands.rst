@@ -148,8 +148,8 @@ archives and compression
    :man:`unzip` archive.zip file.txt%Extract one file from archive
    :coreutils:`dd` if=/dev/vg0/vol0 of=/dev/vg1/vol1 bs=4096%Copy a partition to another one (bs must be a divider of volume blocksize)
    :coreutils:`dd` bs=1M if=/dev/sda | gzip | :man:`ssh` user\@remote 'dd of=sda.gz'%Backup harddisk to remote machine.
-   :coreutils:`dd` bs=4096 if=/dev/vgsource/root_snap| :man:`ssh` -c arcfour128 rootr\@remote dd  bs=4096 of=/dev/vgremote/root_copy%copy a partition to remote machine
-   :coreutils:`dd` bs=4096 if=/dev/vg0/root_snap| | :man:`ssh`-c arcfour128 root
+   :coreutils:`dd` bs=4096 if=/dev/vgsource/root_snap| :man:`ssh` -c 'chacha20-poly1305@openssh.com' rootr\@remote dd  bs=4096 of=/dev/vgremote/root_copy%copy a partition to remote machine
+   :coreutils:`dd` bs=4096 if=/dev/vg0/root_snap| | :man:`ssh`-c 'chacha20-poly1305@openssh.com' root
    :man:`killall` -s USR1 dd%Ask dd to print the state of the current transfer.
 
 process management
@@ -282,7 +282,7 @@ More info in the :ref:`ssh section <ssh_section>`.
 
    :bsdman:`ssh` $USER\@$HOST command%Run command on $HOST as $USER (default command=shell)
    :bsdman:`ssh` -f -Y $USER\@$HOSTNAME xterm%Run GUI command on $HOSTNAME as $USER
-   :bsdman:`ssh` -c arcfour128 -f -Y $USER\@$LANHOST xterm%Run GUI command on $LANHOST as $USER with :ref:`faster crypto <ssh_ciphers>`.
+   :bsdman:`ssh` -c 'chacha20-poly1305@openssh.com' -f -Y $USER\@$LANHOST xterm%Run GUI command on $LANHOST as $USER with :ref:`faster crypto <ssh_ciphers>`.
    :man:`tar` -cf- src | :bsdman:`ssh` -q -c arcfour128 $LANHOST tar -xf- -Cdest% :ref:`quick directory transfer <ssh_file_transfer>`.
    :bsdman:`scp` -p -r -C $USER\@$HOST: file dir/%Copy with permissions to $USER's home directory on $HOST, compress  for slow links.
    :bsdman:`scp` -c arcfour128 $USER\@$LANHOST: bigfile%Use :ref:`faster crypto <ssh_ciphers>` for local LAN, but :ref:`tar over ssh is to be preferred <ssh_file_transfer>`.
@@ -515,3 +515,4 @@ Refs
 ..
    TODO: Complete with other commands from http://cb.vu/unixtoolbox.xhtml
    Use |percnt| to include % in a command.
+   Use the commands in https://wiki.archlinux.org/index.php/Core_utilities.
