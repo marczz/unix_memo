@@ -4,144 +4,10 @@ SSH
 ===
 ..  highlight:: shell-session
 
-References
-----------
-
--  :mzlinux:`MzLinux: SSH <63>`,
-   :mzlinux:`MzLinux: Security and Encryption section <155>`  and
-   :mzlinux:`MzLinux: Strong Passwords <286>`
-
--  Introduction:
-   Wikipedia: :wikipedia:`Secure Shell`,
-   :wikipedia:`OpenSSH`, :wikipedia:`SSh tunnel`.
-
-   `Openssh susefaq how-to
-   <http://susefaq.sourceforge.net/howto/openssh.html>`_,
-   `OpenSSH FAQ <http://www.openssh.com/faq.html>`_
--  The man pages are
-
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh`                    |Basic rlogin/rsh-like client program.                    |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`sshd`                   |Daemon that permits you to login.                        |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh_config`             |Client configuration file.                               |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`sshd_config`            |Daemon configuration file.                               |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh-agent`              |Authentication agent that can store private keys.        |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh-add`                |Tool which adds keys to in the above agent.              |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`sftp`                   |FTP-like program over SSH protocol.                      |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`scp`                    |File copy program.                                       |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh-keygen`             |Key generation tool                                      |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh-keygen#CERTIFICATES`|use of certificates.                                     |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`sftp-server`            |SFTP server subsystem (started automatically by sshd).   |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh-keyscan`            |Utility for gathering public host keys from a number of  |
-|                                 |hosts.                                                   |
-+---------------------------------+---------------------------------------------------------+
-|:bsdman:`ssh-keysign`            |Helper program for host based authentication.            |
-+---------------------------------+---------------------------------------------------------+
-
--   `ArchWiki: ssh <https://wiki.archlinux.org/index.php/Secure_Shell>`_,
-    `sshfs <https://wiki.archlinux.org/index.php/Sshfs>`_,
-    `SSH\_Keys <https://wiki.archlinux.org/index.php/SSH_Keys>`_,
-    `Sshguard <https://wiki.archlinux.org/index.php/Sshguard>`_ *daemon
-    that protects SSH and other services against brute-force attacts* .
--   `The 101 Uses of OpenSSH: Part
-    II <http://www.linuxjournal.com/article/4413>`_ by Mick Bauer explain
-    the public key crypto aspect of ssh.
--   Ibm Developer Work: `OpenSSH key
-    management <http://www.ibm.com/developerworks/linux/library/l-keyc.html>`_
-    by Daniel Robbins introduces RSA/DSA key authentication, the `second
-    article <http://www-106.ibm.com/developerworks/linux/library/l-keyc2/>`_
-    shows you how to use ssh-agent, ssh-add and keychain. The `third
-    article <http://www-106.ibm.com/developerworks/linux/library/l-keyc3/>`_
-    explains ssh-agent authentication forwarding mechanism.
--   Van Emery: `Useful OpenSSL
-    Tricks <http://www.vanemery.com/Linux/Apache/openSSL.html>`_, `X over
-    SSH <http://www.vanemery.com/Linux/XoverSSH/X-over-SSH2.html>`_
--   The eecs departement of berkeley has some `quick text help
-    files <http://inst.eecs.berkeley.edu/usr/pub/>`_ among with
-    `ssh.help <http://inst.eecs.berkeley.edu/usr/pub/ssh.help>`_ and
-    `ssh-agent.help <http://inst.eecs.berkeley.edu/usr/pub/ssh-agent.help>`_.
--   `OpenSSH certificates
-    tutorial <http://blog.habets.pp.se/2011/07/OpenSSH-certificates>`_
--   While
-    `ssh-agent <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-agent>`_
-    is a daemon that cache your decrypted private keys during your
-    session `Keychain <http://www.funtoo.org/wiki/Keychain>`_ is a
-    front-end to ssh-agent, allowing you to have one long-running
-    ssh-agent process per system, rather than one per login session.
-    Keychain was `introduced by Daniel Robins in
-    2001 <http://www.ibm.com/developerworks/linux/library/l-keyc2/>`_ for
-    Gentoo *Keychain has evolved since this article*, It is now available
-    in most distributions.
-
-    -   `Gentoo Guide:
-        Keychain <http://www.gentoo.org/doc/en/keychain-guide.xml>`_.
-    -   `ArchWiki:
-        Keychain <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
-    -   `man: keychain(1) <http://man.cx/keychain(1)>`_
-
--   Gnome Keyring is a daemon that keeps user's security credentials,
-    such as user names and passwords encrypted in a keyring file in the
-    user's home folder. The default keyring uses the login password for
-    encryption.
-
-    -   `ArchLinux: Gnome
-        Keyring <https://wiki.archlinux.org/index.php/GNOME_Keyring>`_
-        describe also how to use it without gnome.
-
--   `autossh <http://www.harding.motd.ca/autossh/>`_ (modified BSD) is a
-    program to start a copy of ssh and monitor it, restarting it as
-    necessary should it die or stop passing traffic. A small included
-    script ``rscreen`` or ``rtmux`` allow a *perpetual* ssh session. It
-    is in Debian. To use autossh a monitoring port should be choosen
-    using the ``-M`` option, but the debian version of autossh uses a
-    wrapper to automatically select a free monitoring port. In any case
-    you could also disable the monitoring port with ``-M 0`` and have ssh
-    do itself the monitoring by setting ``ServerAliveInterval`` and
-    ``ServerAliveCountMax`` options to have the SSH client exit if it
-    finds itself no longer connected to the server. If not set in the
-    [man:ssh\_config] file your command line looks like:
-
-    ::
-
-        $ autossh -M 0 -o "ServerAliveInterval 45" -o "ServerAliveCountMax 2" username@myserver
-
-    To use sshfs with autossh you can use:
-
-    ::
-
-         $ sshfs -o reconnect,compression=yes,transform_symlinks,\
-             ServerAliveInterval=45,ServerAliveCountMax=2,\
-             ssh_command='autossh -M 0' username@server:/\
-             /mnt/remote
-
--   `mosh <http://mosh.mit.edu/>`_ (GPL with OpenSSL exceptions) is a
-    replacement for SSH that allows roaming, supports intermittent
-    connectivity, and provides intelligent local echo and line editing of
-    user keystrokes. Mosh improve ssh usability for mobile users. It is
-    in Debian. Mosh does not use the ssh tcp protocol, but runs a
-    terminal emulator at the server and transmits this screen to the
-    client through udp. This udp protocol may conflict with firewall
-    rules. Mosh cannot forward ssh-agent nor X11, and does not support
-    IPv6.
-
-    -  :wikipedia:`mosh`
-    -  `ArchWiki:
-       autossh <https://wiki.archlinux.org/index.php/Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`_
 
 ssh memo
 --------
-See the :ref:`ssh commands <ssh_commands>` in the :ref:`linux_command_memo`.
+Fo ssh commands examples see  :ref:`ssh commands <ssh_commands>` in the :ref:`linux_command_memo`.
 
 -   To get the public key from the private one::
 
@@ -305,23 +171,95 @@ otherwise you will get an answer of::
   server aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr
 
 
-We find some tests in
+We find some tests in the articles
 `ssh speed tests
-<http://www.damtp.cam.ac.uk/user/ejb48/sshspeedtests.html>`_
+<http://www.damtp.cam.ac.uk/user/ejb48/sshspeedtests.html>`_ that test
+ssh between two pentiums
 and
 `OpenSSH ciphers performance benchmark
-<http://blog.famzah.net/2010/06/11/openssh-ciphers-performance-benchmark/>`_.
+<http://blog.famzah.net/2010/06/11/openssh-ciphers-performance-benchmark/>`_
+that ssh from a pentium to an arm computer.
 
-I did some speed tests from my pc to my NAS 1GB connection.
-I found that 3des is 2.5MB/s, the many aes are around 5MB/s,
-blowfish and cast128 8MB/s, the many arcfour and chacha20 12.5MB.
+As you will see below *aes256* is very fast on Pentium, but may be
+quite slow on arm computers, it is why it is more important to choose
+your cipher for speed when transferring from or to an arm computer,
+when it does not involve security risks.
 
-For arcfour we have to
+I did also some ssh speed tests from my pc (pentium 1.70GHz) to three arm
+computers with a 1Gb ethernet connection *only 100Mb/s for
+raspberry*. The arm computers are: a NAS with armv5l 1.2GHz, a raspberry  ARM11 armv6,
+0.7GHz, a banana pi armv7h, cortex-A7 2 cores, 1GHz.
+
+
++-----------+----------+----------+---------+---------+---------+----------+
+| processor |aes256-ctr|aes128-ctr| 3des    |blowfish |arcfour  |chacha20  |
++===========+==========+==========+=========+=========+=========+==========+
+|armv5l     |4.8MB/s   |5.9MB/s   |2.5MB/s  |8MB/s    |12.5MB/s |          |
++-----------+----------+----------+---------+---------+---------+----------+
+|armv6      |4.4MB/s   | 4.8MB/s  |1.7MB/s  |5.0MB/s  |5.6MB/s  |          |
++-----------+----------+----------+---------+---------+---------+----------+
+|armv7h x 2 |5.9MB/s   |8.3MB/s   |         |         |         |12.5MB/s  |
++-----------+----------+----------+---------+---------+---------+----------+
+
+
+For *arcfour* we have to
 `prefer arcfour128
-<http://security.stackexchange.com/questions/26765/what-are-the-differences-between-the-arcfour-arcfour128-and-arcfour256-ciphers>`_
+<http://security.stackexchange.com/questions/26765/what-are-the-differences-between-the-arcfour-arcfour128-and-arcfour256-ciphers>`_,
+I repeated the test on raspberry, with the same result,I don't
+understand such poor
+performance for a cipher whose main quality is the speed, more it
+contradict the following test done with openssl.
 
-For extra security on wan we can use :wikipedia:`blowfish
-<Blowfish_(cipher)>` for a quick cypher, stronger than :wikipedia:`RC4`.
+For extra security when there is no *chacha20* support
+on wan we can use :wikipedia:`blowfish
+<Blowfish_(cipher)>` for a quick cypher, stronger than
+:wikipedia:`RC4`, but the tests above show that the gain is minor on
+most architectures.
+
+The transfer time is the result of five  operations , reading,transfer
+proper, decoding, writing when ethernet link is fast, and we use a
+fast storage *for the test I use tmpfs* the encoding
+capabilities of the processors are crucial.
+
+Of course from the five links the weaker is encryption/decryption on
+the arm computer, to better isolate this element I tested
+encryption/decryption of a 10MB random bytes file on three processors.
+
+I used as command::
+
+  $ time openssl enc -e -aes-256-ctr -out /dev/null -in /tmp/testdata -k mypasswd
+  $ time openssl enc -d -aes-256-ctr -out /dev/null -in /tmp/testdata.enc -k mypasswd
+
+
++------------+------------+------------+----------+----------+----------+----------+
+|cipher      |pentium enc |pentium dec |armv6 enc |armv6 dec |armv7h enc|armv7h dec|
++============+============+============+==========+==========+==========+==========+
+|aes-256-ctr |0.5s        |0.6s        |9.8s      |9.9s      | 6.7s     |6.5s      |
++------------+------------+------------+----------+----------+----------+----------+
+|des3        |7.6s        |7.4         |46.7s     |46.6      | 22.6s    | 22.4s    |
++------------+------------+------------+----------+----------+----------+----------+
+|blowfish    |1.9s        |1.6s        |9.8s      |9.7s      |5.6s      | 5.9s     |
++------------+------------+------------+----------+----------+----------+----------+
+|rc4         |0.3s        |0.3s        |3.3s      |3.3s      |2.4s      |2.7s      |
++------------+------------+------------+----------+----------+----------+----------+
+|chacha20    |            |            |          |          |          |          |
++------------+------------+------------+----------+----------+----------+----------+
+
+So there is hardly any reason on Pentium to use an other crypto than
+*aes-256* that is said very secure. Des3 is 14 times slower than
+*aes-256*,  even *blowfish* is slower than
+*aes-256* and
+the gain of *arcfour* is not worth the loss of security.
+
+Compared to Pentium the encryption
+time of *aes-256* is multiplied by 20 on armv6 and 13 on armv7. Even
+here the gain of *blowfish* is nul or low, but arcfour is three time
+faster than *aes-256*.
+
+I will add the results of *chacha20* when I get on these computers an
+openssl newer than 1.02 which is needed for
+*chacha20* support.
+
 
 .. _chacha20_cipher:
 
@@ -335,9 +273,8 @@ More details on this new cipher in the
 `ietf draft
 <https://tools.ietf.org/id/draft-agl-tls-chacha20poly1305-01.html>`_.
 
-
-When it is available it should replace weaker RC4 and blowfish which
-cant now be considered as outdated.
+When it is available it should replace weaker *RC4* and *blowfish* which
+can now be considered as outdated.
 
 .. _ssh_file_transfer:
 
@@ -525,6 +462,190 @@ look at `options.h in source tree
 When dropbear is `built for a small server
 <https://github.com/mkj/dropbear/blob/5cf83a7212c0f353e7367766cc4bbf349e83ff0b/SMALL>`_
 some of these ciphers may be disabled.
+
+Fish
+----
+
+Fish is the acronym for Files transferred over shell protocol, it is a
+protocol to use SSH or RSH and Unix utilities like ls, cat or dd to
+transfer files. The protocol was designed for Midnight Commander and can
+also be used by `lftp <http://lftp.yar.ru/lftp-man.html>`_ and by KDE
+:wikipedia:`KIO` kioslave.
+
+The fish protocol reference is
+`midnight commander: README.fish
+<https://github.com/MidnightCommander/mc/blob/master/src/vfs/fish/helpers/README.fish>`_
+it is also explained in `Wikipedia: Files transferred over
+shell protocol <http://en.wikipedia.org/wiki/Files_transferrer_over_shell_protocol>`_.
+
+You can use fish when the remote host does not provide a sftp service,
+as it is often the case with with dropbear *(because an openssl sftp
+is needed to run sftp with dropbear)* and on servers where sftp is not
+enabled.
+You need only a full ssh access to the remote host as fish requires a
+full rsh or ssh shell on the remote side.
+
+SSH References
+--------------
+
+-  Introduction:
+   Wikipedia: :wikipedia:`Secure Shell`,
+   :wikipedia:`OpenSSH`, :wikipedia:`SSh tunnel`.
+
+   `Openssh susefaq how-to
+   <http://susefaq.sourceforge.net/howto/openssh.html>`_,
+   `OpenSSH FAQ <http://www.openssh.com/faq.html>`_
+-  The man pages are
+
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh`                    |Basic rlogin/rsh-like client program.                    |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`sshd`                   |Daemon that permits you to login.                        |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh_config`             |Client configuration file.                               |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`sshd_config`            |Daemon configuration file.                               |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh-agent`              |Authentication agent that can store private keys.        |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh-add`                |Tool which adds keys to in the above agent.              |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`sftp`                   |FTP-like program over SSH protocol.                      |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`scp`                    |File copy program.                                       |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh-keygen`             |Key generation tool, include use of certificates         |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`sftp-server`            |SFTP server subsystem (started automatically by sshd).   |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh-keyscan`            |Utility for gathering public host keys from a number of  |
+|                                 |hosts.                                                   |
++---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh-keysign`            |Helper program for host based authentication.            |
++---------------------------------+---------------------------------------------------------+
+
+-   `ArchWiki: ssh <https://wiki.archlinux.org/index.php/Secure_Shell>`_,
+    `sshfs <https://wiki.archlinux.org/index.php/Sshfs>`_,
+    `SSH\_Keys <https://wiki.archlinux.org/index.php/SSH_Keys>`_,
+    `Sshguard <https://wiki.archlinux.org/index.php/Sshguard>`_ *daemon
+    that protects SSH and other services against brute-force attacts*.
+-   ` Matt Taggart: Good practices for using ssh
+    <http://lackof.org/taggart/hacking/ssh/>`_ explains basic security
+    rule to use ssh **client**.
+-   `The 101 Uses of OpenSSH: Part
+    II <http://www.linuxjournal.com/article/4413>`_ by Mick Bauer explain
+    the public key crypto aspect of ssh.
+-   Ibm Developer Work: `OpenSSH key
+    management <http://www.ibm.com/developerworks/linux/library/l-keyc.html>`_
+    by Daniel Robbins introduces RSA/DSA key authentication, the `second
+    article <http://www-106.ibm.com/developerworks/linux/library/l-keyc2/>`_
+    shows you how to use ssh-agent, ssh-add and keychain. The `third
+    article <http://www-106.ibm.com/developerworks/linux/library/l-keyc3/>`_
+    explains ssh-agent authentication forwarding mechanism.
+-   Van Emery: `Useful OpenSSL
+    Tricks <http://www.vanemery.com/Linux/Apache/openSSL.html>`_, `X over
+    SSH <http://www.vanemery.com/Linux/XoverSSH/X-over-SSH2.html>`_
+-   The eecs departement of berkeley has some `quick text help
+    files <http://inst.eecs.berkeley.edu/usr/pub/>`_ among with
+    `ssh.help <http://inst.eecs.berkeley.edu/usr/pub/ssh.help>`_ and
+    `ssh-agent.help <http://inst.eecs.berkeley.edu/usr/pub/ssh-agent.help>`_.
+-   OpenSSH certificates are not so well known, the reference is the
+    `CERTICATES section of ssh-keygen(1)
+    <http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/ssh-keygen.1?query=ssh-keygen#x434552544946494341544553>`_
+    they are distinct and simpler than X.509 certificates used in ssl
+    and allow client and servers to authenticate in a simpler and more
+    reliable wy than user/host keys.
+
+    There are some tutorials on this subject:
+    `DigitalOcean: How To Create an SSH CA to Validate Hosts and
+    Clients
+    <https://www.digitalocean.com/community/tutorials/how-to-create-an-ssh-ca-to-validate-hosts-and-clients-with-ubuntu>`_,
+    `Blargh: OpenSSH certificates
+    tutorial
+    <http://blog.habets.pp.se/2011/07/OpenSSH-certificates>`_,
+    `Using a CA with SSH <http://www.lorier.net/docs/ssh-ca>`_.
+-   While
+    `ssh-agent <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-agent>`_
+    is a daemon that cache your decrypted private keys during your
+    session `Keychain <http://www.funtoo.org/wiki/Keychain>`_ is a
+    front-end to ssh-agent, allowing you to have one long-running
+    ssh-agent process per system, rather than one per login session.
+    Keychain was `introduced by Daniel Robins in
+    2001 <http://www.ibm.com/developerworks/linux/library/l-keyc2/>`_ for
+    Gentoo *Keychain has evolved since this article*, It is now available
+    in most distributions.
+
+    -   `Gentoo Guide:
+        Keychain <http://www.gentoo.org/doc/en/keychain-guide.xml>`_.
+    -   `ArchWiki:
+        Keychain <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
+    -   `man: keychain(1) <http://man.cx/keychain(1)>`_
+
+-   `Envoy <https://github.com/vodik/envoy>`_ (GPL)
+    is a ssh/gpg-agent wrapper leveraging cgroups and
+    systemd/socket activation with functionalities similar to
+    keychain, but done in c, takes advantage of cgroups and systemd.
+-   Gnome Keyring is a daemon that keeps user's security credentials,
+    such as user names and passwords encrypted in a keyring file in the
+    user's home folder. The default keyring uses the login password for
+    encryption.
+
+    -   `ArchLinux: Gnome
+        Keyring <https://wiki.archlinux.org/index.php/GNOME_Keyring>`_
+        describe also how to `use it without gnome
+        <https://wiki.archlinux.org/index.php/GNOME_Keyring#Use_without_GNOME.2C_and_without_a_display_manager>`_.
+    -   `mozilla-gnome-keyring
+        <https://github.com/infinity0/mozilla-gnome-keyring>`_
+        is a mozilla extension to replace the default password manager in
+        Firefox and Thunderbird and store passwords and form logins
+        in gnome-keyring. The Debian package is named
+        *xul-ext-gnome-keyring*.
+
+-   `autossh <http://www.harding.motd.ca/autossh/>`_ (modified BSD) is a
+    program to start a copy of ssh and monitor it, restarting it as
+    necessary should it die or stop passing traffic. A small included
+    script ``rscreen`` or ``rtmux`` allow a *perpetual* ssh session. It
+    is in Debian. To use autossh a monitoring port should be choosen
+    using the ``-M`` option, but the debian version of autossh uses a
+    wrapper to automatically select a free monitoring port. In any case
+    you could also disable the monitoring port with ``-M 0`` and have ssh
+    do itself the monitoring by setting ``ServerAliveInterval`` and
+    ``ServerAliveCountMax`` options to have the SSH client exit if it
+    finds itself no longer connected to the server. If not set in the
+    [man:ssh\_config] file your command line looks like:
+
+    ::
+
+        $ autossh -M 0 -o "ServerAliveInterval 45" -o "ServerAliveCountMax 2" username@myserver
+
+    To use sshfs with autossh you can use:
+
+    ::
+
+         $ sshfs -o reconnect,compression=yes,transform_symlinks,\
+             ServerAliveInterval=45,ServerAliveCountMax=2,\
+             ssh_command='autossh -M 0' username@server:/\
+             /mnt/remote
+
+-   `mosh <http://mosh.mit.edu/>`_ (GPL with OpenSSL exceptions) is a
+    replacement for SSH that allows roaming, supports intermittent
+    connectivity, and provides intelligent local echo and line editing of
+    user keystrokes. Mosh improve ssh usability for mobile users. It is
+    in Debian. Mosh does not use the ssh tcp protocol, but runs a
+    terminal emulator at the server and transmits this screen to the
+    client through udp. This udp protocol may conflict with firewall
+    rules. Mosh cannot forward ssh-agent nor X11.
+
+    -  :wikipedia:`mosh`
+    -  `Mosh usage <https://mosh.mit.edu/#usage>`_, `info
+       <https://mosh.mit.edu/#techinfo>`_
+       and `FAQ <https://mosh.mit.edu/#faq>`_.
+    -  `GitHub: keithw/mosh source repository
+       <https://github.com/keithw/mosh>`_.
+    -  `ArchWiki:
+       autossh <https://wiki.archlinux.org/index.php/Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`_
+    -  Mosh has a chrome plugin and an `android client JuiceSSH
+       <https://play.google.com/store/apps/details?id=com.sonelli.juicessh>`.
 
 .. comment
 
