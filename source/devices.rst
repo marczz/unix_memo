@@ -136,11 +136,20 @@ Interacting with *proc* and *sys*.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If these command are not available you can work at low level with the
-*proc and *sys* virtual filesystem.
+*proc* and *sys* virtual filesystem.
 ::
 
     $ cat /proc/partitions
+    major minor  #blocks  name
+       8        0  976762584 sda
+       8        1     409600 sda1
+       8        2     307200 sda2
+    ....
+    $ ls -l /sys/block/*/device
+    lrwxrwxrwx 1 root root 0 Jan 25 21:10 /sys/block/sda/device -> ../../../0:0:0:0
+    lrwxrwxrwx 1 root root 0 Jan 25 21:12 /sys/block/sr0/device -> ../../../1:0:0:0
     $ cat /sys/block/sr0/device/model
+    DVDRAM GUA0N
 
 ..  _dev_fs:
 
@@ -170,6 +179,14 @@ Determine the file system of an unmounted partition.
 ----------------------------------------------------
 When the partition is mounted the output of :man:`mount` show the file
 system type.
+
+You can also use :man:`df` with the command::
+
+  $ df -Th
+  /dev/mapper/vg0-root         ext3       19G   12G  6.2G  65% /
+  /dev/sda2                    vfat      296M   50M  247M  17%
+  /boot/efi
+  ....
 
 When the partition is unmounted the you can use
 :man:`fdisk` or :man:`sfdisk` with *mbr* partition table
