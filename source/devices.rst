@@ -76,11 +76,18 @@ but it will not give you a partition list like :ref:`lsblk <lsblk>`
 or :ref:`blkid <blkid>`
 which I find more informative for discovering new devices.
 
-When you know your partitions, by using any mean like the
+There are many way to know what partitions compose your storage
+devices like
 :ref:`proc filesystem <devices_proc_sys_fs>`, the
-:ref:`dev filesystem <dev_fs>`, :man:`fdisk` or :man:`gdisk`
+:ref:`dev filesystem <dev_fs>`, or the commands: :man:`fdisk`, :man:`sfdisk`,
+:man:`gdisk`, :man:`sgdisk` or :man:`parted`.
 
-You can get more info using the device entry:
+You may have to use a second level whent the partition is a lvm
+partition used in a volume group divided in logical volumes by using
+:man:`lvdisplay` or for a btrfs file system divided in subvolumes by
+using :man:`btrfs-subvolume`.
+
+You can then get more info using the device entry:
 
 ::
 
@@ -158,6 +165,29 @@ their *UUID*.
 
 
     2075  ls /etc/dbus-1/system.d/ | grep freedesktop
+
+Determine the file system of an unmounted partition.
+----------------------------------------------------
+When the partition is mounted the output of :man:`mount` show the file
+system type.
+
+When the partition is unmounted the you can use
+:man:`fdisk` or :man:`sfdisk` with *mbr* partition table
+:man:`gdisk` or :man:`sgdisk` with *gpt* partition table,
+and  :man:`parted` with both to issue one of::
+
+  $ sudo fdisk -l /dev/sdd
+  $ sudo sfdisk -l /dev/sdd
+  $ sudo gdisk -l /dev/sdd
+  $ sudo sgdisk -i -p /dev/sdd
+  $ sudo parted /dev/sdd print
+
+All these command are to be run as root.
+
+
+We have also seen :ref:`above <blkid>` that :man:`blkid` also give the
+partition type, and it can even be run as a user, in this case he
+cannot tell if the partition is in use or not, but it gives the fs type.
 
 Mounting devices.
 -----------------
