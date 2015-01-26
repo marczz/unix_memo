@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    commands.rst
+   net_commands.rst
    shell.rst
    access_lists.rst
    attributes.rst
