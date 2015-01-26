@@ -5,7 +5,7 @@ Debian Package Config Memo
 dpkg Memo
 =========
 
-See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`,
+See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`, :man:`dpkg.cfg(5)`,
 :man:`dlocate(1)`, :man:`apt-file(1)`
 
 
@@ -34,6 +34,20 @@ See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`,
 -  Detailed status of foo, including dependencies and configuration::
 
      dpkg --status foo
+
+   Note that configuration files are followed by the md5sum  of the
+   original configuration file provided by the package. It allows the
+   package manager to know when they are changed. You can also use it
+   in the same way.
+   ::
+
+       $ dpkg --status mysql-common
+       .....
+       Conffiles:
+       /etc/mysql/conf.d/.keepme d41d8cd98f00b204e9800998ecf8427e
+       /etc/mysql/my.cnf 77f15d6c87f9c136c4efcda072017f71
+       $ md5sum /etc/mysql/my.cnf # unchanged conf
+       77f15d6c87f9c136c4efcda072017f71  /etc/mysql/my.cnf
 
 -  files provided by the installed package foo::
 
@@ -114,9 +128,43 @@ See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`,
       aptitude purge foo
 
 -   List the installation status of packages containing the string (or
-    regular expression) "foo*"::
+    regular expression) ``'foo*'``::
 
       dpkg --list 'foo*'
+
+-   Configuration files policy, without prompt:
+    They are listed in the ``--force-things`` section of the
+    :man:`dpkg(1) manpage <dpkg>`.
+
+    -   List the *force* options::
+
+          dpkg --force-help
+
+    -   Do not modify the current configuration file touched or not::
+
+          dpkg --install --force-confold foo
+
+
+    -   Do not modify the current configuration file when touched, but
+        apply the default policy when untouched (usually update it!)::
+
+          dpkg --install --force-confold --force-confdef foo
+
+    -   Install the new version of a modified configuration file,
+        the current version is kept in a file with the .dpkg-old::
+
+          dpkg --install --force-confnew foo
+
+    -   If a conffile is missing and the version in the  package
+        did  change,  always  install  the missing conffile without
+        prompting::
+
+          dpkg --install --force-confmiss foo
+
+    -   If a conffile has been modified always offer to replace
+        it, even if the version in the package did not change::
+
+          dpkg --install --force-confask foo
 
 apt/aptitude memo
 =================
@@ -202,6 +250,11 @@ Install/Remove
 -   removes the bar package together with all its configuration files::
 
       aptitude purge bar
+
+-   Use ``--force-things`` when calling dpkg from apt and aptitude::
+
+      apt-get install --reinstall -o Dpkg::Options::="--force-confmiss" foo
+      aptitude reinstall -o Dpkg::Options::="--force-confmiss" foo
 
 informations about packages
 ---------------------------
