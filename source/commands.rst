@@ -225,6 +225,7 @@ Users
    :man:`groupadd` admin%Add group "admin"
    :man:`useradd` -c "Linus Torvald" -g admin -m linus%Add new user
    :man:`usermod` -a -G sudo linus%add group "sudo" to linus groups.
+   :man:`adduser` |min2|\ uid 3333 linus%Add new user, with interactive prompt, create home dir.
    :man:`userdel` linus%Delete user linus
 
 system information
