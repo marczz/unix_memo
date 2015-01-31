@@ -2,12 +2,14 @@
 
 GnuPG Memo
 ==========
-References:
-    -    `Using the GNU Privacy Guard
-         <http://www.gnupg.org/documentation/manuals/gnupg/>`_
-    -    `Invoking GPG
-         <http://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html>`_
-         is an online version of the gpg2(1) manual.
+
+There are two gnupg programs GnuPG 1.4 is the standalone,
+non-modularized series, GnuPG 2.x is the new modularized version of
+GnuPG supporting OpenPGP and S/MIME. GnuPG2 gpg2 command is backward
+compatible whith version 1.4. ``gpg`` 1.4 is  the standalone version of gpg
+it will stay for embedded and server usage, as it brings less
+dependencies and smaller binaries.  For desktop use you should
+consider using gpg2.
 
 Gpg commands by category
 ------------------------
@@ -32,6 +34,18 @@ to add the fingerprints::
 
     gpg --fingerprint
     gpg --fingerprint Luc
+
+List only secret keys::
+
+    gpg --list-secret-keys
+    gpg --list-secret-keys 123456789D
+
+*keys followed by # are not usable.*
+
+The usage field use: **e** for *encrypt*, **s** for *sign*, **c** for *certify*
+i.e. signing an other key, **a** for *authentication*  cf `doc/DETAILS
+<http://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=blob_plain;f=doc/DETAILS>`_
+installed with gnupg.
 
 signing
 ~~~~~~~
@@ -131,7 +145,8 @@ Even if gpg is most often used for
 you can use it for encoding with a :wikipedia:`symmetric key
 <Symmetric-key_algorithm>`. In this case GnuPG will ask for a
 passphrase, and the  passphrase verification. The
-default gnupg encryption algorithm is :wikipedia:`CAST-128`,
+default gnupg encryption algorithm is :wikipedia:`CAST-128` also
+called *CAST5*,
 you can change it with ``--cipher-algo``. To encrypt with a
 symmetric key use::
 
@@ -261,7 +276,9 @@ If you follow the advice to symetric encrypt the secret key::
 
 
 Editing your keys
-~~~~~~~~~~~~~~~~~
+-----------------
+
+To edit a key you have to select it by a substring of one of its IDs.
 ::
 
     gpg --edit-key me@example.com
@@ -270,20 +287,201 @@ Editing your keys
 present a menu with many key management related tasks, you get a
 list with ``help``, among which:
 
-+----------+--------------------------------+
-|key       |select subkey                   |
-+----------+--------------------------------+
-|adduid    |add a user ID                   |
-+----------+--------------------------------+
-|deluid    |delete selected user IDs        |
-+----------+--------------------------------+
-|addkey    |add a subkey                    |
-+----------+--------------------------------+
-|delkey    |delete selected subkeys         |
-+----------+--------------------------------+
-|revkey    |revoke key or selected subkeys  |
-+----------+--------------------------------+
-|expire    |change the expiration date      |
-+----------+--------------------------------+
-|passwd    |change the passphrase           |
-+----------+--------------------------------+
++-----------------------------+--------------------------------+
+|list                         |list subkeys and uid            |
++-----------------------------+--------------------------------+
+|key                          |select subkey N                 |
++-----------------------------+--------------------------------+
+|uid                          |select uid N                    |
++-----------------------------+--------------------------------+
+|:ref:`adduid <uid_manage>`   |add a user ID                   |
+|                             |                                |
++-----------------------------+--------------------------------+
+|:ref:`deluid <uid_manage>`   |delete selected user IDs        |
+|                             |                                |
++-----------------------------+--------------------------------+
+|:ref:`revuid <uid_manage>`   |revoke selected user ID         |
+|                             |                                |
++-----------------------------+--------------------------------+
+|addkey                       |add a subkey                    |
++-----------------------------+--------------------------------+
+|delkey                       |delete selected subkeys         |
++-----------------------------+--------------------------------+
+|revkey                       |revoke key or selected subkeys  |
++-----------------------------+--------------------------------+
+|expire                       |change the expiration date      |
++-----------------------------+--------------------------------+
+|passwd                       |change the passphrase           |
++-----------------------------+--------------------------------+
+|:ref:`showpref <pref_modify>`|show key preferences            |
+|                             |                                |
++-----------------------------+--------------------------------+
+|:ref:`setpref <pref_modify>` |change key preferences          |
+|                             |                                |
++-----------------------------+--------------------------------+
+|save                         |save and quit                   |
++-----------------------------+--------------------------------+
+|quit                         |ask for saving and quit         |
++-----------------------------+--------------------------------+
+
+
+..  _uid_manage:
+
+Deleting or Revoking UID
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometime you either change your mail address, or drop an old one, or
+acquire a new one. An uid cannot be modified. You have to delete or
+revoke the old uid, and create a new one.
+
+For local keys you can delete components subkeys and uid, but when
+your key is distributed, for instance when published on a key server,
+it is ineffective and your old id will still be present on the
+keyserver, and other people keyring, see
+`GnuPg Manual: Adding and deleting key components
+<https://www.gnupg.org/gph/en/manual/c235.html#AEN281https://www.gnupg.org/gph/en/manual/c235.html#AEN281>`_
+for explanations.
+
+so if your key is distributed you rather want to revoke old
+components, and add new ones.
+
+::
+
+    gpg> list
+    pub  2048R/1234567C created ......
+    sub  2048R/9876543F created ....
+    [ultimate] (1). Frank <frank.nick@mail.org>
+    [ultimate] (2)  Frank <frank.oldnick@prevmail.org>
+    gpg> uid 2
+    .....
+    [ultimate] (2)*  Frank <frank.oldnick@prevmail.org>
+    gpg> revuid
+
+..  _pref_modify:
+
+Changing Preferences
+~~~~~~~~~~~~~~~~~~~~
+Key preferences are list of preferred algorithm for ciphers, digest,
+and compression.
+
+If you have some old private key, it could have been created with a
+set of preferrence that is no longer current.
+
+The first versions of GnuPg used a default hash of SHA1, now
+considerred as weak, and sha2 is preferred.
+
+You can inspect your preferences and change them in the following way.
+::
+
+    gpg> showpref
+         [ultimate] (1). Frank <frank.nick@mail.org>
+         Cipher: AES256, AES192, AES, CAST5, 3DES
+         Digest: SHA1, SHA256, RIPEMD160
+         Compression: ZLIB, BZIP2, ZIP, Uncompressed
+         Features: MDC, Keyserver no-modify
+     gpg> setpref
+         Set preference list to:
+         Cipher: AES256, AES192, AES, CAST5, 3DES, IDEA
+         Digest: SHA256, SHA1, SHA384, SHA512, SHA224
+         ......
+     Really update the preferences? (y/N) y
+     You need a passphrase to unlock the secret key for ...
+     .....
+     gpg> pref
+         [ultimate] (1). Frank <frank.nick@mail.org>
+         Cipher: AES256, AES192, AES, CAST5, 3DES, IDEA
+         Digest: SHA256, SHA1, SHA384, SHA512, SHA224
+         ......
+
+Here we have used pref *without argument* to reset the preferences to
+the default, either the server wide default set by gnupg or if you
+have set personal defaults in your configuration with
+``default-preference-list``.
+
+You can also set preferences only for this key, see more details in
+`GnuPg Manual: Key Management
+<https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html>`_
+in the *setpref* description.
+
+References
+----------
+
+-   `Wikipedia: GNU Privacy Guard
+    <http://en.wikipedia.org/wiki/GNU_Privacy_Guard>`_
+-   `Using the GNU Privacy Guard
+    <http://www.gnupg.org/documentation/manuals/gnupg/>`_
+-   `GnuPG Home Page
+    <http://www.gnupg.org/>`_
+
+    -   `Invoking GPG
+        <http://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html>`_
+        is an online version of the gpg2(1) manual.
+    -   `The GNU Privacy
+        Handbook <http://www.gnupg.org/gph/en/manual.html>`_, ( `french
+        translation <http://www.gnupg.org/gph/fr/manual.html>`_ )
+
+        -   `GnuPG manual
+            <http://www.gnupg.org/documentation/manuals/gnupg/>`_
+            This manual documents how to use the GNU Privacy Guard system as
+            well as the administration and the architecture.
+        -   `Faq <http://www.gnupg.org/documentation/faqs.html>`_
+        -   `list of howtos
+            <http://www.gnupg.org/documentation/howtos.en.html>`_
+
+-   `GnuPG Gentoo User Guide <http://wiki.gentoo.org/wiki/GnuPG>`_
+    how to install GnuPG, how to create your key pair, how to add keys
+    to your keyring, how to submit your public key to a key server and
+    how to sign, encrypt, verify or decode messages you send or
+    receive, or local files.
+-   `ArchWiki: GnuPG <https://wiki.archlinux.org/index.php/GnuPG>`_
+    environment variables, configuration file, encrypt and decrypt,
+    gpg-agent, pinentry, start gpg-agent with systemd user,
+    unattended passphrase, keysigning Parties, smartcards, troubleshooting.
+-   Ubuntu Documentation: `Gnu Privacy Guard Howto
+    <https://help.ubuntu.com/community/GnuPrivacyGuardHowto>`_
+    does not bring much on usage, but has a section on web of trust,,
+    key signing and key backup.
+
+    -   `Storing GPG Keys on an Encrypted USB Flash Drive
+        <https://help.ubuntu.com/community/GPGKeyOnUSBDrive>`_
+-   `OpenPGP Best Practices
+    <https://help.riseup.net/en/security/message-security/openpgp/best-practices>`_
+-  `gpg quickstart <http://www.madboa.com/geek/gpg-quickstart/>`__ by
+   Paul Heinlein, is an up-to-date beginner how-to.
+-  subkeys are a quite difficult feature of gnupg and not very well
+   documented. You can read `Using multiple subkeys in
+   GPG <http://blog.dest-unreach.be/wp-content/uploads/2009/04/pgp-subkeys.html>`__
+   by Adrian von Bidder and `Debian
+   Wiki:subkeys <https://wiki.debian.org/subkeys>`__.
+-  `Philip Zimmermann Home page <http://www.philzimmermann.com/>`__
+   Philip Zimmermann is the creator of PGP and distributes also Zfone,
+   soft for encrypting voip telephony.
+
+Replacing old  dsa key by a new rsa one.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-  `Ana's blog: Creating a new GPG key
+   <http://ekaia.org/blog/2009/05/10/creating-new-gpgkey/>`_
+   included also in
+   `keyring.debian.org - Creating a new GPG key
+   <http://keyring.debian.org/creating-key.html>`_.
+-  `Weblog for dkg: HOWTO prep for migration off of SHA-1 in
+   OpenPGP <http://www.debian-administration.org/users/dkg/weblog/48>`_
+
+GPG tools
+~~~~~~~~~
+-   `GnuPg Helper Tools
+    <http://www.gnupg.org/documentation/manuals/gnupg/Helper-Tools.html>`_
+    contains *watchgnupg*, *gpgv*, *addgnupghome*, *gpgconf*,
+    *applygnupgdefaults*, *gpgsm-gencert.sh*, *gpg-preset-passphrase*,
+    *gpg-connect-agent*, *dirmngr-client*, *gpgparsemail*, *symcryptrun*,
+    *gpg-zip*.
+-   `gpgv2
+    <https://www.gnupg.org/documentation/manuals/gnupg/gpgv.html>`_
+    a stripped-down version of gpg which is only able to check signatures.
+-   `Gpa <http://wald.intevation.org/projects/gpa/>`__ is a graphical
+    user interface for GnuPG. GPA utilizes GTK+ and connects to GnuPG via
+    the `GPGME
+    library <http://www.gnupg.org/documentation/manuals/gpgme/>`__.
+-   `gpg-preset-passphrase
+    <https://www.gnupg.org/documentation/manuals/gnupg/gpg_002dpreset_002dpassphrase.html#gpg_002dpreset_002dpassphrase>`_
+    Put a passphrase into the cache.
