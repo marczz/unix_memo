@@ -49,13 +49,22 @@ installed with gnupg.
 
 signing
 ~~~~~~~
-
+To sign with your default key:
 ::
 
     gpg --sign message.txt
 
 in this case the result ``message.txt.gpg`` is compressed and not
 legible.
+
+If you want to use an other private key
+::
+
+    gpg -u 1234ABC8 message.txt
+    gpg -u 'gnu corp. inc'  message.txt
+
+Here the string *'gnu corp. inc'* is a unique substring in the
+private key uids.
 
 To make a clear signature::
 
@@ -68,6 +77,7 @@ for a a detached signature in ``/tmp/message.txt.sig``::
 now a detached and ascii armored signature in ``/tmp/message.txt.asc``::
 
     gpg --detach-sign --armor /tmp/message.txt
+
 
 
 Verifying a signature
@@ -97,13 +107,13 @@ Encrypting
 
     gpg --recipient Luc  --encrypt /tmp/message.txt
 
-produces ``/tmp/message.txt.gpg`` ``Luc`` is **a part** of the Id of the
+produces ``/tmp/message.txt.gpg`` ``Luc`` is **a substring** of the Id of the
 recipient, if ambiguous or absent you are asked for the recipient.
 
 *Note that you* `don't need a full uid
 <http://www.gnupg.org/documentation/manuals/gnupg/Specify-a-User-ID.html>`_
 of a key or subkey, any non ambiguous part will do. You can also use
-the pub key itself.
+the pub key Id itself.
 
 To encrypt to stdout with the key associated wit pub key
 ``A897396C``::
@@ -114,23 +124,41 @@ The same operation using fingerprints::
 
     gpg --recipient 123434343434343C3434343434343734349A3434 --output - /tmp/message.txt
 
+You can also use a word match::
+
+    gpg --recipient '+Smith Frank Junior'
+
+Will match a key uid containing *Frank Smith Junior*.
+
 If you have configured ``~/.gnupg/gpg.conf`` with a
-``default-recipient-self`` and set a ``default-key``::
+``default-recipient`` or ``default-recipient-self``::
 
     gpg --encrypt /tmp/message.txt
 
-encrypt with your own key. If these defaults are missing it will
+encrypt to the default recipient, if it is missing it will
 ask for a recipient.
 
 To encrypt and *armor* in the *ASCII-armored text*
-``/tmp/message.txt.asc`` use::
+``/tmp/message.txt.asc`` using the key set in configuration with
+``default-key`` (or a single private key) use::
 
     gpg --recipient Luc  --armor --encrypt /tmp/message.txt``
 
-To encrypt and sign::
+To encrypt and sign with armored text::
 
     gpg --recipient Luc --sign --armor --encrypt /tmp/message.txt
 
+
+To encrypt and sign choosing as recipient the key which have an uid
+with an *exact* (not *substring*) mail address of
+``luc.smith@gnu.org``, and a specific secret key::
+
+
+    gpg --local-user 1122C3B8 --recipient '<luc.smith@gnu.org>' --output /tmp/doc.gpg \
+    --encrypt --sign doc.txt
+
+The recipient will use the ``--decrypt`` option to extract
+*and verify the signature* of ``message.txt.asc`` or ``doc.gpg``.
 
 To create an encrypted archive with your default key::
 
@@ -466,6 +494,22 @@ Replacing old  dsa key by a new rsa one.
    <http://keyring.debian.org/creating-key.html>`_.
 -  `Weblog for dkg: HOWTO prep for migration off of SHA-1 in
    OpenPGP <http://www.debian-administration.org/users/dkg/weblog/48>`_
+
+To summarize the process:
+
+-   Create a new key, using 2048-bit RSA
+-   Generate revocation certificate for the new key
+-   Add necessary uids
+-   Sign your new key with your old one.
+-   Revoke no longer used uid from the old key.
+-   If all uid are to be revoked, create a new one specifying
+    *in the comment*, that the other key is to be used now.
+-   Publish both keys.
+-   Ask trusted people that use and certificated the old key to
+    certificate the new one.
+-   Issue a new certification for users keys that you certified with
+    the old key, and are still current.
+
 
 GPG tools
 ~~~~~~~~~
