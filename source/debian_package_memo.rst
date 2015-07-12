@@ -260,60 +260,54 @@ informations about packages
 ---------------------------
 
 -   update cache and check for broken packages
-
     ::
 
         apt-get   check
 
 -   search package from text description:
-
     ::
 
         apt-cache search  pattern
 
-    or
-
-    ::
+    or ::
 
         aptitude search foo
 
 -   Search all manually installed packages (~i: installed, !~M not
     automatic)
-
     ::
 
         aptitude search '~i!~M'
 
 -   Search all packages with tag hardware::input:keyboard
-
     ::
 
         aptitude search ~Ghardware::input:keyboard
 
 -   Search all packages whose description contains the word "switcher"
-
     ::
 
         aptitude search ~dswitcher
 
 -   Search all installed packages that contains "firewall" in
     description.
-
     ::
 
         aptitude search '~dfirewall~i'
 
 -   Search all package installed from an other archive than debian
-
     ::
 
         aptitude search '!~Odebian'~i
 
 -   Search or show all packages of priority *standard* (priority must be
-    extra, important, optional, required, or standard. ) :sub:`~`
-    aptitude search '?priority(standard)' aptitude search '~p standard'
-    aptitude show "?priority(standard)" aptitude show '~p standard'
-    :sub:`~`
+    extra, important, optional, required, or standard. )
+    ::
+
+        aptitude search '?priority(standard)'
+        aptitude search '~p standard'
+        aptitude show '?priority(standard)'
+        aptitude show '~p standard'
 
 -   search patterns description is in
     `Debian Reference: The aptitude regex formula
@@ -353,20 +347,18 @@ informations about packages
 <type\> is one of ``depends``, ``predepends``, ``recommends``,
 ``suggests``, ``breaks``, ``conflicts``, or ``replaces``.
 
--    package priority/dists information
-
+-    package priority/dists information:
      ::
 
          apt-cache policy  package
+         aptitude versions package
 
--    show description of package
-
+-    show description of package:
      ::
 
          aptitude show package
 
--    show description of package in archive
-
+-    show description of package in archive:
      ::
 
          aptitude show package/archive
@@ -377,14 +369,13 @@ informations about packages
 
          aptitude show -t archive package
 
--    show the installed version of a package
-
+-    show the installed version of a package:
      ::
 
          apt-show-versions -p package
          apt-show-versions -r regex
 
--    show all versions in archives
+-    show all versions in archives:
 
      ::
 
@@ -410,72 +401,65 @@ informations about packages
 
 -    package information including what repositories provide available
      versions and forward and reverse dependencies
-
      ::
 
          apt-cache showpkg package
 
 -    Print the full package record of a package including all aptitude
-     show output and md5, sha1, sha256 sums, and tags.
-
+     show output and md5, sha1, sha256 sums, and tags:
      ::
 
          apt-cache show package
          dpkg --print-avail package
 
--    Transitive dependencies and reverse dependencies of a package
-
+-    Transitive dependencies and reverse dependencies of a package:
      ::
 
          apt-cache depends package
          apt-cache rdepends package
 
 -    You can also use aptitude
-
      ::
 
          apt-cache rdepends xdg-utils
 
-     can be replaced by
+     can be replaced by:
+     ::
 
-     aptitude search '?dependency(xdg-utils)'
+         aptitude search '?dependency(xdg-utils)'
 
      but the to search all dependencies of the package like
      ``apt-cache depends``:
+     ::
 
-     aptitude search
-     '?reverse-depends(xdg-utils)\|?reverse-recommends(xdg-utils)\|reverse-suggest(xdg-utils)'
+         aptitude search
+         '?reverse-depends(xdg-utils)\|?reverse-recommends(xdg-utils)\|reverse-suggest(xdg-utils)'
 
 -    Detailed information about the priority selection of the named
      package. It helps to debug your preferences pinning.
-
      ::
 
          apt-cache policy <package>
 
 -    Look for a file matching a pattern among the sources.list packages,
-     first update the ``apt-file`` cache with
-
+     first update the ``apt-file`` cache with:
      ::
 
          apt-file update
 
-     Then search with
-
+     Then search with:
      ::
 
          apt-file search <pattern>
 
      We can switch from the default glob pattern to a regex or a fixed
-     string with
-
+     string with:
      ::
 
          apt-file --regexp search <pattern>
          apt-file --fixed-string search <pattern>
 
--    Look for a file matching a pattern among installed packages ''only''
-
+-    Look for a file matching a pattern among installed packages *only'*:
      ::
 
          dpkg --search <pattern>
@@ -483,47 +467,40 @@ informations about packages
 
 -    Content of all packages (among the sources.list packages) whose name
      match a pattern:
-
      ::
 
          apt-file list <pattern>
 
-     for installed packages *only* use
-
+     for installed packages *only* use:
      ::
 
          dpkg {-listfiles|-L} <pattern>
          dlocate -l <pattern>
 
-     for deb packages
-
+     for deb package files:
      ::
 
          dpkg -c </path/to/pkg.deb>
 
--    Dependencies and reverse dependencies of a package
-
+-    Dependencies and reverse dependencies of a package:
      ::
 
          apt-cache depends pkg(s)
          apt-cache rdepends pkg(s)
 
--    how many packages you have from testing
-
+-    how many packages you have from testing:
      ::
 
          apt-show-versions | fgrep /testing | wc
 
--    list of upgradeable packages (''including upgrades not in
-     preferences''):
-
+-    list of upgradeable packages *including upgrades not in
+     preferences*:
      ::
 
          apt-show-versions -u
 
 -    upgrade all unstable packages to their newest versions
-     (''dangerous''):
-
+     *(dangerous)*:
      ::
 
          aptitude install `apt-show-versions -u -b | fgrep /unstable`
@@ -536,7 +513,7 @@ Reference: :man:`apt-key(8)`
      receive a key, you will use either the default keyserver or give
      one explicitly::
 
-       sudo apt-key adv --recv-keys --keyserver hkp://keys.gnupg.net <missing key>
+       sudo apt-key adv --recv-keys --keyserver hkp://pgp.mit.edu <missing key>
 
 -   You can also directly provide the key in stdin::
 
