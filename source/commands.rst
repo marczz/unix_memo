@@ -26,7 +26,9 @@ files
    :delim: %
    :widths: 50, 60
 
-   :man:`rename` 's/.jpeg$/.jpg/' \*.jpeg%Mass rename
+   ls -la > dirlist 2>&1%`Redirect`_ both stdout and stderr to a file.
+   `rename`_ 's/.jpeg$/.jpg/' \*.jpeg%Mass rename with perl rename command
+   :man:`rename <rename.ul>` .jpeg .jpg \*.jpeg%Mass rename with util-linux rename command
    `find`_ ./ -type f -print | `xargs`_ :coreutils:`chmod` 640%Change permissions to 640 for all files in subtree.
    `find`_ ./ -type d -print | `xargs`_ :coreutils:`chmod` 751%Change permissions to 751 for all sub-directories.
 
@@ -241,8 +243,11 @@ system information
    :coreutils:`cat` /proc/partition%Show all partitions registered on the system.
    `grep`_ MemTotal /proc/meminfo%Show RAM total (see also *free*, *vmstat*)
    :coreutils:`cat` /proc/cpuinfo%Show CPU(s) info
+   :man:`lscpu`%Show CPU(s) info
    :man:`lsdev`%hardware info from the /proc directory
-   :man:`lspci` -tv%Show PCI info
+   sudo :man:`lspci` -tv%Show PCI info
+   sudo :man:`lshw`%Show hardware configuration of the machine
+   sudo :man:`hwinfo`%Show hardware configuration of the machine
    :man:`lsusb` -tv%Show USB info
    :man:`mount` | :coreutils:`column` -t%List mounted fs on the system (and align output)
    `grep`_ -F capacity: /proc/acpi/battery/BAT0/info%Show state of cells in laptop battery
@@ -390,6 +395,8 @@ Refs
 .. _grep: http://www.gnu.org/software/grep/manual/html_node/index.html
 .. _ImageMagick: http://www.imagemagick.org
 .. _rsync: http://www.samba.org/ftp/rsync/rsync.html
+.. _Redirect: http://www.gnu.org/software/bash/manual/bashref.html#Redirections
+.. _rename: https://metacpan.org/pod/distribution/File-Rename/rename.PL
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
 .. _tcpdump: http://www.tcpdump.org/tcpdump_man.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
