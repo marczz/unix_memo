@@ -2,6 +2,7 @@
 
 Udev device Management and usb devices
 ======================================
+..  highlight:: shell-session
 
 -  :mzlinux:`MZlinux udev/hotplug Page </node/151>`
 -  :man:`udev(7)`
@@ -30,11 +31,11 @@ finding usb devices
 
 -  To have a list of usb devices just do::
 
-       lsusb
+       $ lsusb
 
 -   A slightly more informative list is got by::
 
-        lsusb -v \| grep -E '<(Bus\|iProduct\|bDeviceClass\|bDeviceProtocol)' 2>/dev/null
+        $ lsusb -v \| grep -E '<(Bus\|iProduct\|bDeviceClass\|bDeviceProtocol)' 2>/dev/null
 
 -   To get detailled information you can
 
@@ -44,12 +45,12 @@ finding usb devices
 
             lsusb -v -s 003:001
 
-    -   Use the *vendor:product* that you find with ``udevinfo`` or
-        ``udevadm info`` like:
+    - Use the *vendor:product* that you find with ``udevadm info``
+      like:
 
         ::
 
-            lsusb -v -d 04b8:082b
+            $ lsusb -v -d 04b8:082b
 
 Many of the keys in ``lsusb`` are attributes of ``udevadm info`` and can
 be used in udev configuration.
@@ -58,7 +59,9 @@ Using /sys keys
 -------------------
 
 Ref: `Writing udev rules by Daniel Drake
-<http://www.reactivated.net/writing_udev_rules.html>`_
+<http://www.reactivated.net/writing_udev_rules.html>`_,
+`ArchWiki: udev
+<https://wiki.archlinux.org/index.php/udev>`_.
 
 We obtain the keys by looking for dev ``/sys`` info, with
 ``udevadm info``:
@@ -66,51 +69,43 @@ We obtain the keys by looking for dev ``/sys`` info, with
 1.  find the key by either
 
     -   Report with ``udevadm info`` providing the device name
-
         ::
 
-            #!sh
-            $ udevadm info -a  -n /dev/usb/lp0
+            $ udevadm info --query=property  --name /dev/usb/lp0
 
    -   use the path that you also get from device by
-
        ::
 
-           #!sh
-           $ udevadm info -q all  -n /dev/usb/lp0
-           P: /class/usb/lp0
-           N: usb/lp0
+           $ udevadm info --query=path  --name /dev/usb/lp0
+           /class/usb/lp0
 
        and get dev ``/sys`` info by
-
        ::
 
-           $ udevadm info -a  -p /class/usb/lp0
+           $ udevadm info --query=property  --path /class/usb/lp0
 
 2.  We can then find appropriate keys to identify uniquely our device::
 
-        #!sh
+
         SYSFS{manufacturer}=="Hewlett-Packard "
         SYSFS{product}=="DeskJet 840C"
 
 3.  We then add our rule in /etc/udev/rules.d/10-local.rules
-    ::
 
-        #!sh
-        BUS=="usb", SYSFS{product}=="DeskJet 840C", NAME="%k", KERNEL=="lp[0-9]*", NAME="usb/%k", GROUP="lp", SYMLINK="deskjet"
+.. code-block:: cfg
+
+       BUS=="usb", SYSFS{product}=="DeskJet 840C", NAME="%k", KERNEL=="lp[0-9]*", NAME="usb/%k", GROUP="lp", SYMLINK="deskjet"
 
 4.  Reload udev conf by::
 
-        #!sh
-        udevcontrol reload_rules
+        $ udevcontrol reload_rules
 
 5.  Test the config with::
 
-        udevtest   $(udevadm info -q path -n /dev/usb/lp0)
+        $ udevtest   $(udevadm info -q path -n /dev/usb/lp0)
 
     or::
 
-        #!sh
         $ udevtest /class/usb/lp0 usb
         main: looking at device '/class/usb/lp0' from subsystem 'usb'
         main: opened class_dev->name='lp0'
@@ -119,7 +114,6 @@ We obtain the keys by looking for dev ``/sys`` info, with
         udev_rules_get_name: rule applied, 'lp0' becomes 'usb/lp0'
         create_node: creating device node '/dev/usb/lp0', major = '180', minor     = '0', mode = '0660', uid = '0', gid = '7'
         create_node: creating symlink '/dev/deskjet' to 'usb/lp0'
-
 
 
     -   note that it is only a udev simulation, not the true udev creating
@@ -133,7 +127,6 @@ We obtain the keys by looking for dev ``/sys`` info, with
 
 6.  We must now have::
 
-        #!sh
         $ ls -l /dev/usb/lp0
         crw-rw----  1 root lp 180, 0 Mar 14 21:42 /dev/usb/lp0
         $ ls -l /dev/deskjet
@@ -144,7 +137,9 @@ keys by::
 
     $ udevadm info -a -p $(udevadm info -q path -n /dev/uba1)
 
-then add in /etc/udev/rules.d/10-local.rules::
+then add in /etc/udev/rules.d/10-local.rules
+
+.. code-block:: cfg
 
     BUS="usb", SYSFS{serial}="0402170100000020EB5D00000000000", KERNEL="ub?1", NAME="%k", SYMLINK="usbfoo"
 
@@ -172,8 +167,9 @@ Device <http://gentoo-wiki.com/HOWTO_USB_Mass_Storage_Device>`__
 Automounting USB devices
 ------------------------
 
-/etc/udev/rules.d/sda.rules::
+/etc/udev/rules.d/sda.rules:
 
+.. code-block:: cfg
 
     KERNEL=="sd[a-z]", NAME="%k", SYMLINK+="usbhd-%k", GROUP="users", OPTIONS="last_rule"
     ACTION=="add", KERNEL=="sd[a-z][0-9]", SYMLINK+="usbhd-%k", GROUP="users", NAME="%k"
@@ -197,11 +193,13 @@ To debug udev we can:
 1.  use ``udevtest``
 2.  log ``udevd`` by issuing::
 
+.. code-block:cfg
+
         log="yes"
 
 3.  in /etc/udev.conf and change the level of debugging with::
 
-        udevcontrol log_priority=level
+        $ udevcontrol log_priority=level
 
 the priority is a  numerical or symbolic level from systlog
 **err**, **info** and **debug**
