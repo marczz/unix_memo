@@ -5,8 +5,8 @@ Access Control List
 ACL References
 ==============
 
--  Acl is described in :man:`acl(5)`, its use is in :man:`setfacl(1)` and
-   [cx:getfacl(1)]
+-  Acl is described in :man:`acl` (5), its use is in :man:`setfacl` (1)
+   and :man:`getfacl` (1).
 -  `ArchWiki: Access Control Lists
    <https://wiki.archlinux.org/index.php/Access_Control_Lists>`_
 -  `POSIX Access Control Lists on Linux
@@ -25,7 +25,7 @@ ACL References
 -  `python-pylibacl <http://pylibacl.k1024.org/>`__ provide an acl
    interface to python
 -  `NFSV4 has an ACL support
-   <http://www.citi.umich.edu/projects/nfsv4/linux/using-acls.html>`__
+   <http://www.citi.umich.edu/projects/nfsv4/linux/using-acls.html>`_
    The nfsv4 acls are thinner than the posix acls, even if they get
    translated to posix. you manage nfsv4 acl with *nfs4-acl-tools*
    *nfs4_getfacl* and *nfs4_setacl*.
@@ -54,17 +54,25 @@ permissions in the group class. The group class contains the owning
 group, other, and all named user and named group permission. So the
 initial mask of a directory without acl is the union of group and other.
 
-In a directory with a mask chmod change the mask (wich limit the 'group
-class' permission), nor the owning group permission.
+In a directory with a mask chmod change the mask (which limit the *group
+class* permission), nor the *owning group* permission.
 
-Default acl
-===========
+Default acl.
+============
 
 A new directory inherit from the default acl of his parent directory both
-as *access acl* and *default acl*.
+as *access acl* and *default acl*. When a directory has extra acls it
+is listed by ``ls -l`` with an extra ``+`` after the access bits.
 
-Using acl to control access
-===========================
+You can reset the acls to the default value by one of:
+::
+
+    $ setfacl -b /path/to/directory
+    $ setfacl --remove-all /path/to/directory
+
+
+Using acl to control access.
+============================
 
 You may have some directory that contains sensible data and you don't
 want to give others a read permission in any (or most) part of this
@@ -83,8 +91,8 @@ your protected directory to some sensible value every process accessing
 this directory, will not use the mask but the *mode* field, and files or
 directory are created in accordance to your default acl.
 
-My acl to protect crypt and other sensitive data
-================================================
+My acl to protect crypt and other sensitive data.
+=================================================
 
 
 ::
