@@ -7,7 +7,8 @@ SSH
 
 ssh memo
 --------
-Fo ssh commands examples see  :ref:`ssh commands <ssh_commands>` in the :ref:`linux_command_memo`.
+Fo ssh commands examples see  :ref:`ssh commands <ssh_commands>`
+in the :ref:`linux_command_memo`.
 
 -   To get the public key from the private one::
 
@@ -77,14 +78,15 @@ If you use ``ControlMaster`` you need to specify
 Ssh port forwarding
 -------------------
 
--   ssh port forwarding and tunneling is explained in the `Tcp forwarding
-    section <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh#TCP+FORWARDING>`_
-    and `X11 forwarding
-    section <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh#X11+FORWARDING>`_
-    of the man page, `SSH Port
-    Forwarding <http://www.symantec.com/connect/articles/ssh-port-forwarding>`_
-    by Brian Hatch see also `Compressed-TCP
-    HOWTO <http://en.tldp.org/HOWTO/Compressed-TCP.html>`_ by Sebastian
+-   ssh port forwarding and tunneling is explained in the
+    `Tcp forwarding section
+    <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh#TCP+FORWARDING>`_
+    and `X11 forwarding section
+    <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh#X11+FORWARDING>`_
+    of the man page, `SSH Port Forwarding
+    <http://www.symantec.com/connect/articles/ssh-port-forwarding>`_
+    by Brian Hatch see also `Compressed-TCP HOWTO
+    <http://en.tldp.org/HOWTO/Compressed-TCP.html>`_ by Sebastian
     Schreiber.
 -   The general syntax for port forwarding is: -L port:host:hostport --
     redirect a local port to a remote host:hostport -R port:host:hostport
@@ -306,10 +308,10 @@ As set :ref:`above <chacha20_cipher>` we should replace ``arcfour128`` with
 ``chacha20-poly1305@openssh.com`` whenever it is available.
 
 sshd config
-~~~~~~~~~~~
+-----------
 
 AllowUsers
-++++++++++
+~~~~~~~~~~
 
 To restrict to some users and hosts the ssh access, we can use the
 directives *Allowusers*, *AllowGroups*, *DenyUsers*, *DenyGroups*.
@@ -323,7 +325,7 @@ Example::
           maint@119.20.143.*
 
 Match directive examples
-++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 *Match* deirectives are more powerfull than the *Allowusers*,
 *AllowGroups*, *DenyUsers*, *DenyGroups* directive but need more care
@@ -366,7 +368,7 @@ and older examples previously posted by Darren Tucker
             Subsystem sftp /bin/false
 
 Testing new configuration
-+++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If we administer a server where the only access is through ssh we
 should be very careful when changing sshd configuration, or we can be
@@ -382,10 +384,10 @@ which I test on a client with::
 
 
 ssh config
-~~~~~~~~~~
+----------
 
 Match directive
-+++++++++++++++
+~~~~~~~~~~~~~~~
 
 The match directive is available also for the client since 6.4.
 
@@ -462,6 +464,25 @@ look at `options.h in source tree
 When dropbear is `built for a small server
 <https://github.com/mkj/dropbear/blob/5cf83a7212c0f353e7367766cc4bbf349e83ff0b/SMALL>`_
 some of these ciphers may be disabled.
+
+ssh debugging
+-------------
+
+-   A usual and easy problem are the permissions on your home
+    directory, .ssh directory, and the authorized_keys file.  Your
+    home directory should be writable only by you, ``~/.ssh`` should
+    be 700, all the keys and ``authorized_keys`` should be 600.  On
+    the client this is the easier problem, because your client clearly
+    signal this error, it is less obvious for ``authorized_keys`` on
+    the server side.
+-   On ssh client side you can add a ``-v`` option to your ssh
+    command add more ``-v`` for more detailed debug
+-   To see authentification problems on the server tail the
+    authentication log: ``less +H /var/log/auth.log``, and the
+    sshd.service: ``journalctl -f -u ssh.service``.
+-   On the server run sshd in debug mode on a distinct port ex:
+    ``/usr/sbin/sshd -d -p 2222``
+
 
 Fish
 ----
@@ -560,25 +581,24 @@ SSH References
     `DigitalOcean: How To Create an SSH CA to Validate Hosts and
     Clients
     <https://www.digitalocean.com/community/tutorials/how-to-create-an-ssh-ca-to-validate-hosts-and-clients-with-ubuntu>`_,
-    `Blargh: OpenSSH certificates
-    tutorial
+    `Blargh: OpenSSH certificates tutorial
     <http://blog.habets.pp.se/2011/07/OpenSSH-certificates>`_,
     `Using a CA with SSH <http://www.lorier.net/docs/ssh-ca>`_.
--   While
-    `ssh-agent <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-agent>`_
+-   While `ssh-agent
+    <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-agent>`_
     is a daemon that cache your decrypted private keys during your
     session `Keychain <http://www.funtoo.org/wiki/Keychain>`_ is a
     front-end to ssh-agent, allowing you to have one long-running
     ssh-agent process per system, rather than one per login session.
-    Keychain was `introduced by Daniel Robins in
-    2001 <http://www.ibm.com/developerworks/linux/library/l-keyc2/>`_ for
+    Keychain was `introduced by Daniel Robins in 2001
+    <http://www.ibm.com/developerworks/linux/library/l-keyc2/>`_ for
     Gentoo *Keychain has evolved since this article*, It is now available
     in most distributions.
 
-    -   `Gentoo Guide:
-        Keychain <http://www.gentoo.org/doc/en/keychain-guide.xml>`_.
-    -   `ArchWiki:
-        Keychain <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
+    -   `Gentoo Guide: Keychain
+        <http://www.gentoo.org/doc/en/keychain-guide.xml>`_.
+    -   `ArchWiki: Keychain
+        <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
     -   `man: keychain(1) <http://man.cx/keychain(1)>`_
 
 -   `Envoy <https://github.com/vodik/envoy>`_ (GPL)
@@ -590,8 +610,8 @@ SSH References
     user's home folder. The default keyring uses the login password for
     encryption.
 
-    -   `ArchLinux: Gnome
-        Keyring <https://wiki.archlinux.org/index.php/GNOME_Keyring>`_
+    -   `ArchLinux: Gnome Keyring
+        <https://wiki.archlinux.org/index.php/GNOME_Keyring>`_
         describe also how to `use it without gnome
         <https://wiki.archlinux.org/index.php/GNOME_Keyring#Use_without_GNOME.2C_and_without_a_display_manager>`_.
     -   `mozilla-gnome-keyring
