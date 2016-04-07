@@ -1,5 +1,7 @@
-Operating on devices
-====================
+.. _disk-devices:
+
+Operating on disk devices
+=========================
 
 Listing devices.
 ----------------
@@ -82,12 +84,17 @@ devices like
 :ref:`dev filesystem <dev_fs>`, or the commands: :man:`fdisk`, :man:`sfdisk`,
 :man:`gdisk`, :man:`sgdisk` or :man:`parted`.
 
-You may have to use a second level whent the partition is a lvm
-partition used in a volume group divided in logical volumes by using
-:man:`lvdisplay` or for a btrfs file system divided in subvolumes by
-using :man:`btrfs-subvolume`.
+You may have to use a second level when the partition is not a
+physical partition but a logical partition.
+lvm volumes are grouped in *volume groups* divided in *logical
+volumes* that you can list using
+:man:`lvdisplay`.
 
-You can then get more info using the device entry:
+If the partition host a btrfs file system, you can list the
+subvolumes that compose it by using :man:`btrfs-subvolume`.
+
+When you add the device entry to *udiskctl* you obtain a more detailed
+info:
 
 ::
 
@@ -98,7 +105,7 @@ You can then get more info using the device entry:
 
 ``-p`` *is an abbrev for* ``--object-path`` *and* ``b`` *an abbrev
 for* ``--block-device``. In any case the *block-device* the
-*object-path* are told in the answer.
+*object-path* is told in the answer.
 
 You can also use ``udisksctl monitor`` to monitor devices
 before connecting the device and see the
@@ -107,6 +114,14 @@ device entry attributed by udev.
 It is also shown in your kernel messages, and can be read with
 :man:`dmesg` but it is quite laborious to find the proper line.
 
+
+References
+++++++++++
+
+-   `udisksctl
+    <http://udisks.freedesktop.org/docs/latest/udisksctl.1.html>`_
+-   `ArchWiki: udisks
+    <https://wiki.archlinux.org/index.php/Udisks>`_
 
 Using the *udev* level for usb devices.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,16 +197,24 @@ system type.
 
 You can also use :man:`df` with the command::
 
-  $ df -Th
+  $ df --print-type --human-readable
+  Filesystem                   Type      Size  Used Avail Use% Mounted on
   /dev/mapper/vg0-root         ext3       19G   12G  6.2G  65% /
   /dev/sda2                    vfat      296M   50M  247M  17%
   /boot/efi
   ....
 
-When the partition is unmounted the you can use
-:man:`fdisk` or :man:`sfdisk` with *mbr* partition table
-:man:`gdisk` or :man:`sgdisk` with *gpt* partition table,
-and  :man:`parted` with both to issue one of::
+Using short options the command is ``df -Th``.
+
+When the partition is not mounted whe have seen :ref:`above <blkid>`
+that :man:`blkid` also give the partition type, and it can even be run
+as a user, in this case he cannot tell if the partition is in use or
+not, but it still gives the fs type.
+
+When you want to know the size and alignement of a partition you can
+use :man:`fdisk` or :man:`sfdisk` with *mbr* partition table
+:man:`gdisk` or :man:`sgdisk` with *gpt* partition table, and
+:man:`parted` with both of them to issue one of::
 
   $ sudo fdisk -l /dev/sdd
   $ sudo sfdisk -l /dev/sdd
@@ -200,11 +223,6 @@ and  :man:`parted` with both to issue one of::
   $ sudo parted /dev/sdd print
 
 All these command are to be run as root.
-
-
-We have also seen :ref:`above <blkid>` that :man:`blkid` also give the
-partition type, and it can even be run as a user, in this case he
-cannot tell if the partition is in use or not, but it gives the fs type.
 
 Mounting devices.
 -----------------
@@ -224,15 +242,25 @@ system, you should use `udisksctl
 ::
 
     $ udisksctl mount -b /dev/sdd1
+    $ udisksctl mount -b /dev/disk/by-label/key64G001
     $ udisksctl unmount -b /dev/sdd1
     $ udisksctl power-off -b /dev/sdd1
+
+The *udisks* daemon mount your block device in a directory
+``/media/<user>`` that it creates if necessary. If ther is a label it is
+used; so the device above *key64G001* is mounted as
+``/media/<user>/key64G001``.
+
+The directory ``/media/<user>`` belongs to root, but has an ACL giving
+you the ``r-x`` access. ``/media/<user>/key64G001`` and entry below
+belongs to to you with ``rwx`` access.
 
 Front ends
 ----------
 You may also want to have some frontend that allows to alleviate the
 burden of remembering the commands or to read the manual, *but which add
-the the load of remembering the frontend api and make you depend on
-the presence of an added software piece*.
+the the load of remembering the frontend api, and make you depend on
+the presence of an added piece of software*.
 
 -   `bashmount <https://github.com/jamielinux/bashmount/>`__ is a bash
     script to help mounting with *udisks2*.
