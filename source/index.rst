@@ -14,6 +14,7 @@ Contents:
    commands.rst
    net_commands.rst
    shell.rst
+   portable_shell.rst
    access_lists.rst
    attributes.rst
    swap.rst
@@ -22,12 +23,15 @@ Contents:
    wpa.rst
    udev.rst
    devices.rst
+   vfs.rst
    encrypt.rst
    gnupg.rst
    debian_package_memo.rst
+   pdf.rst
+   systemd.rst
    vi_cheatsheet
    nano.rst
-   network
+   network.rst
 
 Indices and tables
 ==================
