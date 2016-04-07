@@ -264,14 +264,20 @@ informations about packages
 
         apt-get   check
 
--   search package from text description:
+-   Text search in the package names and the descriptions for the POSIX regex pattern:
     ::
 
         apt-cache search  pattern
 
-    or ::
+-   When using aptitude, the patterns are composed by terms introduced
+    by the character "?" or "~", the default search is ``?name()`` or
+    ``~n``.To look for packages containing ``foo`` in their name use
+    one of
+    ::
 
         aptitude search foo
+        aptitude search '?name(foo)'
+        aptitude search ~nfoo
 
 -   Search all manually installed packages (~i: installed, !~M not
     automatic)
@@ -309,13 +315,19 @@ informations about packages
         aptitude show '?priority(standard)'
         aptitude show '~p standard'
 
--   search patterns description is in
+-   Search patterns description is in
     `Debian Reference: The aptitude regex formula
     <http://www.debian.org/doc/manuals/debian-reference/ch02.en.html#_the_aptitude_regex_formula>`_
     and
     `Aptitude reference guide: search  patterns
     <http://aptitude.alioth.debian.org/doc/en/ch02s04.html>`_.
+    `Aptitude reference guide:Search term reference
+    <http://aptitude.alioth.debian.org/doc/en/ch02s04s05.html#tableSearchTermQuickGuide>`_
 
+    This table is a shorter reference only to the short form of search
+    term .The `Search term reference
+    <http://aptitude.alioth.debian.org/doc/en/ch02s04s05.html#tableSearchTermQuickGuide>`_
+    has also the longer form.
 
 +--------------+----------------+----------------------+-----------------+--------------------+------------+
 | key          | val            | key                  | val             | key                | val        |
@@ -347,15 +359,18 @@ informations about packages
 <type\> is one of ``depends``, ``predepends``, ``recommends``,
 ``suggests``, ``breaks``, ``conflicts``, or ``replaces``.
 
+*garbage* means not required by any manually installed package.
+
 -    package priority/dists information:
      ::
 
          apt-cache policy  package
          aptitude versions package
 
--    show description of package:
+-    show description of candidate version of a package:
      ::
 
+         apt-cache show --no-all-versions package
          aptitude show package
 
 -    show description of package in archive:
@@ -364,7 +379,6 @@ informations about packages
          aptitude show package/archive
 
      or
-
      ::
 
          aptitude show -t archive package
@@ -376,25 +390,22 @@ informations about packages
          apt-show-versions -r regex
 
 -    show all versions in archives:
-
      ::
 
          apt-show-versions -a package
 
 -    show description of all versions of a package:
-
      ::
 
          aptitude -v show package
 
 -    show description of package in all dists:
-
      ::
 
+         apt-cache show package
          apt-cache show -a package
 
 -    show description of matching source package:
-
      ::
 
          apt-cache showsrc package
@@ -418,18 +429,18 @@ informations about packages
          apt-cache depends package
          apt-cache rdepends package
 
--    You can also use aptitude
+-    You can also use aptitude by replacing
      ::
 
          apt-cache rdepends xdg-utils
 
-     can be replaced by:
+     by:
      ::
 
          aptitude search '?dependency(xdg-utils)'
 
      but the to search all dependencies of the package like
-     ``apt-cache depends``:
+     ``apt-cache depends`` you need a complex search
      ::
 
          aptitude search
