@@ -5,17 +5,232 @@ SSH
 ..  highlight:: shell-session
 
 
-ssh memo
---------
+ssh memo.
+---------
 Fo ssh commands examples see  :ref:`ssh commands <ssh_commands>`
 in the :ref:`linux_command_memo`.
 
--   To get the public key from the private one::
+ssh escapes.
+~~~~~~~~~~~~
+From :bsdman:`escape characters in the ssh manual
+<ssh#ESCAPE_CHARACTERS>`
 
-      $ openssl rsa -in rsa_key.priv -pubout
 
-authorized-keys
++---------+-------------------------------------+
+| ``~.``  | Disconnect.                         |
++---------+-------------------------------------+
+| ``~^Z`` | Background ssh.                     |
++---------+-------------------------------------+
+| ``~#``  | List forwarded connections.         |
++---------+-------------------------------------+
+| ``~&``  | Background ssh at logout. [#]_      |
++---------+-------------------------------------+
+| ``~?``  | list escape characters.             |
++---------+-------------------------------------+
+| ``~B``  | Send a BREAK to the remote system   |
++---------+-------------------------------------+
+| ``~C``  | Open command line. [#]_.            |
++---------+-------------------------------------+
+| ``~R``  | Request rekeying of the connection. |
++---------+-------------------------------------+
+| ``~V``  | Decrease the log verbosity.         |
++---------+-------------------------------------+
+| ``~v``  | Increase the log verbosity.         |
++---------+-------------------------------------+
+
+.. [#] when waiting for forwarded connection / X11 sessions to terminate.
+.. [#] currently this allows the addition or cancelation of port forwardings using the
+       ``-L``, ``-R`` and ``-D``; or ``-KL`` ``-KR``, ``-KD``; ``-h`` for help.
+
+       ``!command`` execute a local command if the ``PermitLocalCommand``
+       option is enabled in :bsdman:`ssh_config`.
+
+ssh keys.
+---------
+
+Key encryption
+~~~~~~~~~~~~~~
+
+SSH protocol 2 supports
+:wikipedia:`DSA
+<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>`,
+:wikipedia:`RSA
+<https://en.wikipedia.org/wiki/RSA_(cryptosystem)>`
+:wikipedia:`ECDSA
+<https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm>`,
+:wikipedia:`Ed25519 <https://en.wikipedia.org/wiki/EdDSA>`
+keys, the two last being instance of
+:wikipedia:`Curve algorithm <https://en.wikipedia.org/wiki/Curve25519>`;
+protocol 1 only supports RSA keys.
+
+DSA has vulnerabilities and is deprecated in openssh 7.0,
+there are `concerns about the security of ECDSA
+<https://git.libssh.org/projects/libssh.git/tree/doc/curve25519-sha256@libssh.org.txt#n4>`_
+and it is supposed that NSA could have put backdoors in this
+algorithm, as Ed25519 is also technically superior we can always
+prefer it.
+
+The more portable key is RSA, Ed25519 will give you the best security
+and performance but requires recent versions of client & server,
+Ed25519 and ECDSA are not supported by gnome keyring as of March 2016.
+
+`SSH implementation comparison: hostkey
+<http://ssh-comparison.quendi.de/comparison/hostkey.html>`
+give the support of key algorithm for most of ssh software.
+ssh-RSA is required to be supported by ssh RFC, so is always present
+:wikipedia:`ECDSA
+<https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm>`
+is widely present; but
+:wikipedia:`SSH-Ed25519 <https://en.wikipedia.org/wiki/EdDSA>`
+is only supported by OpenSSH, and few other softare like
+the windows clients :wikipedia:`PuTTY` and
+`smartFTP <https://www.smartftp.com/>`_, the iOS and Android client
+`TinyTerm <http://www.censoft.com/products/mobile/>`_, and the linux
+tiny client `TinySSH <https://tinyssh.org/index.html>`_.
+
+You  can also find a list of `Things that use Ed25519
+<https://ianix.com/pub/ed25519-deployment.html>` including a list of
+ssh software
+
+Even if Ed25519 is both secure and fast, most often for ssh what
+matter is the ref:`cipher performance` not the authentication speed.
+
+Generating a key pair
+~~~~~~~~~~~~~~~~~~~~~
+
+To generate a RSA key with default keysize of 2048::
+
+  $ ssh-keygen
+
+The ``-b`` option allow to choose an other key size but as state the
+`Gnupg FAQ <https://www.gnupg.org/faq/gnupg-faq.html#no_default_of_rsa4096>`_
+*Once you move past RSA-2048, you’re really not gaining very much*
+and you loose the portability.
+
+If you use Ed25519 all keys are 256 bits.
+
+You can consult a list of `Summary of keylength recommendations of
+well-known security organizations <https://www.keylength.com/>`_
+
+If you wantto explore thie keylength topic you have first to
+understand why `symmetric cryptography have smaller key than
+asymmetric cryptography
+<https://blog.cloudflare.com/why-are-some-keys-small/>`_.
+You can also look in the `Référentiel Général de Sécurité
+version 2.0 <http://www.ssi.gouv.fr/uploads/2015/01/RGS_v-2-0_B1.pdf>`_.
+
+
+If you really want a stronger key you can use Ed25519 with::
+
+  $ ssh-keygen -t ed25519
+
+But it is a good choice only to communicate with recent OpenSSH
+servers, older version and some other ssh servers don't support it,
+there is a list of `Things that use Ed25519
+<https://ianix.com/pub/ed25519-deployment.html>` including a list of
+ssh software, note that as far as april 2016 the windows popular
+client PutTTY support Ed25519 in its snapshot version.
+
+.. _new key format:
+
+The ed2519 are stored in a new format that implement a
+:wikipedia:`Key derivation function` using many bcrypt rounds to
+make more difficult rainbow table attacks. This new format is
+the default for ed2519 and can be requested for other keys by adding
+the option ``-o``::
+
+  $ ssh-keygen -o -f ~/.ssh/myspecialid_rsa
+
+See :ref:`below <bcrypt_private_key>` for details on this new format.
+
+To know what keys are supported by your ssh software issue::
+
+  $ ssh -Q cipher
+
+It is not advisable to have a key without password since any one that
+get access to your private key can will be able to assume your
+identity on any SSH server. Nevertherless if I never use as main key a
+key without password, it can be acceptable to have a secondary key
+that allow unattended connections if you make sure that only the
+appropriate daemon can use it, by using :ref:`a proper authorized-keys
+entry like shown below <authorized-keys>`.
+
+Modyfying a key
 ~~~~~~~~~~~~~~~
+
+To change the passphrase of an existing key::
+
+  $ ssh-keygen -f ~/.ssh/id_rsa -p
+
+To get the public key from the private one::
+
+  $ ssh-keygen -f ~/.ssh/id_rsa -y
+
+
+Key formats
+~~~~~~~~~~~
+
+To convert a public key to PEM format::
+
+  $ ssh-keygen -e -m PEM -f ~/.ssh/id_rsa.pub >id_rsa_PEM.pub
+
+It works also with the private key as input, but the output is only
+the public key::
+
+    $ ssh-keygen -e -m PEM -f ~/.ssh/id_rsa >id_rsa_PEM.pub
+
+You can also give to ``-m`` the format ``RFC4716`` to have a SSH2
+public key or ``PKCS8`` to have an openssl compatible
+:wikipedia:`PKCS8 <PKCS>` key.
+
+Refs: :bsdman:`ssh-keygen`, :bsdman:`openssl`
+
+.. _bcrypt_private_key:
+
+You can convert your old key to `new key format`_ by::
+
+  $ ssh-keygen -o -p -a 64 -f id_rsa
+
+The ``-a`` give the number of bcrypt rounds, and default to 16, the
+bigger they are the longer is the password verification time, and the
+stronger the protection to brute-force password cracking. As example
+adding to the agent with ``ssh-add`` a private RSA 256 bytes on my
+laptop gives a time of 0.004s (too small to be truly significative)
+but with a default of 16 rounds encryption 0.292s i.e 73 time longer,
+a 100 rounds encryption 1.616s 404 times longer, a 1000 rounds
+encryption it is 16.172 seconds 4176 longer, it means that a rainbow
+table attack will try one table entry for the encrypted format in the
+same time than 4000 entries with the unencrypted format.
+
+Of course a slower decrypting could be annoying if you wait for each
+ssh-connection, but if you use the agent, and still more if you have
+keychain or envoy. You have to wait only once.
+
+
+To recognize the formats of your key you can look at the head comment
+of the key block.
+
+For an RSA password less key ::
+
+  -----BEGIN RSA PRIVATE KEY-----
+  (base64 blurb)
+
+For a RSA encrypted ssh old format  ::
+
+  -----BEGIN RSA PRIVATE KEY-----
+  Proc-Type: 4,ENCRYPTED
+  DEK-Info: AES-128-CBC,227...
+  (base64 blurb)
+
+For the new format ::
+
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  (base64 blurb)
+
+.. _authorized-keys:
+
+authorized-keys.
+~~~~~~~~~~~~~~~~
 
 -   The file ``authorized-keys`` protocol 2 public key consist of:
     options, keytype, base64-encoded key, comment. Where options are
@@ -23,12 +238,11 @@ authorized-keys
 -   You can secure ssh when using a key without passphrase by putting
     **options** in your authorized_keys file. Options allow you to
     restrict to some clients, limit port forwarding, or force the use of
-    a predefined command. The options are listed in the `SSHRC section of
-    sshd man
-    page <http://www.openbsd.org/cgi-bin/man.cgi?query=sshd#SSHRC>`_ that
+    a predefined command. The options are listed in the
+    :bsdman:`SSHRC section of sshd man page <sshd#SSHRC>` that
     also gives some examples like
 
-    ..  code:: cfg
+    ..  code-block:: cfg
 
         # Comments allowed at start of line
         ssh-rsa AAAAB3Nza...LiPk== user@example.net
@@ -38,6 +252,181 @@ authorized-keys
         tunnel="0",command="sh /etc/netstart tun0" ssh-rsa AAAA...==  jane@example.net
 
 
+copying the key to a remote server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can use :bsdman:`ssh-copy-id` to copy the file to the remote server::
+
+  $ ssh-copy-id -i ~/.ssh/mykeyid_rsa.pub username@remote-server.org
+
+If you omit the id it will add all your keys to the remote server,
+either the keys returned bi ``ssh-add -L``, if nothing is in your
+agent it will use the most recent file that matches: ``~/.ssh/id*.pub``.
+When using the ssh-agent key, :bsdman:`ssh-copy-id` will loose your
+comment. When you have multiple keys the comment is very usefull to
+remember the key role, so it is better to always givr the key file
+with the ``-i`` option.
+
+It is allowed but not recommended to specify the port or other options
+with ssh-copylike this::
+
+  $ ssh-copy-id -i ~/.ssh/mykeyid_rsa.pub -p 27654 -o 'X11Forward=Yes' username@remote-server.org
+
+But is is always better to put these option in  :bsdman:`ssh_config`.
+
+We can also manually copy the key, if we can ssh to the server by::
+
+  $ cat ~/.ssh/mykeyid_rsa.pub | ssh username@remote-server.org \
+  'sh -c "cat >> ~/.ssh/authorized_key; chmod 0600  ~/.ssh/authorized_key"
+
+which is similar to the previous ``ssh-copy``.
+
+If you have not yet an ssh access to the server, you can copy the key
+by any mean like ftp, webdav, shared cloud ... to the server, if the
+transport media is not protected it is more secure to encrypt it
+during the transport with gpg or symetric encryption; the on the
+server::
+
+  $ mkdir ~/.ssh
+  $ chmod 700 ~/.ssh
+  $ cat /path/of/mykeyid_rsa.pub >> ~/.ssh/authorized_keys
+  $ rm /path/of/mykeyid_rsa.pub
+  $ chmod 600 ~/.ssh/authorized_keys
+
+
+
+
+ssh agent.
+----------
+An SSH agent is a program which caches your decrypted private keys and
+provides them to SSH client programs on your behalf.
+
+Launching ssh-agent.
+~~~~~~~~~~~~~~~~~~~~
+
+On Debian the ssh-agent is launched in the ancestors of your X session
+by ``/etc/X11/Xsession`` so under X it should run as you can check
+with::
+
+  $ [ $SSH_AUTH_SOCK ] && echo "socket $SSH_AUTH_SOCK" && ps u $SSH_AGENT_PID
+
+If it is not running you can launch it by::
+
+  $ eval $(ssh-agent)
+
+In Debian default you have no ssh-agent session when in a console
+session, or connected from a remote site.
+
+You can launch it from your profile, if it is not yet present.
+
+You may use `a more elaborate script
+<http://mah.everybody.org/docs/ssh>`_ to ensure you are launching an
+unique agent session for your user on the computer.
+
+In way used by default by Debian, if it is not yet done you can launch
+it as a parent process of a daemon with::
+
+  $ ssh-agent startx
+
+or adding to your .xinitrc::
+
+  eval $(ssh-agent)
+
+It is also possible to `start it as a systemd user service
+<https://wiki.archlinux.org/index.php/SSH_keys#Start_ssh-agent_with_systemd_user>`_
+and you will have a global ssh-agent for your global user session,
+whatever it run X or not.
+
+Refs: :bsdman:`ssh-agent`
+
+Using ssh-agent.
+~~~~~~~~~~~~~~~~
+
+You can list the cached keys::
+
+  $ ssh-add -l
+  2048 SHA256:4135dff81d9eff01f2319078995c06ab05feccc0S28 /home/user/.ssh/id_rsa (RSA)
+
+Add a key with::
+
+  $ ssh-add /path/of/key
+
+Remove all keys from cache by::
+
+  $ ssh-add -D
+
+Refs: :bsdman:`ssh-add`
+
+ssh agent forwarding.
+~~~~~~~~~~~~~~~~~~~~~
+
+To get agent forwarding we must have the option ``ForwardAgent``
+set, it is not recommended to set it globally because
+users with the ability to bypass file permissions on the remote host
+socket ``$SSH_AUTH_SOCK`` can access the local agent
+through the forwarded connection.
+
+You can either do it when required by::
+
+  $ ssh -oForwardAgent=true user@example.com
+
+or use the short option ``-A``::
+
+  $ ssh -A user@example.com
+
+or if you want to always forward agent to a specific server you trust,
+you can put in ``~/.ssh/config``::
+
+  Host example.com
+    ForwardAgent yes
+
+in any case you can check your have forwarder your agent by looking at
+the value of ``$SSH_AUTH_SOCK`` which should be defined::
+
+  $ ssh -oForwardAgent=true user@example.com
+  Linux server 3.2.62-1  ...
+  ....
+  $ echo "$SSH_AUTH_SOCK"
+  /tmp/ssh-4TjiNKqsGf/agent.3737
+
+Refs: :bsdman:`ssh`
+
+Forwarding to a sudo session.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are logged in a machine A with a ssh-agent running and holding
+your key, and you ssh to a machine B with agent forwarding in your B
+session you can still use your key to log in to a server C.
+
+Now suppose you do a sudo  you loose the agent because SSH_AUTH_SOCK
+is not exported, so you can no longer ssh to C even if your
+user key is authorized.
+
+You can preserve your agent by using::
+
+  $ sudo -i SSH_AUTH_SOCK=$SSH_AUTH_SOCK
+
+or if you want to use su::
+
+  $sudo SSH_AUTH_SOCK=$SSH_AUTH_SOCK su -p -l
+
+Note than when using ``su`` the option ``-p`` preserve the environment
+that as yet be reset by ``sudo`` except  SSH_AUTH_SOCK=$SSH_AUTH_SOCK.
+
+If you want to do it for all your sudo sessions you could add to your
+``/etc/sudoers``::
+
+  Defaults    env_keep+=SSH_AUTH_SOCK
+
+This method may not work for an other user than root because it does
+not have the rights to read ``$SSH_AUTH_SOCK``, you have to add it
+either by adding it to your group and ensuring thet the group has
+read-write access, or using acl like::
+
+  $ setfacl -m otheruser:x   $(dirname "$SSH_AUTH_SOCK")
+  $ setfacl -m otheruser:rwx "$SSH_AUTH_SOCK"
+  $ sudo su - otheruser
+
+Refs: :man:`su`, :man:`sudo`, man:`setfacl`
 
 Connection sharing
 ~~~~~~~~~~~~~~~~~~
@@ -54,7 +443,7 @@ These feature are described in the
 You can fix the control path of your connections by putting in
 ``~/.ssh/config``
 
-..  code:: cfg
+..  code-block:: aconf
 
     Host *
     ControlPath ~/.ssh/sshsocket-%r@%h:%p
@@ -64,7 +453,7 @@ then you can set first a master connection by adding the option
 same control socket. and will not ask for any authentication If you
 don't want to use ``-M`` you can put in your ssh config
 
-.. code:: cfg
+.. code-block:: aconf
 
     Host *
     ControlMaster auto
@@ -75,14 +464,74 @@ connection and ``autoask`` to combine both options
 If you use ``ControlMaster`` you need to specify
 ``-o ControlMaster=no`` when using ssh to do ssh tunneling.
 
+  $ ssh -Y example.com
+
+when your goal is to open an X11 application on the server you can
+use::
+
+  $ ssh -X -f example.com xprog
+
+ssh will open the remote session, letting you enter your credentials,
+then background before command execution.before command execution.
+
+You may want to allow automatic X11 forwarding to trusted servers,
+you can do it by putting in your ``~/.ssh/config``::
+
+  Host example.com
+    ForwardX11 yes
+    ForwardX11Trusted yes
+
+Note that to be able to forward connection you the server should have
+in its  :bsdman:`sshd_config` ``X11Forwarding yes`` and the
+default is ``no``, and ``AllowTcpForwarding``, ``X11UseLocalhost`` set to
+``yes`` which is the default. In some case you may want to change also
+``X11DisplayOffset``. A basic Xorg configuration including ``xauth``
+should also be present on the remote server, but it does not imply
+that the remote server has a display.
+
+Refs: :bsdman:`ssh manual - X11 forwarding section
+<ssh#X11_FORWARDING>`, :bsdman:`sshd_config(5)<sshd_config>`,
+:bsdman:`ssh_config(5)<ssh_config>`.
+
+.. _keychain:
+
+Keychain
+~~~~~~~~
+
+While :bsdman:`ssh-agent`
+is a daemon that cache your decrypted private keys during your
+session `Keychain <http://www.funtoo.org/wiki/Keychain>`_ is a
+front-end to ssh-agent, allowing you to have one long-running
+ssh-agent process per system, rather than one per login session.
+Keychain was `introduced by Daniel Robins in 2001
+<http://www.ibm.com/developerworks/linux/library/l-keyc2/>`_ for
+Gentoo *Keychain has evolved since this article*, It is now available
+in most distributions.
+
+-   `Gentoo Guide: Keychain
+    <http://www.gentoo.org/doc/en/keychain-guide.xml>`_.
+-   `ArchWiki: Keychain
+    <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
+-   `man: keychain(1) <http://man.cx/keychain(1)>`_
+
+.. _envoy:
+
+Envoy
+~~~~~
+
+`Envoy <https://github.com/vodik/envoy>`_ (GPL)
+is a ssh/gpg-agent wrapper leveraging cgroups and
+systemd/socket activation with functionalities similar to
+keychain, but done in c, takes advantage of cgroups and systemd.
+
 Ssh port forwarding
 -------------------
 
 -   ssh port forwarding and tunneling is explained in the
-    `Tcp forwarding section
-    <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh#TCP+FORWARDING>`_
-    and `X11 forwarding section
-    <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh#X11+FORWARDING>`_
+    :bsdman:`Tcp forwarding section
+    <ssh#TCP_FORWARDING>`
+    and :bsdman:`X11 forwarding section
+    <ssh#X11_FORWARDING>`
     of the man page, `SSH Port Forwarding
     <http://www.symantec.com/connect/articles/ssh-port-forwarding>`_
     by Brian Hatch see also `Compressed-TCP HOWTO
@@ -141,6 +590,29 @@ Ssh port forwarding
 
         $ sudo -u <user> $SHELL -c "xauth add $(xauth list :${DISPLAY##*:}); <xprogram>"
 
+Keeping session alive
+---------------------
+You can work either on the server side or the client side.
+
+For the client you can set the configuration option
+``ServerAliveInterval`` which is an intervall after wich a ssh
+keepalive message is sent to the server, the default is 0.
+
+It work in combination with ``ServerAliveCountMax`` which is the max
+number of such message sent, the default value is 3.
+If you have set ``ServerAliveInterval`` to 30 you send at most 3
+messages every 30s.
+
+If the option ``BatchMode`` is ``yes`` then  ``ServerAliveInterval``
+will be set to 300 seconds.
+
+On the Server side by default ``ClientAliveInterval`` is 0 which means
+that the server does not send keep alive message to the client.
+
+If you set ``ClientAliveInterval 300`` and ``ClientAliveCountMax 12``
+(default is 3) you send to the inactive client a keep alive message
+each 5mn during 2 hours.
+
 .. _ssh_ciphers:
 
 Cipher Performances
@@ -149,7 +621,7 @@ The list of supported symmetric **cipher**, supported message integrity
 codes (**MAC**), key exchange algorithms (**KEX**), and **key** types
 are displayed by using the ``-Q`` option::
 
-  ssh -Q cipher
+  $ ssh -Q cipher
 
 the result may contain :wikipedia:`aes <aes>`,
 :wikipedia:`triple DES <triple DES>` *superseded by aes*,
@@ -163,15 +635,33 @@ attacks, so it should not be used in exposed situations; but the speed
 of arcfour let him stand as a good candidate on firewalled local area
 networks *when chacha20 is still unavailable*.
 
+Note that :wikipedia:`chacha20 <Salsa20#ChaCha_variant>` is a fast
+and secure algorithm, see the :ref:`speed tests<speed_tests>` below.
+
 .. _cipher_compatibility:
 
 Note that you can only use it if the server allow this cipher
-otherwise you will get an answer of::
+otherwise you will get an answer like::
 
   $ ssh -c arcfour128 server.example.com
   no matching cipher found: client arcfour128 \
-  server aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr
+  server aes25.
 
+`SSH Implementation Comparison: Ciphers
+<http://ssh-comparison.quendi.de/comparison/cipher.html>`_ shows what
+cipher is supported by each ssh software, :wikipedia:`Arcfour <RC4>`
+is still suported by many server and clients, while
+:wikipedia:`chacha20 <Salsa20#ChaCha_variant>`
+is only available in OpenSSH,  :wikipedia:`PuTTY` and
+`TinySSH`_.
+
+
+.. _speed_tests:
+
+For *chacha20-poly1305*
+there are a `CloudFare page showing the improvement on https
+<https://blog.cloudflare.com/do-the-chacha-better-mobile-performance-with-cryptography/>`_
+when opting for  *chacha20-poly1305* encryption.
 
 We find some tests in the articles
 `ssh speed tests
@@ -187,108 +677,6 @@ quite slow on arm computers, it is why it is more important to choose
 your cipher for speed when transferring from or to an arm computer,
 when it does not involve security risks.
 
-I did also some ssh speed tests from my pc (pentium 1.70GHz) to three arm
-computers with a 1Gb ethernet connection *only 100Mb/s for
-raspberry*. The arm computers are: a NAS with armv5l 1.2GHz, a raspberry  ARM11 armv6,
-0.7GHz, a banana pi armv7h, cortex-A7 2 cores, 1GHz.
-
-
-+-----------+----------+----------+---------+---------+---------+----------+
-| processor |aes256-ctr|aes128-ctr| 3des    |blowfish |arcfour  |chacha20  |
-+===========+==========+==========+=========+=========+=========+==========+
-|armv5l     |4.8MB/s   |5.9MB/s   |2.5MB/s  |8MB/s    |12.5MB/s |          |
-+-----------+----------+----------+---------+---------+---------+----------+
-|armv6      |4.4MB/s   | 4.8MB/s  |1.7MB/s  |5.0MB/s  |5.6MB/s  |          |
-+-----------+----------+----------+---------+---------+---------+----------+
-|armv7h x 2 |5.9MB/s   |8.3MB/s   |         |         |         |12.5MB/s  |
-+-----------+----------+----------+---------+---------+---------+----------+
-
-
-For *arcfour* we have to
-`prefer arcfour128
-<http://security.stackexchange.com/questions/26765/what-are-the-differences-between-the-arcfour-arcfour128-and-arcfour256-ciphers>`_,
-I repeated the test on raspberry, with the same result,I don't
-understand such poor
-performance for a cipher whose main quality is the speed, more it
-contradict the following test done with openssl.
-
-For extra security when there is no *chacha20* support
-on wan we can use :wikipedia:`blowfish
-<Blowfish_(cipher)>` for a quick cypher, stronger than
-:wikipedia:`RC4`, but the tests above show that the gain is minor on
-most architectures.
-
-The transfer time is the result of five  operations , reading,transfer
-proper, decoding, writing when ethernet link is fast, and we use a
-fast storage *for the test I use tmpfs* the encoding
-capabilities of the processors are crucial.
-
-Of course from the five links the weaker is encryption/decryption on
-the arm computer, to better isolate this element I tested
-encryption/decryption of a 10MB random bytes file on three processors.
-
-I used as command::
-
-  $ time openssl enc -e -aes-256-ctr -out /dev/null -in /tmp/testdata -k mypasswd
-  $ time openssl enc -d -aes-256-ctr -out /dev/null -in /tmp/testdata.enc -k mypasswd
-
-
-+------------+------------+------------+----------+----------+----------+----------+
-|cipher      |pentium enc |pentium dec |armv6 enc |armv6 dec |armv7h enc|armv7h dec|
-+============+============+============+==========+==========+==========+==========+
-|aes-256-ctr |0.5s        |0.6s        |9.8s      |9.9s      | 6.7s     |6.5s      |
-+------------+------------+------------+----------+----------+----------+----------+
-|des3        |7.6s        |7.4         |46.7s     |46.6      | 22.6s    | 22.4s    |
-+------------+------------+------------+----------+----------+----------+----------+
-|blowfish    |1.9s        |1.6s        |9.8s      |9.7s      |5.6s      | 5.9s     |
-+------------+------------+------------+----------+----------+----------+----------+
-|rc4         |0.3s        |0.3s        |3.3s      |3.3s      |2.4s      |2.7s      |
-+------------+------------+------------+----------+----------+----------+----------+
-|chacha20    |            |            |          |          |          |          |
-+------------+------------+------------+----------+----------+----------+----------+
-
-So there is hardly any reason on Pentium to use an other crypto than
-*aes-256* that is said very secure. Des3 is 14 times slower than
-*aes-256*,  even *blowfish* is slower than
-*aes-256* and
-the gain of *arcfour* is not worth the loss of security.
-
-Compared to Pentium the encryption
-time of *aes-256* is multiplied by 20 on armv6 and 13 on armv7. Even
-here the gain of *blowfish* is nul or low, but arcfour is three time
-faster than *aes-256*.
-
-I will add the results of *chacha20* when I get on these computers an
-openssl newer than 1.02 which is needed for
-*chacha20* support.
-
-
-.. _chacha20_cipher:
-
-The new :wikipedia:`chacha20 <Salsa20#ChaCha_variant>` has also be
-conceived `to replace RC4 and be fast on devices that don’t have
-AES hardware acceleration
-<http://googleonlinesecurity.blogspot.fr/2014/04/speeding-up-and-strengthening-https.html>`_
-the previous paper contains also some speed tests.
-
-More details on this new cipher in the
-`ietf draft
-<https://tools.ietf.org/id/draft-agl-tls-chacha20poly1305-01.html>`_.
-
-When it is available it should replace weaker *RC4* and *blowfish* which
-can now be considered as outdated.
-
-.. _ssh_file_transfer:
-
-File transfer on a quick link
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The `ssh speed tests
-<http://www.damtp.cam.ac.uk/user/ejb48/sshspeedtests.html>`_
-article point out that for file transfer we get a better gain, no by
-only choosing a proper cipher, but mainly by using the appropriate
-method.
-
 This article compare *scp*, *tar over ssh*, *rsync*, *sshfs* when
 transferring compressible or incompressible data. He shows *tar over
 ssh* without compression at 100MB/S while scp at 10MB/s and sshfs at
@@ -302,10 +690,11 @@ for on-the-fly compression.
 The main conclusion is that to transfer a big directory on a fast lan the
 better is::
 
-  tar -cf- src | ssh -q -c arcfour128 lanhost tar -xf- -Cdest
+  tar -cf- src | ssh -q -c chacha20-poly1305@openssh.com lanhost tar -xf- -Cdest
 
-As set :ref:`above <chacha20_cipher>` we should replace ``arcfour128`` with
-``chacha20-poly1305@openssh.com`` whenever it is available.
+As set :ref:`above <ssh_ciphers>` we should replace
+``chacha20-poly1305@openssh.com`` with ``arcfour128`` whenever it is
+unavailable.
 
 sshd config
 -----------
@@ -319,9 +708,10 @@ directives *Allowusers*, *AllowGroups*, *DenyUsers*, *DenyGroups*.
 *Allowusers* can use patterns that takes the form *USER@HOST* to
 restrict to some user on specific hosts.
 
-Example::
+Example:
+..  code-block:: aconf
 
-  AllowUsers john root@119.20.143.62 root@119.20.143.116
+    AllowUsers john root@119.20.143.62 root@119.20.143.116
           maint@119.20.143.*
 
 Match directive examples
@@ -332,7 +722,9 @@ Match directive examples
 to setup properly.
 
 An example of overriding settings on a per-user basis
-from the sshd configuration example in the *openssh* package::
+from the sshd configuration example in the *openssh* package:
+
+..  code-block:: aconf
 
     Match User anoncvs
            X11Forwarding no
@@ -340,8 +732,9 @@ from the sshd configuration example in the *openssh* package::
            PermitTTY no
            ForceCommand cvs server
 
-and older examples previously posted by Darren Tucker
-::
+and older examples previously posted by Darren Tucker:
+
+..  code-block:: squid
 
     # allow anyone to authenticate normally from the local net
     Match Address 192.168.0.0/24
@@ -391,7 +784,9 @@ Match directive
 
 The match directive is available also for the client since 6.4.
 
-I use it to detect local subnets like::
+I use it to detect local subnets like:
+
+..  code-block:: aconf
 
     # faster ciphers for lan
     Match exec "local_ip %h"
@@ -400,7 +795,9 @@ I use it to detect local subnets like::
          Ciphers chacha20-poly1305@openssh.com,arcfour128,blowfish-cbc,aes128-ctr
 
 here local ip is a python function that match the ip associated with
-an hostname::
+an hostname:
+
+..  code-block:: python
 
     import socket
     import re
@@ -426,7 +823,9 @@ an hostname::
         main()
 
 With these settings when I target a local subnet my settings are used,
-we can check it with the ``-v`` *verbose* option::
+we can check it with the ``-v`` *verbose* option:
+
+..  code-block:: console
 
     OpenSSH_6.5, OpenSSL 1.0.1f 6 Jan 2014
     debug1: Reading configuration data /home/marc/.ssh/config
@@ -531,6 +930,8 @@ SSH References
 +---------------------------------+---------------------------------------------------------+
 |:bsdman:`ssh-add`                |Tool which adds keys to in the above agent.              |
 +---------------------------------+---------------------------------------------------------+
+|:bsdman:`ssh-copy-id`            |copy your pub key to a remote server                     |
++---------------------------------+---------------------------------------------------------+
 |:bsdman:`sftp`                   |FTP-like program over SSH protocol.                      |
 +---------------------------------+---------------------------------------------------------+
 |:bsdman:`scp`                    |File copy program.                                       |
@@ -547,7 +948,7 @@ SSH References
 
 -   `ArchWiki: ssh <https://wiki.archlinux.org/index.php/Secure_Shell>`_,
     `sshfs <https://wiki.archlinux.org/index.php/Sshfs>`_,
-    `SSH\_Keys <https://wiki.archlinux.org/index.php/SSH_Keys>`_,
+    `SSH Keys <https://wiki.archlinux.org/index.php/SSH_keys>`_,
     `Sshguard <https://wiki.archlinux.org/index.php/Sshguard>`_ *daemon
     that protects SSH and other services against brute-force attacts*.
 -   ` Matt Taggart: Good practices for using ssh
@@ -571,8 +972,8 @@ SSH References
     `ssh.help <http://inst.eecs.berkeley.edu/usr/pub/ssh.help>`_ and
     `ssh-agent.help <http://inst.eecs.berkeley.edu/usr/pub/ssh-agent.help>`_.
 -   OpenSSH certificates are not so well known, the reference is the
-    `CERTICATES section of ssh-keygen(1)
-    <http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/ssh-keygen.1?query=ssh-keygen#x434552544946494341544553>`_
+    :bsdman:`CERTICATES section of ssh-keygen(1)
+    `<ssh-keygen#x434552544946494341544553>`.
     they are distinct and simpler than X.509 certificates used in ssl
     and allow client and servers to authenticate in a simpler and more
     reliable wy than user/host keys.
@@ -584,27 +985,8 @@ SSH References
     `Blargh: OpenSSH certificates tutorial
     <http://blog.habets.pp.se/2011/07/OpenSSH-certificates>`_,
     `Using a CA with SSH <http://www.lorier.net/docs/ssh-ca>`_.
--   While `ssh-agent
-    <http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-agent>`_
-    is a daemon that cache your decrypted private keys during your
-    session `Keychain <http://www.funtoo.org/wiki/Keychain>`_ is a
-    front-end to ssh-agent, allowing you to have one long-running
-    ssh-agent process per system, rather than one per login session.
-    Keychain was `introduced by Daniel Robins in 2001
-    <http://www.ibm.com/developerworks/linux/library/l-keyc2/>`_ for
-    Gentoo *Keychain has evolved since this article*, It is now available
-    in most distributions.
 
-    -   `Gentoo Guide: Keychain
-        <http://www.gentoo.org/doc/en/keychain-guide.xml>`_.
-    -   `ArchWiki: Keychain
-        <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
-    -   `man: keychain(1) <http://man.cx/keychain(1)>`_
 
--   `Envoy <https://github.com/vodik/envoy>`_ (GPL)
-    is a ssh/gpg-agent wrapper leveraging cgroups and
-    systemd/socket activation with functionalities similar to
-    keychain, but done in c, takes advantage of cgroups and systemd.
 -   Gnome Keyring is a daemon that keeps user's security credentials,
     such as user names and passwords encrypted in a keyring file in the
     user's home folder. The default keyring uses the login password for
@@ -644,7 +1026,7 @@ SSH References
 
          $ sshfs -o reconnect,compression=yes,transform_symlinks,\
              ServerAliveInterval=45,ServerAliveCountMax=2,\
-             ssh_command='autossh -M 0' username@server:/\
+             ssh_command='autossh -M 0' username@example.com:/\
              /mnt/remote
 
 -   `mosh <http://mosh.mit.edu/>`_ (GPL with OpenSSL exceptions) is a

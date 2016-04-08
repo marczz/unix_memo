@@ -340,7 +340,7 @@ epub_copyright = '2012-2014 Marc Zonzon'
 intersphinx_mapping = {'http://docs.python.org/': None}
 extlinks = {
     'man':('http://manpages.debian.org/cgi-bin/man.cgi?query=%s', ''),
-    'bsdman':('http://www.openbsd.org/cgi-bin/man.cgi?query=%s', ''),
+    'bsdman':('http://man.openbsd.org/OpenBSD-current/man/%s', ''),
     'coreutils':(
         'http://www.gnu.org/software/coreutils/manual/html_node/%s-invocation.html', ''),
     'wikipedia':('http://en.wikipedia.org/wiki/%s', ''),
