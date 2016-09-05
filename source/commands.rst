@@ -31,6 +31,7 @@ files
    :man:`rename <rename.ul>` .jpeg .jpg \*.jpeg%Mass rename with util-linux rename command
    `find`_ ./ -type f -print | `xargs`_ :coreutils:`chmod` 640%Change permissions to 640 for all files in subtree.
    `find`_ ./ -type d -print | `xargs`_ :coreutils:`chmod` 751%Change permissions to 751 for all sub-directories.
+   :man:`shred` -u private.txt%delete a file from disk after securely erasing the content.
 
 dir navigation
 --------------
@@ -95,7 +96,7 @@ text handling
    :coreutils:`tr` -dc '[:print:]' < /dev/urandom§Filter non printable characters
    :coreutils:`tr` -s '[:blank:]' '\t' </proc/diskstats | :coreutils:`cut` -f4§cut fields separated by blanks
    :coreutils:`tr` -s '[:blank:]' </proc/diskstats | :coreutils:`cut` -d' ' -f4§cut fields separated by blanks
-   :man:`dmesg`| :coreutils:`wc` -l§count lines (``w`` words, ``-b`` bytes)
+   :coreutils:`wc` -l file§count lines (``w`` words, ``-b`` bytes)
    :coreutils:`cut` -d: -f1 /etc/passwd | :coreutils:`sort`§Lists all usernames in alphabetical order.
    :coreutils:`dd` if=/dev/urandom count=1 | :coreutils:`base64` -w 0 | :coreutils:`cut` -c 1-16§generate random 16 chararacters password
    :man:`openssl` :man:`rand` -base64 16 | :coreutils:`cut` -c 1-16§generate random 16 chararacters password
@@ -111,6 +112,8 @@ text handling
    :coreutils:`printf` "%d\\n" "\'%"§decimal code of ascii character ``%``
    :man:`iconv` -f ISO8859-1 -t UTF-8 -o file.utf8 file.txt§convert encoding
    :man:`iconv` -l§List known coded character sets
+   :coreutils:`sha1sum` file§checksum of a file (use also ``sha256sum``,  ``sha512sum``,  ``md5sum``)
+   :coreutils:`sha1sum` -c checksumlist§check the sums against the files
 
 encryption
 ----------
