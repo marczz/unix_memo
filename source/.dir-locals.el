@@ -7,5 +7,5 @@
   (rst-indent-literal-normal . 4)
   (rst-indent-comment . 4)
   (ispell-local-dictionary . "english")
-  (eval magit-wip-save-mode)
+  (eval magit-wip-after-save-local-mode)
 ))
