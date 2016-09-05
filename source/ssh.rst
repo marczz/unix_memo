@@ -204,7 +204,8 @@ same time than 4000 entries with the unencrypted format.
 
 Of course a slower decrypting could be annoying if you wait for each
 ssh-connection, but if you use the agent, and still more if you have
-keychain or envoy. You have to wait only once.
+:ref:`keychain<keychain_prog>` or :ref:`envoy<envoy_prog>`.
+You have to wait only once.
 
 
 To recognize the formats of your key you can look at the head comment
@@ -293,6 +294,24 @@ server::
   $ chmod 600 ~/.ssh/authorized_keys
 
 
+Gnome Keyring
+~~~~~~~~~~~~~
+
+Gnome Keyring is a daemon that keeps user's security credentials,
+such as user names and passwords encrypted in a keyring file in the
+user's home folder. The default keyring uses the login password for
+encryption.
+
+-   `ArchLinux: Gnome Keyring
+    <https://wiki.archlinux.org/index.php/GNOME_Keyring>`_
+    describe also how to `use it without gnome
+    <https://wiki.archlinux.org/index.php/GNOME_Keyring#Use_without_GNOME.2C_and_without_a_display_manager>`_.
+-   `mozilla-gnome-keyring
+    <https://github.com/infinity0/mozilla-gnome-keyring>`_
+    is a mozilla extension to replace the default password manager in
+    Firefox and Thunderbird and store passwords and form logins
+    in gnome-keyring. The Debian package is named
+    *xul-ext-gnome-keyring*.
 
 
 ssh agent.
@@ -303,9 +322,13 @@ provides them to SSH client programs on your behalf.
 Launching ssh-agent.
 ~~~~~~~~~~~~~~~~~~~~
 
-On Debian the ssh-agent is launched in the ancestors of your X session
-by ``/etc/X11/Xsession`` so under X it should run as you can check
-with::
+On Debian the ``ssh-agent`` is launched in the ancestors of your X session
+by ``/etc/X11/Xsession`` so it should run in your X session.
+
+``ssh-agent`` export two environments variables ``SSH_AUTH_SOCK`` the
+socket path, and ``SSH_AGENT_PID`` the pid of the process, so you
+can check a running instance with:
+::
 
   $ [ $SSH_AUTH_SOCK ] && echo "socket $SSH_AUTH_SOCK" && ps u $SSH_AGENT_PID
 
@@ -322,7 +345,7 @@ You may use `a more elaborate script
 <http://mah.everybody.org/docs/ssh>`_ to ensure you are launching an
 unique agent session for your user on the computer.
 
-In way used by default by Debian, if it is not yet done you can launch
+In the way used by default by Debian, if it is not yet done you can launch
 it as a parent process of a daemon with::
 
   $ ssh-agent startx
@@ -336,7 +359,24 @@ It is also possible to `start it as a systemd user service
 and you will have a global ssh-agent for your global user session,
 whatever it run X or not.
 
-Refs: :bsdman:`ssh-agent`
+
+``ssh-agent`` can be replaced by ``gpg-agent`` that can act as an
+agent both for gpg keys and ssh keys if it is run with the argument
+``--enable-ssh-support`` you can then launch it like set `in the manual
+<https://www.gnupg.org/documentation/manuals/gnupg/Agent-Examples.html#Agent-Examples>`_
+::
+
+    unset SSH_AGENT_PID
+    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+      export SSH_AUTH_SOCK="/run/user/$UID/gnupg/S.gpg-agent.ssh"
+    fi
+
+in the same way used for ssh you can prefer to
+`start gpg-agent with systemd user
+<https://wiki.archlinux.org/index.php/GnuPG#Start_gpg-agent_with_systemd_user>`_
+
+ Refs: :bsdman:`ssh-agent`, `gpg-agent
+ <https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html>`_
 
 Using ssh-agent.
 ~~~~~~~~~~~~~~~~
@@ -493,7 +533,7 @@ Refs: :bsdman:`ssh manual - X11 forwarding section
 <ssh#X11_FORWARDING>`, :bsdman:`sshd_config(5)<sshd_config>`,
 :bsdman:`ssh_config(5)<ssh_config>`.
 
-.. _keychain:
+.. _keychain_prog:
 
 Keychain
 ~~~~~~~~
@@ -514,7 +554,7 @@ in most distributions.
     <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
 -   `man: keychain(1) <http://man.cx/keychain(1)>`_
 
-.. _envoy:
+.. _envoy_prog:
 
 Envoy
 ~~~~~
@@ -522,7 +562,18 @@ Envoy
 `Envoy <https://github.com/vodik/envoy>`_ (GPL)
 is a ssh/gpg-agent wrapper leveraging cgroups and
 systemd/socket activation with functionalities similar to
-keychain, but done in c, takes advantage of cgroups and systemd.
+keychain, but done in c. It takes advantage of cgroups and systemd.
+
+-   `ArchWiki: Envoy
+    <https://wiki.archlinux.org/index.php/SSH_keys#envoy>`_
+
+But now envoy can be considered as obsolete as its author Simon
+Gomizelj find simpler and better to just wrap gpg-agent in a service,
+and replace ssh-agent by gpg-agent.
+
+It has now set up a small new project `gpg-exec
+<https://github.com/vodik/gpg-tools>`_ to support this policy.
+
 
 Ssh port forwarding
 -------------------
@@ -612,6 +663,58 @@ that the server does not send keep alive message to the client.
 If you set ``ClientAliveInterval 300`` and ``ClientAliveCountMax 12``
 (default is 3) you send to the inactive client a keep alive message
 each 5mn during 2 hours.
+
+autossh
+~~~~~~~
+`autossh <http://www.harding.motd.ca/autossh/>`_ (modified BSD) is a
+program to start a copy of ssh and monitor it, restarting it as
+necessary should it die or stop passing traffic. A small included
+script ``rscreen`` or ``rtmux`` allow a *perpetual* ssh session. It
+is in Debian. To use autossh a monitoring port should be choosen
+using the ``-M`` option, but the debian version of autossh uses a
+wrapper to automatically select a free monitoring port. In any case
+you could also disable the monitoring port with ``-M 0`` and have ssh
+do itself the monitoring by setting ``ServerAliveInterval`` and
+``ServerAliveCountMax`` options to have the SSH client exit if it
+finds itself no longer connected to the server. If not set in the
+[man:ssh\_config] file your command line looks like:
+
+::
+
+    $ autossh -M 0 -o "ServerAliveInterval 45" -o "ServerAliveCountMax 2" username@myserver
+
+To use sshfs with autossh you can use:
+
+::
+
+     $ sshfs -o reconnect,compression=yes,transform_symlinks,\
+         ServerAliveInterval=45,ServerAliveCountMax=2,\
+         ssh_command='autossh -M 0' username@example.com:/\
+     /mnt/remote
+
+
+mosh
+~~~~
+`mosh <http://mosh.mit.edu/>`_ (GPL with OpenSSL exceptions) is a
+replacement for SSH that allows roaming, supports intermittent
+connectivity, and provides intelligent local echo and line editing of
+user keystrokes. Mosh improve ssh usability for mobile users. It is
+in Debian. Mosh does not use the ssh tcp protocol, but runs a
+terminal emulator at the server and transmits this screen to the
+client through udp. This udp protocol may conflict with firewall
+rules. Mosh cannot forward ssh-agent nor X11.
+
+-  :wikipedia:`mosh`
+-  `Mosh usage <https://mosh.mit.edu/#usage>`_, `info
+   <https://mosh.mit.edu/#techinfo>`_
+   and `FAQ <https://mosh.mit.edu/#faq>`_.
+-  `GitHub: keithw/mosh source repository
+   <https://github.com/keithw/mosh>`_.
+-  `ArchWiki:
+   autossh <https://wiki.archlinux.org/index.php/Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`_
+-  Mosh has a chrome plugin and an `android client JuiceSSH
+   <https://play.google.com/store/apps/details?id=com.sonelli.juicessh>`.
+
 
 .. _ssh_ciphers:
 
@@ -928,6 +1031,8 @@ SSH References
 +---------------------------------+---------------------------------------------------------+
 |:bsdman:`ssh-agent`              |Authentication agent that can store private keys.        |
 +---------------------------------+---------------------------------------------------------+
+|:man:`gpg-agent`                 |Authentication agent for both gpg and ssh.               |
++---------------------------------+---------------------------------------------------------+
 |:bsdman:`ssh-add`                |Tool which adds keys to in the above agent.              |
 +---------------------------------+---------------------------------------------------------+
 |:bsdman:`ssh-copy-id`            |copy your pub key to a remote server                     |
@@ -951,7 +1056,7 @@ SSH References
     `SSH Keys <https://wiki.archlinux.org/index.php/SSH_keys>`_,
     `Sshguard <https://wiki.archlinux.org/index.php/Sshguard>`_ *daemon
     that protects SSH and other services against brute-force attacts*.
--   ` Matt Taggart: Good practices for using ssh
+-   `Matt Taggart: Good practices for using ssh
     <http://lackof.org/taggart/hacking/ssh/>`_ explains basic security
     rule to use ssh **client**.
 -   `The 101 Uses of OpenSSH: Part
@@ -987,71 +1092,24 @@ SSH References
     `Using a CA with SSH <http://www.lorier.net/docs/ssh-ca>`_.
 
 
--   Gnome Keyring is a daemon that keeps user's security credentials,
-    such as user names and passwords encrypted in a keyring file in the
-    user's home folder. The default keyring uses the login password for
-    encryption.
 
-    -   `ArchLinux: Gnome Keyring
-        <https://wiki.archlinux.org/index.php/GNOME_Keyring>`_
-        describe also how to `use it without gnome
-        <https://wiki.archlinux.org/index.php/GNOME_Keyring#Use_without_GNOME.2C_and_without_a_display_manager>`_.
-    -   `mozilla-gnome-keyring
-        <https://github.com/infinity0/mozilla-gnome-keyring>`_
-        is a mozilla extension to replace the default password manager in
-        Firefox and Thunderbird and store passwords and form logins
-        in gnome-keyring. The Debian package is named
-        *xul-ext-gnome-keyring*.
+..  comment
 
--   `autossh <http://www.harding.motd.ca/autossh/>`_ (modified BSD) is a
-    program to start a copy of ssh and monitor it, restarting it as
-    necessary should it die or stop passing traffic. A small included
-    script ``rscreen`` or ``rtmux`` allow a *perpetual* ssh session. It
-    is in Debian. To use autossh a monitoring port should be choosen
-    using the ``-M`` option, but the debian version of autossh uses a
-    wrapper to automatically select a free monitoring port. In any case
-    you could also disable the monitoring port with ``-M 0`` and have ssh
-    do itself the monitoring by setting ``ServerAliveInterval`` and
-    ``ServerAliveCountMax`` options to have the SSH client exit if it
-    finds itself no longer connected to the server. If not set in the
-    [man:ssh\_config] file your command line looks like:
+    TODO: include if needed developped themes or references to
+    [[https://wiki.archlinux.org/index.php/SSH_keys#Choosing_the_type_of_encryption][SSH keys - ArchWiki]] ,
+    [[https://wiki.archlinux.org/index.php/Secure_Shell#X11_forwarding][Secure Shell - ArchWiki]],
+    [[https://developer.github.com/guides/using-ssh-agent-forwarding/][Using SSH Agent Forwarding | GitHub Developer Guide]],
+    [[https://wiki.archlinux.org/index.php/GNOME/Keyring][GNOME/Keyring - ArchWiki]],
+    [[http://tartarus.org/~simon/putty-snapshots/htmldoc/][PuTTY User Manual]],
+    [[https://ianix.com/index.html][IANIX Documents]],
+    [[https://ianix.com/pub/browser-privacy-handbook.html][The browser privacy handbook]],
+    [[https://stribika.github.io/2015/01/04/secure-secure-shell.html][Secure Secure Shell]],
+    [[https://git.libssh.org/projects/libssh.git/tree/doc/curve25519-sha256@libssh.org.txt#n4][projects/libssh.git - libssh shared repository]],
+    many pages in [[https://en.wikibooks.org/wiki/Category:OpenSSH][Category:OpenSSH - Wikibooks]],
 
-    ::
+..  comment
 
-        $ autossh -M 0 -o "ServerAliveInterval 45" -o "ServerAliveCountMax 2" username@myserver
-
-    To use sshfs with autossh you can use:
-
-    ::
-
-         $ sshfs -o reconnect,compression=yes,transform_symlinks,\
-             ServerAliveInterval=45,ServerAliveCountMax=2,\
-             ssh_command='autossh -M 0' username@example.com:/\
-             /mnt/remote
-
--   `mosh <http://mosh.mit.edu/>`_ (GPL with OpenSSL exceptions) is a
-    replacement for SSH that allows roaming, supports intermittent
-    connectivity, and provides intelligent local echo and line editing of
-    user keystrokes. Mosh improve ssh usability for mobile users. It is
-    in Debian. Mosh does not use the ssh tcp protocol, but runs a
-    terminal emulator at the server and transmits this screen to the
-    client through udp. This udp protocol may conflict with firewall
-    rules. Mosh cannot forward ssh-agent nor X11.
-
-    -  :wikipedia:`mosh`
-    -  `Mosh usage <https://mosh.mit.edu/#usage>`_, `info
-       <https://mosh.mit.edu/#techinfo>`_
-       and `FAQ <https://mosh.mit.edu/#faq>`_.
-    -  `GitHub: keithw/mosh source repository
-       <https://github.com/keithw/mosh>`_.
-    -  `ArchWiki:
-       autossh <https://wiki.archlinux.org/index.php/Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`_
-    -  Mosh has a chrome plugin and an `android client JuiceSSH
-       <https://play.google.com/store/apps/details?id=com.sonelli.juicessh>`.
-
-.. comment
-
-   Local Variables:
-   mode: rst
-   ispell-local-dictionary: "english"
-   End:
+    Local Variables:
+    mode: rst
+    ispell-local-dictionary: "english"
+    End:
