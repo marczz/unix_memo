@@ -193,7 +193,7 @@ To debug udev we can:
 1.  use ``udevtest``
 2.  log ``udevd`` by issuing::
 
-.. code-block:cfg
+    ..  code-block: cfg
 
         log="yes"
 
