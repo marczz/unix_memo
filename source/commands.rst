@@ -100,6 +100,8 @@ text handling
    :coreutils:`cut` -d: -f1 /etc/passwd | :coreutils:`sort`§Lists all usernames in alphabetical order.
    :coreutils:`dd` if=/dev/urandom count=1 | :coreutils:`base64` -w 0 | :coreutils:`cut` -c 1-16§generate random 16 chararacters password
    :man:`openssl` :man:`rand` -base64 16 | :coreutils:`cut` -c 1-16§generate random 16 chararacters password
+   :coreutils:`tr` -dc '[:alnum:]&~#|_@=+$%*<>,?;.:/!-' < /dev/urandom | :coreutils:`head` -c${1:-16}; echo§generate random 16 chararacters password
+   :man:`date` +%s |:coreutils:`sha1sum`|:coreutils:`cut` -f1 -d' '§generate new 4O alphanumeric chars password
    :coreutils:`paste` -d ',:' file1 file2 file3§Merges given files line by line
    :man:`mount` | :bsdman:`column` -t§table of mounted filesystems
    :coreutils:`join` -t'\0' -a1 -a2 file1 file2§Union of sorted files
