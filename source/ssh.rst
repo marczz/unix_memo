@@ -739,7 +739,7 @@ of arcfour let him stand as a good candidate on firewalled local area
 networks *when chacha20 is still unavailable*.
 
 Note that :wikipedia:`chacha20 <Salsa20#ChaCha_variant>` is a fast
-and secure algorithm, see the :ref:`speed tests<speed_tests>` below.
+and secure algorithm, see the :ref:`speed tests<ssh_speed_tests>` below.
 
 .. _cipher_compatibility:
 
@@ -759,7 +759,7 @@ is only available in OpenSSH,  :wikipedia:`PuTTY` and
 `TinySSH`_.
 
 
-.. _speed_tests:
+.. _ssh_speed_tests:
 
 For *chacha20-poly1305*
 there are a `CloudFare page showing the improvement on https
@@ -1056,6 +1056,9 @@ SSH References
     `SSH Keys <https://wiki.archlinux.org/index.php/SSH_keys>`_,
     `Sshguard <https://wiki.archlinux.org/index.php/Sshguard>`_ *daemon
     that protects SSH and other services against brute-force attacts*.
+-   `Red Hat Entreprise System Administrator's Guide - Chapter 9
+    OpenSSH
+    <https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7-Beta/html/System_Administrators_Guide/ch-OpenSSH.html>`_
 -   `Matt Taggart: Good practices for using ssh
     <http://lackof.org/taggart/hacking/ssh/>`_ explains basic security
     rule to use ssh **client**.
