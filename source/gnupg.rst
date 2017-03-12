@@ -5,16 +5,17 @@ GnuPG Memo
 
 There are two gnupg programs GnuPG 1.4 is the standalone,
 non-modularized series, GnuPG 2.x is the new modularized version of
-GnuPG supporting OpenPGP and S/MIME. GnuPG2 gpg2 command is backward
-compatible whith version 1.4. ``gpg`` 1.4 is  the standalone version of gpg
-it will stay for embedded and server usage, as it brings less
-dependencies and smaller binaries.  For desktop use you should
-consider using gpg2.
+GnuPG supporting OpenPGP and S/MIME. GnuPG 2.1 introduce number of
+`new characteristics
+<https://www.gnupg.org/faq/whats-new-in-2.1.html>`_
+including a new format for locally storing the public keys, and
+dropping the file ``secring.gpg``. ``gpg`` 1.4 is the standalone
+version of gpg it will stay for embedded and server usage, as it
+brings less dependencies and smaller binaries.  For desktop we use
+gpg2 and most distribution alias the command `gpg` to `gpg2`.
 
-Gpg commands by category
-------------------------
 
-.. contents:: `Operations`
+.. contents:: `Gpg commands by category`
    :depth: 2
    :local:
 
@@ -22,8 +23,8 @@ For all commands a running
 `gpg-agent <http://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html>`__
 avoid to enter again your passphrase in the same session.
 
-list of keys
-~~~~~~~~~~~~
+list of keys.
+-------------
 
 ::
 
@@ -47,8 +48,8 @@ i.e. signing an other key, **a** for *authentication*  cf `doc/DETAILS
 <http://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=blob_plain;f=doc/DETAILS>`_
 installed with gnupg.
 
-signing
-~~~~~~~
+signing.
+--------
 To sign with your default key:
 ::
 
@@ -80,8 +81,8 @@ now a detached and ascii armored signature in ``/tmp/message.txt.asc``::
 
 
 
-Verifying a signature
-~~~~~~~~~~~~~~~~~~~~~
+Verifying a signature.
+----------------------
 
 If you have a file ``message.txt`` and the detached signature
 ``/tmp/message.txt.asc``::
@@ -100,8 +101,8 @@ if it is also crypted the ``--decrypt`` operation decrypt *and*
 verify the signature.
 
 
-Encrypting
-~~~~~~~~~~
+Encrypting.
+-----------
 
 ::
 
@@ -194,15 +195,15 @@ To  encrypt with a symmetric key using AES256 algorithm::
 
     gpg --cipher-algo AES256 --symmetric /tmp/message.txt
 
-Decrypting:
-~~~~~~~~~~~
+Decrypting.
+-----------
 ::
 
     gpg --decrypt /tmp/message.txt.asc
     gpg --decrypt --output /tmp/message.txt /tmp/message.txt.asc
 
-available ciphers
-~~~~~~~~~~~~~~~~~
+available ciphers.
+------------------
 
 List version, available cipher algorithms and compression methods
 ::
@@ -210,17 +211,18 @@ List version, available cipher algorithms and compression methods
     gpg --version
 
 
-receiving keys
-~~~~~~~~~~~~~~
+receiving keys.
+---------------
 
 ::
 
     gpg --recv-keys --keyserver hkp://subkeys.pgp.net 0xC9C40C31
 
-server can be omitted to use the one in ``~/.gnupg/gpg.conf``
+The server can be omitted to use the default one in
+``~/.gnupg/gpg.conf``
 
-refreshing keys
-~~~~~~~~~~~~~~~
+refreshing keys.
+----------------
 ::
 
     gpg --refresh-keys --keyserver hkp://subkeys.pgp.net
@@ -229,8 +231,8 @@ or with default server::
 
     gpg --refresh-keys
 
-creating a key
-~~~~~~~~~~~~~~
+creating a key.
+---------------
 ::
 
     gpg --gen-key
@@ -241,8 +243,8 @@ you should then create a revocation certificate with::
 
 and put it in a secure place.
 
-Exporting a key
-~~~~~~~~~~~~~~~
+Exporting a key.
+----------------
 
 To export the public keys in binary format to ``/tmp/keyring``::
 
@@ -276,8 +278,8 @@ You can better symmetric encrypt the exported private key::
 You are then asked for a password for symmetric encryption, and you
 private key stay protected.
 
-importing a key
-~~~~~~~~~~~~~~~
+importing a key.
+----------------
 ::
 
     gpg --import colleague.asc
@@ -347,6 +349,12 @@ list with ``help``, among which:
 |:ref:`setpref <pref_modify>` |change key preferences          |
 |                             |                                |
 +-----------------------------+--------------------------------+
+|sign                         |sign a key                      |
++-----------------------------+--------------------------------+
+|lsign                        |local sign a key                |
++-----------------------------+--------------------------------+
+|:ref:`trust<trust>`          |change owner trust level        |
++-----------------------------+--------------------------------+
 |save                         |save and quit                   |
 +-----------------------------+--------------------------------+
 |quit                         |ask for saving and quit         |
@@ -384,6 +392,88 @@ components, and add new ones.
     .....
     [ultimate] (2)*  Frank <frank.oldnick@prevmail.org>
     gpg> revuid
+
+..  _trust_vs_validity:
+
+Trust and validity
+~~~~~~~~~~~~~~~~~~
+*Trust* is used to mean trust in a key's owner, and *validity* is
+used to mean trust that a key belongs to the human associated with the
+key ID. So a key is *Valid* if signed by trusted people, you can
+manage the *trust* in the owners of your keyring by editing key trust,
+and you can also *validate* a key by signing it, or by doing a private
+(i.e. not exported and shown to other) *local signature*.
+
+
+There are four trust levels: *unknown* this is the initial trust of a
+newly imported key, *none* i.e. untrusted, *marginal* i.e. good trust
+level, *full* i.e. as secure as your own key.
+
+A key is considered valid if it meets two conditions:
+
+1.  It has been signed by you or by one fully trusted key, or by three
+    marginally trusted keys.
+
+2.  The path length from your key down to the considered key is less
+    or equal to five steps.
+
+You can see an example of a marginally trusted but nevertheless not
+valid key in the :ref:`next subsection<trust>`.
+
+..  _trust:
+
+Editing trust.
+~~~~~~~~~~~~~~
+
+You change the owner trust with the *trust* subcommand:
+
+::
+
+    gpg> trust
+    pub  dsa1024/ECEC8BDAA6606D75
+        created: 2004-12-09  expires: never       usage: SCA
+        trust: unknown       validity: unknown
+    sub  elg1024/D7671AF7DE8BAA37
+        created: 2004-12-09  expires: never       usage: E
+        [ unknown] (1). Albert Lebrazh <albert.Lebrazh@gmail.com>
+
+    Please decide how far you trust this user to correctly verify other users' keys
+    (by looking at passports, checking fingerprints from different sources, etc.)
+
+    1 = I don't know or won't say
+    2 = I do NOT trust
+    3 = I trust marginally
+    4 = I trust fully
+    5 = I trust ultimately
+    m = back to the main menu
+
+    Your decision?
+
+    3
+
+    pub  dsa1024/ECEC8BDAA6606D75
+        created: 2004-12-09  expires: never       usage: SCA
+        trust: marginal      validity: unknown
+    sub  elg1024/D7671AF7DE8BAA37
+        created: 2004-12-09  expires: never       usage: E
+        [ unknown] (1). Albert Lebrazh <albert.Lebrazh@gmail.com>
+    Please note that the shown key validity is not necessarily correct
+    unless you restart the program.
+
+In this example nobody else than Albert Lebrazh has signed this key,
+so even when I declare marginally trusting him as explained
+:ref:`above<trust_vs_validity` , his key is still not
+valid, this is confirmed when I try again to edit the key.
+
+::
+
+    gpg --edit-key ECEC8BDAA6606D75
+
+    gpg: checking the trustdb
+    gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+
+If I am sure than the key belongs to the user, I can sign it *or
+lsign*; and it will become valid.
 
 ..  _pref_modify:
 
@@ -430,6 +520,32 @@ You can also set preferences only for this key, see more details in
 `GnuPg Manual: Key Management
 <https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html>`_
 in the *setpref* description.
+
+Replacing old  dsa key by a new rsa one.
+----------------------------------------
+-  `Ana's blog: Creating a new GPG key
+   <http://ekaia.org/blog/2009/05/10/creating-new-gpgkey/>`_
+   included also in
+   `keyring.debian.org - Creating a new GPG key
+   <http://keyring.debian.org/creating-key.html>`_.
+-  `Weblog for dkg: HOWTO prep for migration off of SHA-1 in
+   OpenPGP <http://www.debian-administration.org/users/dkg/weblog/48>`_
+
+To summarize the process:
+
+-   Create a new key, using 2048-bit RSA
+-   Generate revocation certificate for the new key
+-   Add necessary uids
+-   Sign your new key with your old one.
+-   Revoke no longer used uid from the old key.
+-   If all uid are to be revoked, create a new one specifying
+    *in the comment*, that the other key is to be used now.
+-   Publish both keys.
+-   Ask trusted people that use and certificated the old key to
+    certificate the new one.
+-   Issue a new certification for users keys that you certified with
+    the old key, and are still current.
+
 
 References
 ----------
@@ -484,31 +600,6 @@ References
 -  `Philip Zimmermann Home page <http://www.philzimmermann.com/>`__
    Philip Zimmermann is the creator of PGP and distributes also Zfone,
    soft for encrypting voip telephony.
-
-Replacing old  dsa key by a new rsa one.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--  `Ana's blog: Creating a new GPG key
-   <http://ekaia.org/blog/2009/05/10/creating-new-gpgkey/>`_
-   included also in
-   `keyring.debian.org - Creating a new GPG key
-   <http://keyring.debian.org/creating-key.html>`_.
--  `Weblog for dkg: HOWTO prep for migration off of SHA-1 in
-   OpenPGP <http://www.debian-administration.org/users/dkg/weblog/48>`_
-
-To summarize the process:
-
--   Create a new key, using 2048-bit RSA
--   Generate revocation certificate for the new key
--   Add necessary uids
--   Sign your new key with your old one.
--   Revoke no longer used uid from the old key.
--   If all uid are to be revoked, create a new one specifying
-    *in the comment*, that the other key is to be used now.
--   Publish both keys.
--   Ask trusted people that use and certificated the old key to
-    certificate the new one.
--   Issue a new certification for users keys that you certified with
-    the old key, and are still current.
 
 
 GPG tools
