@@ -566,6 +566,8 @@ Refs:
 PDF and DJVU bookmarks
 ----------------------
 
+..  _bmconverter:
+
 Bookmark conversion
 ~~~~~~~~~~~~~~~~~~~
 
@@ -577,3 +579,36 @@ Bookmark Tool.
 
 *bmconverter.py* is `available in GitHub
 <https://github.com/goerz/bmconverter.py>`_.
+
+
+pdf bookmarks with pdftk.
+~~~~~~~~~~~~~~~~~~~~~~~~~
+`pdftk - The PDF Toolkit
+<https://www.pdflabs.com/tools/pdftk-server/>`__ (GPL) is a java
+*compiled (with gcj)* application which uses the
+`iText library <http://en.wikipedia.org/wiki/IText>`__ (LGPL).
+
+It can merge, split, rotate, encryt, decrypt, attach files, unpack,
+repair pdf documents. It allows also to fill PDF Forms with FDF data
+or XFDF data and flatten Forms.
+
+*pdftk* allows also to edit bookmarks, by dumping bookmarks to a text
+file, and importing bookmarks from a text file. The bookmark format is
+specific to *pdftk*; but the :ref:`bmconverter <bmconverter>` program
+allow to convert it from and to other formats.
+
+To dump the bookmarks do
+
+::
+
+    $ pdftk document.pdf dump_data output bookmarks.txt
+
+You can the work with the text file *bookmark.txt* then
+
+::
+
+    $ pdftk document.pdf update_info bookmarks.txt output document_new.pdf
+
+
+The python3 script `booky <https://github.com/SiddharthPant/booky>`_
+is a *pdftk* wrapper that uses a simpler bookmark format.
