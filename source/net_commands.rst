@@ -107,19 +107,33 @@ networking
 
 network manager
 ---------------
+
 .. csv-table::
    :delim: %
    :widths: 55, 55
 
-   :man:`nm-tool`%state of network-manager including Wireless Access Points
+   :man:`nmcli`%state of network-manager including Wireless Access Points
    :man:`nmcli` dev status%status of all devices
-   :man:`nmcli` -p dev wifi list%list all availables wifi access points
-   :man:`nmcli` -p dev list iface *wlan0*%detailled list of device and APs
+   :man:`nmcli` dev show%details of all devices and connections
+   :man:`nmcli` dev show *eth0*%details of a specific device.
+   :man:`nmcli` radio wifi off%disable wifi
    :man:`nmcli` con show%list of registered connections
+   :man:`nmcli` con show --active%list of active connections
+   :man:`nmcli` con show *df67bf87-452f-4a03-af4e-60f31afd749a*%show connection details by uuid
+   :man:`nmcli` con show  id *myaccess_pt*%show connection details by id
+   :man:`nmcli` con -f IP4.dns con show eth0-dhcp%dns of a connection
+   :man:`nmcli` --show-secret --field 802-11-wireless-security.psk con show id *myaccess_pt*%show a connection password
+   :man:`nmcli` connection del id *'my access pt'*%delete connection
+   :man:`nmcli` con modify id *old_id* connection.id *new_id*%change connection id
+   :man:`nmcli` con up id *MyWifi* password *mypasswd*%connect with password
+   :man:`nmcli` con edit *conid*%interactive edit the connection
+   :man:`nmcli` dev wifi list%List available Wi-Fi access points.
+   :man:`nmcli` -p dev wifi list%pretty list of all availables wifi access points
    :man:`nmcli` dev wifi connect *FreeWifi*%setup and activate a new connection
    :man:`nmcli` dev wifi connect *apssid* name *conname* password *private*%new connection with name and password
-   :man:`nmcli` con status id *MyWifi*%details of connection
-   :man:`nmcli` con up id *MyWifi* password *mypasswd*%connect with password
+   :man:`nmcli` -f IP4 dev show eth0%IPV4 adress, gateway, and dns
+   :man:`nmcli` -f general.connection dev show eth0%active connection on an iface
+   :man:`nmcli` dev disconnect *wlan0*%disconnect *wlan0* interface
    `curl`_ -F login=\ *myid*  -F password=\ *mypasswd* *https://wifi.provider.org/Auth*%Connect to open spot
 
 
