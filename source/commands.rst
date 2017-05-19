@@ -94,6 +94,7 @@ text handling
    :widths: 50, 60
 
    :coreutils:`tr` -dc '[:print:]' < /dev/urandom§Filter non printable characters
+   echo "(33) 06.61 62-63+84" | :coreutils:`tr` -d [:blank:][:punct:]§clean a phone number string
    :coreutils:`tr` -s '[:blank:]' '\t' </proc/diskstats | :coreutils:`cut` -f4§cut fields separated by blanks
    :coreutils:`tr` -s '[:blank:]' </proc/diskstats | :coreutils:`cut` -d' ' -f4§cut fields separated by blanks
    :coreutils:`wc` -l file§count lines (``w`` words, ``-b`` bytes)
