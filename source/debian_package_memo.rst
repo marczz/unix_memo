@@ -2,6 +2,8 @@
 Debian Package Config Memo
 ==========================
 
+..  _dpkg-memo:
+
 dpkg Memo
 =========
 
@@ -132,6 +134,8 @@ See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`, :man:`dpkg.cfg(5)`,
 
       dpkg --list 'foo*'
 
+..  _force-configuration:
+
 -   Configuration files policy, without prompt:
     They are listed in the ``--force-things`` section of the
     :man:`dpkg(1) manpage <dpkg>`.
@@ -165,6 +169,9 @@ See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`, :man:`dpkg.cfg(5)`,
         it, even if the version in the package did not change::
 
           dpkg --install --force-confask foo
+
+    You can also use these options from *apt-get* or *aptitude as*
+    :ref:`explained below <force-configuration-from-aptitude>`.
 
 apt/aptitude memo
 =================
@@ -251,10 +258,17 @@ Install/Remove
 
       aptitude purge bar
 
--   Use ``--force-things`` when calling dpkg from apt and aptitude::
+..  _force-configuration-from-aptitude:
+
+-   Use ``--force-things`` for controlling conffiles replacement
+    when calling dpkg from apt and aptitude::
 
       apt-get install --reinstall -o Dpkg::Options::="--force-confmiss" foo
       aptitude reinstall -o Dpkg::Options::="--force-confmiss" foo
+
+    *See the* :ref:`force options <force-configuration>` *above in
+    the* :ref:`dpkg-memo`.
+
 
 informations about packages
 ---------------------------
@@ -378,7 +392,7 @@ informations about packages
 
          aptitude show package/archive
 
-     or
+     or:
      ::
 
          aptitude show -t archive package
