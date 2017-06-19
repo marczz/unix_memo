@@ -2,6 +2,192 @@ Virtual File Systems
 ====================
 
 
+GVFS
+----
+
+:wikipedia:`Gvfs` is a userspace virtual filesystem where mount runs
+as a separate processes which you talk to via D-Bus. It also contains
+a gio module that seamlessly adds gvfs support to all applications
+using the gio API. It also supports exposing the gvfs mounts to
+non-gio applications using fuse.
+
+Gvfs is used through collection of daemons which communicate with each
+other and the GIO module over D-Bus. Supported backends include HAL
+integration, sftp, ftp, webdav, smb, smb-browse, http, obexftp, medias
+(burn, cdda, gphoto2, mtp) and archive mounting support.
+
+-   Wikipedia: :wikipedia:`Gvfs`.
+-   `Gnome gvfs doc <https://wiki.gnome.org/Projects/gvfs/doc>`_ is a
+    presentation of the gvfs system architecture.
+-   The present way to mount gvfs filesystems is through
+    `udisk2 <http://udisks.freedesktop.org/docs/latest/>`_, with
+    `udiskctl
+    <http://storaged.org/doc/udisks2-api/latest/udisksctl.1.html>`_
+    command.
+-   `ArchWiki: File manager functionality - Mounting
+    <https://wiki.archlinux.org/index.php/File_manager_functionality#Mounting>`_
+
+gvfs memo
+---------
+
+The *gvfs* daemon by itself is not big 2.6M resident (2M shared), Each
+of the backend daemon take also the same size, and I have usually at
+least 7 of them (*gvfsd-archive*, *gvfsd-trash*, *gvfsd-sftp*,
+*gvfs-fuse-daemon*, *gvfs-afc-volume-monitor*,
+*gvfs-gphoto2-volume-monitor*, *gvfs-goa-volume-monitor*).
+*gvfs-gdu-volume-monitor* and *gdm-simple-slave* are bigger at 4M/2M
+shared. Some of this daemons are launched on demand, but some of them
+are launched at start by systemd, the services are in
+``/usr/lib/systemd/user/gvfs-<backend-name>.service``. If you never use
+some of them like *gphoto2* and have no *iphone* to make use of the
+*afc* backend; they can be disabled at session start and only launch
+them on demand.
+
+gvfs-goa is for Gnome Online Account see the
+`GNOME Online Accounts (GOA) project
+<https://wiki.gnome.org/Projects/GnomeOnlineAccounts>`__
+and `Debarshi Ray posts tagged "Online Account"
+<https://debarshiray.wordpress.com/category/gnome/online-accounts/>`_.
+
+There is a set of command line programs starting with "gvfs-" that
+lets you run commands (like cat, ls, stat, etc) on files in the gvfs
+mounts.
+
+As a command line example you mount a gvfs share by
+
+::
+
+    $ gvfs-mount sftp://192.168.1.1
+    $ gvfs-mount smb://192.168.1.1/share
+    $ gvfs-mount dav://192.168.1.1/owncloud/files/webdav.php
+    $ gvfs-mount davs://dav.box.com/dav
+
+You will unmount it with
+
+::
+
+    $ gvfs-mount -u sftp://192.168.1.1
+
+If gvfs-fuse is enabled your mount are available in
+``/run/user/<id>/gvfs``.
+
+You get info on the file system by
+
+::
+
+    $ gvfs-info sftp://192.168.1.1
+    $ gvfs-info davs://dav.box.com/dav
+    $ gvfs-info /run/user/12345/gvfs/dav:host=dav.box.com,ssl=true
+
+You can then use it from any gio enabled application or in command line
+with
+
+::
+
+    $ gvfs-ls sftp://192.168.1.1/my/path
+    $ gvfs-ls smb://192.168.1.1/
+    $ gvfs-cat http://192.168.1.1/path
+    $ gvfs-cat dav://192.168.1.1/owncloud/files/webdav.php/pim/address.txt
+    $ gvfs-tree smb://192.168.1.1/share
+
+And unmount it by
+
+::
+
+    $ gvfs-mount -u sftp://192.168.1.1
+
+You can use it under emacs in
+`Tramp
+<http://www.gnu.org/software/emacs/manual/html_node/tramp/GVFS-based-methods.html>`__
+with a slightly different syntax. To load a file:
+
+::
+
+    /dav:user@192.168.1.1:/owncloud/files/webdav.php/pim/address.txt
+
+To browse a directory:
+
+::
+
+     /dav:user@192.168.1.1:/owncloud/files/webdav.php:
+
+Archive backend allow to read and write `all formats
+<https://github.com/libarchive/libarchive/wiki/LibarchiveFormats>`__
+supported by `libarchive <https://github.com/libarchive/>`__:
+
+    - read and write: tar, cpio, pax , gzip , zip xz, lzip, lzma, ar
+    - read only: iso9660, 7-Zip, mtree,
+      :wikipedia:`xar <xar (archiver)>`, lha/lzh, microsoft CAB.
+
+To command-line use of the archive backend is a bit harder, because the
+path of the archive is url-encoded. If you want to read the archive
+whose path is ``//path/to/my/archive.tgz`` you do:
+
+::
+
+    $ gvfs-mount archive://file%3A%2F%2F%2Fpath%2Fto%2Fmy%2Farchive.tgz
+
+Of course it's somewhat painful to do it by hand, you can use a script to
+url encode and better do:
+
+::
+
+    $ gvfs-mount archive://file$(urlencode ':///path/to/my/archive.tgz')
+
+The easier way to access your ``gvfs`` share with a non ``gpio`` enabled
+software is to use the ``gvfs-fuse`` gateway. It needs that the
+``gvfs-fuse-daemon`` is running. Otherwise launch it with
+
+::
+
+    $ /usr/lib/gvfs-fuse-daemon ~/.gvfs
+
+Then you should see the virtual file system mounted in your directory
+``/run/<user_id>/gvfs``
+
+::
+
+    $ ls /run/1234/gvfs
+    archive.tgz sftp on 192.168.1.1
+
+You can also mount your obex enabled device, (it may be a phone) by
+
+::
+
+    $ gvfs-mount obex://[00:0F:DE:72:22:D5]
+
+Other medias (gphoto2, cdda) and network file system are also available.
+
+Gvfs is directly enabled in all gpio enabled applications,it includes gnome
+applications.
+
+In many modern file managers like *nautilus* or *pcmanfm* you can
+directly open gvfs file system like: `sftp://192.168.1.1` or
+`davs://dav.box.com/dav`.
+
+
+For other applications you have to either use
+`udiskctl
+<http://storaged.org/doc/udisks2-api/latest/udisksctl.1.html>`_,
+*Fuse* as shown above, a special bridge as
+`Gigolo <http://www.uvena.de/gigolo/>`_ *this is a Debian package* or
+the `Tramp Gvfs backend
+<http://www.gnu.org/software/emacs/manual/html_node/tramp/GVFS-based-methods.html>`__
+for Emacs.
+
+The gvfs deamon can automount gvfs backends, this is an option set in
+``/usr/share/gvfs/mounts/<gvfs service>``. The following one is set by
+default:
+
+::
+
+    $ cat /usr/share/gvfs/mounts/network.mount
+    [Mount]
+    Type=network
+    Exec=/usr/lib/gvfs/gvfsd-network
+    AutoMount=true
+
+To use one's own rules, create ``~/.gvfs/mounts``.
 
 MTP
 ---
@@ -88,7 +274,7 @@ or::
 
     $ gvfs-mount --device '/dev/bus/usb/001/006'
 
-The command ouptput the location of the mount point in
+The command output the location of the mount point in
 ``/run/user/<id>/gvfs``. You can get more info on the root node of the
 device by one of
 ::
