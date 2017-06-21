@@ -12,23 +12,51 @@ using the gio API. It also supports exposing the gvfs mounts to
 non-gio applications using fuse.
 
 Gvfs is used through collection of daemons which communicate with each
-other and the GIO module over D-Bus. Supported backends include HAL
-integration, sftp, ftp, webdav, smb, smb-browse, http, obexftp, medias
-(burn, cdda, gphoto2, mtp) and archive mounting support.
+other and the GIO module over D-Bus. `Supported backends
+<https://wiki.gnome.org/Projects/gvfs/backends>`_
+include file operations sftp, ftp, webdav, smb, smb-browse, http,
+google drive, obexftp; medias (burn, cdda, gphoto2, mtp),
+:ref:`archive mounting <gvfs_libarchive>` support,
+:ref:`Gnome Online Account <goa>`, admin access for local filesystem.
+
+..  _goa:
+
+gvfs-goa is for Gnome Online Account see the
+`GNOME Online Accounts (GOA) project
+<https://wiki.gnome.org/Projects/GnomeOnlineAccounts>`__
+and `Debarshi Ray posts tagged "Online Account"
+<https://debarshiray.wordpress.com/category/gnome/online-accounts/>`_.
+
+..  _gvfs_libarchive:
+
+Archive backend allow to read and write `all formats
+<https://github.com/libarchive/libarchive/wiki/LibarchiveFormats>`_
+supported by `libarchive <https://github.com/libarchive/>`_:
+
+-   read and write: tar, cpio, pax , gzip , zip, bzip2,  xz, lzip, lzma, ar,
+    mtree, iso9660, compress,
+-   read only:  7-Zip, mtree, :wikipedia:`xar <Xar_archiver>`,
+    lha/lzh, rar, microsoft cab,
+
+Gvfs is directly enabled in all gpio enabled applications, which include gnome
+applications. For other applications you have to either use
+*Fuse* as shown below, a special bridge as
+`Gigolo <http://www.uvena.de/gigolo/>`_
+or `Tramp Gvfs backend
+<http://www.gnu.org/software/emacs/manual/html_node/tramp/GVFS-based-methods.html>`__
+for Emacs.
+
+Gvfs references
+~~~~~~~~~~~~~~~
 
 -   Wikipedia: :wikipedia:`Gvfs`.
 -   `Gnome gvfs doc <https://wiki.gnome.org/Projects/gvfs/doc>`_ is a
     presentation of the gvfs system architecture.
--   The present way to mount gvfs filesystems is through
-    `udisk2 <http://udisks.freedesktop.org/docs/latest/>`_, with
-    `udiskctl
-    <http://storaged.org/doc/udisks2-api/latest/udisksctl.1.html>`_
-    command.
 -   `ArchWiki: File manager functionality - Mounting
     <https://wiki.archlinux.org/index.php/File_manager_functionality#Mounting>`_
 
 gvfs memo
----------
+~~~~~~~~~
 
 The *gvfs* daemon by itself is not big 2.6M resident (2M shared), Each
 of the backend daemon take also the same size, and I have usually at
@@ -43,11 +71,6 @@ some of them like *gphoto2* and have no *iphone* to make use of the
 *afc* backend; they can be disabled at session start and only launch
 them on demand.
 
-gvfs-goa is for Gnome Online Account see the
-`GNOME Online Accounts (GOA) project
-<https://wiki.gnome.org/Projects/GnomeOnlineAccounts>`__
-and `Debarshi Ray posts tagged "Online Account"
-<https://debarshiray.wordpress.com/category/gnome/online-accounts/>`_.
 
 There is a set of command line programs starting with "gvfs-" that
 lets you run commands (like cat, ls, stat, etc) on files in the gvfs
