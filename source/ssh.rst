@@ -8,7 +8,7 @@ SSH
 ssh memo.
 ---------
 Fo ssh commands examples see  :ref:`ssh commands <ssh_commands>`
-in the :ref:`linux_command_memo`.
+in the :ref:`network_commands_memo`.
 
 ssh escapes.
 ~~~~~~~~~~~~
@@ -44,6 +44,44 @@ From :bsdman:`escape characters in the ssh manual
 
        ``!command`` execute a local command if the ``PermitLocalCommand``
        option is enabled in :bsdman:`ssh_config`.
+
+
+sshfs
+~~~~~
+`sshfs <https://github.com/libfuse/sshfs>`_ is the *fuse* access
+to ssh file systems.
+
+You can get more information in
+
+-   `sshf README <https://github.com/libfuse/sshfs/blob/master/README.md>`_
+-   `Ubuntu: sshfs <https://help.ubuntu.com/community/SSHFS>`_
+    explains the usage, including mounting from fstab.
+-   `ArchWiki: sshfs <https://wiki.archlinux.org/index.php/Sshfs>`_
+-   `Gentoo Wiki: SSHFS <https://wiki.gentoo.org/wiki/SSHFS>`_
+
+
+To mount sshfs
+
+-   The user  must be in the group *fuse*
+
+    ::
+
+        $ sudo adduser foo fuse
+
+-   mounting
+
+    ::
+
+        $ sshfs hostname: mountpoint
+
+-   unmounting
+
+    ::
+
+        $ fusermount -u moutpoint
+
+You can find below
+:ref:`how to use autossh to mount sshfs <sshfs_with_autossh>`.
 
 ssh keys.
 ---------
@@ -155,7 +193,7 @@ that allow unattended connections if you make sure that only the
 appropriate daemon can use it, by using :ref:`a proper authorized-keys
 entry like shown below <authorized-keys>`.
 
-Modyfying a key
+Modifying a key
 ~~~~~~~~~~~~~~~
 
 To change the passphrase of an existing key::
@@ -204,7 +242,7 @@ same time than 4000 entries with the unencrypted format.
 
 Of course a slower decrypting could be annoying if you wait for each
 ssh-connection, but if you use the agent, and still more if you have
-:ref:`keychain<keychain_prog>` or :ref:`envoy<envoy_prog>`.
+:ref:`keychain<keychain_prog>` or :ref:`gpg-exec<gpg_exec>`.
 You have to wait only once.
 
 
@@ -430,6 +468,16 @@ the value of ``$SSH_AUTH_SOCK`` which should be defined::
 
 Refs: :bsdman:`ssh`
 
+..   to add
+
+    replace ssh -agent by gpg-agent
+    https://wiki.archlinux.org/index.php/GnuPG#SSH_agent
+    using gpg agent and forwarding it
+    https://wiki.gnupg.org/AgentForwarding
+
+    Also related: `How to use a GPG key for SSH authentication
+    <https://www.linode.com/docs/security/gpg-key-for-ssh-authentication>`_
+
 Forwarding to a sudo session.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -554,26 +602,19 @@ in most distributions.
     <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
 -   `man: keychain(1) <http://man.cx/keychain(1)>`_
 
-.. _envoy_prog:
+..  _gpg_exec:
 
-Envoy
-~~~~~
-
-`Envoy <https://github.com/vodik/envoy>`_ (GPL)
-is a ssh/gpg-agent wrapper leveraging cgroups and
+Simon Gomizelj who has previously written
+`Envoy <https://github.com/vodik/envoy>`_ (GPL),
+a c language ssh/gpg-agent wrapper leveraging cgroups and
 systemd/socket activation with functionalities similar to
-keychain, but done in c. It takes advantage of cgroups and systemd.
+keychain. Now advise to replace ssh-agent by gpg-agent wrapped in a
+systemd service.
 
--   `ArchWiki: Envoy
-    <https://wiki.archlinux.org/index.php/SSH_keys#envoy>`_
-
-But now envoy can be considered as obsolete as its author Simon
-Gomizelj find simpler and better to just wrap gpg-agent in a service,
-and replace ssh-agent by gpg-agent.
-
-It has now set up a small new project `gpg-exec
+It has set up a small new project `gpg-exec
 <https://github.com/vodik/gpg-tools>`_ to support this policy.
 
+..  _port_forward:
 
 Ssh port forwarding
 -------------------
@@ -592,20 +633,56 @@ Ssh port forwarding
     redirect a local port to a remote host:hostport -R port:host:hostport
     -- redirect a remote port to a local host:hostport
 
--   An example from *tychoish* is a tunnel to a remote smtp server
+-   An example of redirecting a local port to a remote one is a tunnel
+    to a remote smtp server by forwarding request to local port 25 to
+    a remote machine port 25
 
     ::
 
-        $ autossh -M 25 -f remoteuser@remote.mach.in -L 25:127.0.0.1:25
+        $ ssh -fN -L 25:127.0.0.1:25 remoteuser@remote.mach.in
 
-    Here the ``-M 25`` tel autossh to watch the port 35 to check the
-    connection is alive.
+    Here the ``-f`` tel *ssh* to go to background after the session
+    is established, so you can still enter a password before it
+    backgrounds. ``-N`` tel not to execute any remote command, your
+    ssh session will **only** be used for port forwarding.
 
--   You can also use ssh as socks proxy you just launch
+    You may want to use *autossh* to keep your forwarding alive; so you
+    will use the options explained in the :ref:`keep alive section
+    <keep_alive>`
 
     ::
 
-        $ ssh -D 4321 user@example.com
+       $ autossh -fN -M 0 -o "ServerAliveInternal 60" -o "ServerAliveCountMax 3" \
+       > -L 25:127.0.0.1:25 remoteuser@remote.mach.in
+
+    Here ``-M 0`` disable the *autossh* keepalive mechanism as the
+    internal keepalive of *ssh* is preferred, to activate it we need to
+    provide the two options *ServerAliveInternal* and
+    *ServerAliveCountMax*.
+
+    There are many use of forward port proxy, if there is a remote
+    hhtp server, serving `localhost:8384` (this is what provide
+    `syncthing <https://docs.syncthing.net/>`_) you can access it by
+    forwarding from client port 8385 with:
+
+        $ ssh -fNL 8385:127.0.0.1:8384 remoteuser@remote.mach.in
+
+    and you can acces the site at `localhost:8385`.
+
+    The :ref:`sock proxy <sock_proxy>` below would also allow you to
+    browse `localhost:8384`, but your browser would send any request
+    through the remote host, which may go beyond what you need.
+
+-   An example of redirecting a remote port, is the
+    :ref:`reverse ssh connection <reverse_ssh>` below.
+
+..  _sock_proxy:
+
+-   You can also use *ssh* as *socks proxy* by:
+
+    ::
+
+        $ ssh -fND 4321 user@example.com
 
     and you get a socks proxy on port 4321 forwarding all traffic to
     example.com, you can browse the web as if you originate from
@@ -641,28 +718,45 @@ Ssh port forwarding
 
         $ sudo -u <user> $SHELL -c "xauth add $(xauth list :${DISPLAY##*:}); <xprogram>"
 
-Keeping session alive
----------------------
+..  _keep_alive:
+
+Keeping a ssh session alive
+---------------------------
 You can work either on the server side or the client side.
 
 For the client you can set the configuration option
-``ServerAliveInterval`` which is an intervall after wich a ssh
-keepalive message is sent to the server, the default is 0.
+:bsdman:`ServerAliveInterval <ssh_config#ServerAliveInterval>` which
+is an intervall after wich a ssh *keepalive* message is sent to the
+server, *keep alive* is not enabled by default and the default
+``ServerAliveInterval`` is 0. Note that these messages are sent
+through the encrypted channels and are not the same than the
+:bsdman:`TCPKeepAlive <ssh_config#TCPKeepAlive>` messages which are
+TCP layer messages enabled by default, they are *spoofable* and may be
+blocked by firewalls; if you use ``ServerAliveInterval`` you can
+disable ``TCPKeepAlive``.
 
-It work in combination with ``ServerAliveCountMax`` which is the max
-number of such message sent, the default value is 3.
-If you have set ``ServerAliveInterval`` to 30 you send at most 3
-messages every 30s.
+``ServerAliveInterval`` works in combination with
+:bsdman:`ServerAliveCountMax <ssh_config#ServerAliveCountMax>` which
+is the max number of such message sent, the default value is 3.  If
+you have only set ``ServerAliveInterval`` to 30 you send every 30s a
+message, and no reponse is received after 3 messages the session is
+closed.
 
-If the option ``BatchMode`` is ``yes`` then  ``ServerAliveInterval``
-will be set to 300 seconds.
+If in a script you set :bsdman:`BatchMode <ssh_config#BatchMode>` to
+``yes`` to disable password/passphrase querying, then
+``ServerAliveInterval`` will be set to a 300 seconds default.
 
-On the Server side by default ``ClientAliveInterval`` is 0 which means
-that the server does not send keep alive message to the client.
+On the Server side you can send keep alive mesage to the client.  By
+default :bsdman:`ClientAliveInterval <ssh_config#ClientAliveInterval>`
+is 0 which means that the server does not send keep alive message to
+the client.
 
-If you set ``ClientAliveInterval 300`` and ``ClientAliveCountMax 12``
+If you set ``ClientAliveInterval 300`` and
+:bsdman:`ClientAliveCountMax <ssh_config#ClientAliveCountMax>` ``12``
 (default is 3) you send to the inactive client a keep alive message
-each 5mn during 2 hours.
+each 5mn, but drop an inactive connection after 2 hours.
+
+All these option may be set in the :bsdman:`ssh_config` file.
 
 autossh
 ~~~~~~~
@@ -672,16 +766,23 @@ necessary should it die or stop passing traffic. A small included
 script ``rscreen`` or ``rtmux`` allow a *perpetual* ssh session. It
 is in Debian. To use autossh a monitoring port should be choosen
 using the ``-M`` option, but the debian version of autossh uses a
-wrapper to automatically select a free monitoring port. In any case
-you could also disable the monitoring port with ``-M 0`` and have ssh
+wrapper to automatically select a free monitoring port.
+
+As OpenSSH supports *keepalive* message since v 3.8 (2004), it is
+better to use it rather than the monitoring port so you will
+disable the monitoring port with ``-M 0`` and have ssh
 do itself the monitoring by setting ``ServerAliveInterval`` and
-``ServerAliveCountMax`` options to have the SSH client exit if it
-finds itself no longer connected to the server. If not set in the
-[man:ssh\_config] file your command line looks like:
+``ServerAliveCountMax`` as explained in in the above
+:ref:`keep alive section <keep_alive>`.
+
+If the *keepalive* is not set in the :bsdman:`ssh_config` file your
+command line looks like:
 
 ::
 
-    $ autossh -M 0 -o "ServerAliveInterval 45" -o "ServerAliveCountMax 2" username@myserver
+    $ autossh -M 0 -o "ServerAliveInterval 45" -o "ServerAliveCountMax 2" username@example.com
+
+..  _sshfs_with_autossh:
 
 To use sshfs with autossh you can use:
 
@@ -691,6 +792,14 @@ To use sshfs with autossh you can use:
          ServerAliveInterval=45,ServerAliveCountMax=2,\
          ssh_command='autossh -M 0' username@example.com:/\
      /mnt/remote
+
+Even without using autossh you can restart automaticaly restart a ssh
+tunnel started from systemd by using the ``Restart`` option in your
+unit file as shown in this `ArchWiki example
+<https://wiki.archlinux.org/index.php/Secure_Shell#Automatically_restart_SSH_tunnels_with_systemd>`_.
+
+-  `ArchWiki: autossh
+   <https://wiki.archlinux.org/index.php/Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`_
 
 
 mosh
@@ -710,10 +819,56 @@ rules. Mosh cannot forward ssh-agent nor X11.
    and `FAQ <https://mosh.mit.edu/#faq>`_.
 -  `GitHub: keithw/mosh source repository
    <https://github.com/keithw/mosh>`_.
--  `ArchWiki:
-   autossh <https://wiki.archlinux.org/index.php/Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`_
 -  Mosh has a chrome plugin and an `android client JuiceSSH
-   <https://play.google.com/store/apps/details?id=com.sonelli.juicessh>`.
+   <https://play.google.com/store/apps/details?id=com.sonelli.juicessh>`_.
+
+..  _reverse_ssh:
+
+Reverse ssh connection
+----------------------
+This is a case study of :ref:`ssh port forward <port_forward>`.
+The tackled problem is you are on a server *serverA* which has a ssh
+server open on internet, either because there are no firewall, or
+there is a firewall but you can set a redirect for ssh connections
+to *serverA* we here suppose it listen on standard port
+22, but it apply whatever port is used. You want to ssh outside of
+the lan on a machine *serverB*, which has a ssh server, but which is
+behind a firewall.
+
+The solution is to go through the firewall with a tunnel. We can use
+any type of tunnel, a vpn connection is appropriate, but if it is only
+an occasional connection to set a vpn for it would be overkill. So we
+will use two ssh, one to establish the tunnel, the other one to
+connect through the tunnel.
+
+We will redirect the remote port of ssh i.e. 22 by default, to a local
+port in order to bypassing the firewall on the remote lan.
+
+On the remote *serverB* you forward the port 5022 of your
+*serverA* to the localhost port 22.
+
+::
+
+    $ ssh -fN -R 5022:localhost:22 usera@serverA-ipaddress
+
+Here this command should be done as *root* because only root can
+forward privileged port. If the ssh server on *serverB* use an
+unpriviliged port, you can do the tunnel even without being root.
+
+Optionally you may want also to use the :ref:`keep alive options
+<keep_alive>` to harden your tunnel.
+
+Then on your *serverA* you connect to port 5022 on localhost:
+
+::
+
+    $ ssh userB@localhost -p 5022
+
+and don't forget when asked for a password that that you will be
+in fact connecting on *serverB* as *userB*.
+
+This command don't need to be done as *root* and *userB* can also be
+an ordinary user.
 
 
 .. _ssh_ciphers:
@@ -812,7 +967,8 @@ directives *Allowusers*, *AllowGroups*, *DenyUsers*, *DenyGroups*.
 restrict to some user on specific hosts.
 
 Example:
-..  code-block:: aconf
+
+..  code-block:: squid
 
     AllowUsers john root@119.20.143.62 root@119.20.143.116
           maint@119.20.143.*
@@ -1052,7 +1208,7 @@ SSH References
 +---------------------------------+---------------------------------------------------------+
 
 -   `ArchWiki: ssh <https://wiki.archlinux.org/index.php/Secure_Shell>`_,
-    `sshfs <https://wiki.archlinux.org/index.php/Sshfs>`_,
+    `sshfs <archwiki_sshfs_>`_,
     `SSH Keys <https://wiki.archlinux.org/index.php/SSH_keys>`_,
     `Sshguard <https://wiki.archlinux.org/index.php/Sshguard>`_ *daemon
     that protects SSH and other services against brute-force attacts*.
@@ -1094,7 +1250,12 @@ SSH References
     <http://blog.habets.pp.se/2011/07/OpenSSH-certificates>`_,
     `Using a CA with SSH <http://www.lorier.net/docs/ssh-ca>`_.
 
+..  comment
 
+    this indirect target is necessary, because there are two sshfs
+    targets.
+
+..  _archwiki_sshfs: https://wiki.archlinux.org/index.php/Sshfs
 
 ..  comment
 
