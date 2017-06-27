@@ -138,7 +138,9 @@ See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`, :man:`dpkg.cfg(5)`,
 
 -   Configuration files policy, without prompt:
     They are listed in the ``--force-things`` section of the
-    :man:`dpkg(1) manpage <dpkg>`.
+    :man:`dpkg(1) manpage <dpkg>`. Except with *confask* they apply only
+    when the version of the package change, not when reinstalling the
+    same version.
 
     -   List the *force* options::
 
@@ -169,6 +171,12 @@ See also :man:`dpkg(1)`, :man:`dpkg-deb(1)`, :man:`dpkg.cfg(5)`,
         it, even if the version in the package did not change::
 
           dpkg --install --force-confask foo
+
+    -   Use *confask* to force install the new version of the conffile
+        when reinstalling the same version of the package::
+
+          dpkg --install --force-confask --force-confnew foo
+
 
     You can also use these options from *apt-get* or *aptitude as*
     :ref:`explained below <force-configuration-from-aptitude>`.
