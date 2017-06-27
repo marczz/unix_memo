@@ -462,8 +462,8 @@ You change the owner trust with the *trust* subcommand:
 
 In this example nobody else than Albert Lebrazh has signed this key,
 so even when I declare marginally trusting him as explained
-:ref:`above<trust_vs_validity` , his key is still not
-valid, this is confirmed when I try again to edit the key.
+:ref:`above<trust_vs_validity>`, his key is still not valid, this is
+confirmed when I try again to edit the key.
 
 ::
 
