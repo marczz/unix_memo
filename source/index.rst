@@ -11,27 +11,29 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   intro.rst
    commands.rst
    net_commands.rst
    shell.rst
    portable_shell.rst
+   systemd.rst
+   debian_package_memo.rst
    access_lists.rst
    attributes.rst
    swap.rst
-   cups.rst
-   ssh.rst
-   wpa.rst
    udev.rst
    devices.rst
    vfs.rst
    encrypt.rst
    gnupg.rst
-   debian_package_memo.rst
+   freedesktop.rst
+   network.rst
+   ssh.rst
+   wpa.rst
    pdf.rst
-   systemd.rst
    vi_cheatsheet
    nano.rst
-   network.rst
+   cups.rst
 
 Indices and tables
 ==================
