@@ -1,4 +1,4 @@
-.. _linux_command_memo:
+.. _linux_commands_memo:
 
 Linux Commands Memo
 ===================
@@ -102,7 +102,7 @@ text handling
    :coreutils:`dd` if=/dev/urandom count=1 | :coreutils:`base64` -w 0 | :coreutils:`cut` -c 1-16§generate random 16 chararacters password
    :man:`openssl` :man:`rand` -base64 16 | :coreutils:`cut` -c 1-16§generate random 16 chararacters password
    :coreutils:`tr` -dc '[:alnum:]&~#|_@=+$%*<>,?;.:/!-' < /dev/urandom | :coreutils:`head` -c${1:-16}; echo§generate random 16 chararacters password
-   :man:`date` +%s |:coreutils:`sha1sum`|:coreutils:`cut` -f1 -d' '§generate new 4O alphanumeric chars password
+   :man:`date` +%s | :coreutils:`sha1sum`|:coreutils:`cut` -f1 -d' '§generate new 4O alphanumeric chars password
    :coreutils:`paste` -d ',:' file1 file2 file3§Merges given files line by line
    :man:`mount` | :bsdman:`column` -t§table of mounted filesystems
    :coreutils:`join` -t'\0' -a1 -a2 file1 file2§Union of sorted files
@@ -115,7 +115,7 @@ text handling
    :coreutils:`printf` "%d\\n" "\'%"§decimal code of ascii character ``%``
    :man:`iconv` -f ISO8859-1 -t UTF-8 -o file.utf8 file.txt§convert encoding
    :man:`iconv` -l§List known coded character sets
-   :coreutils:`sha1sum` file§checksum of a file (use also ``sha256sum``,  ``sha512sum``,  ``md5sum``)
+   :coreutils:`sha1sum` file§checksum of a file (use also `other sums`_: ``sha256sum``,  ``sha512sum``,  ``md5sum``)
    :coreutils:`sha1sum` -c checksumlist§check the sums against the files
 
 encryption
@@ -400,15 +400,16 @@ Refs
 .. _gpg: http://www.gnupg.org/documentation/manuals/gnupg/
 .. _grep: http://www.gnu.org/software/grep/manual/html_node/index.html
 .. _ImageMagick: http://www.imagemagick.org
-.. _rsync: http://www.samba.org/ftp/rsync/rsync.html
+.. _other sums: https://www.gnu.org/software/coreutils/manual/html_node/Summarizing-files.html
+.. _qpdf: http://qpdf.sourceforge.net/files/qpdf-manual.html#ref.using
 .. _Redirect: http://www.gnu.org/software/bash/manual/bashref.html#Redirections
 .. _rename: https://metacpan.org/pod/distribution/File-Rename/rename.PL
+.. _rsync: http://www.samba.org/ftp/rsync/rsync.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
 .. _tcpdump: http://www.tcpdump.org/tcpdump_man.html
 .. _sed: http://www.gnu.org/software/sed/manual/sed.html
 .. _wget: http://www.gnu.org/software/wget/manual/wget.html
 .. _xargs: http://www.gnu.org/software/findutils/manual/html_node/find_html/xargs-options.html
-.. _qpdf: http://qpdf.sourceforge.net/files/qpdf-manual.html#ref.using
 ..
    TODO: Complete with other commands from http://cb.vu/unixtoolbox.xhtml
    Use |percnt| to include % in a command.
