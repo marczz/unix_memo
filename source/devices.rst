@@ -62,13 +62,13 @@ A more readable output is with:
     $ sudo blkid -o list -c /dev/null /dev/sdd1
     $ sudo blkid -o list -c /dev/null /dev/mapper/*
 
+..  _udisksctl_use:
+
 Using *udisk disk manager*.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`udisksctl
-<http://udisks.freedesktop.org/docs/latest/udisksctl.1.html>`_ is a
-higher level control part of the `udisk Disk Manager
-<http://udisks.freedesktop.org/docs/latest/>`_.
+`udisksctl`_ is a
+higher level control part of the `udisk disk manager`_
 If it is running on your system, you get the managed devices with
 their model, revision and serial number by::
 
@@ -118,8 +118,7 @@ It is also shown in your kernel messages, and can be read with
 References
 ++++++++++
 
--   `udisksctl
-    <http://udisks.freedesktop.org/docs/latest/udisksctl.1.html>`_
+-   `udisksctl`_
 -   `ArchWiki: udisks
     <https://wiki.archlinux.org/index.php/Udisks>`_
 
@@ -224,6 +223,8 @@ use :man:`fdisk` or :man:`sfdisk` with *mbr* partition table
 
 All these command are to be run as root.
 
+..  _udisksctl_mount:
+
 Mounting devices.
 -----------------
 
@@ -234,10 +235,7 @@ You can still use :man:`mount` if the fstab has a ``user`` option for
 the device, but not for arbitrary plugged devices.
 
 The old way is to use :man:`pmount`, but if you have
-`udisdk daemon
-<http://udisks.freedesktop.org/docs/latest/udiskd.8.html>`_ running on your
-system, you should use `udisksctl
-<http://udisks.freedesktop.org/docs/latest/udisksctl.1.html>`_:
+`udisdk daemon`_ running on your system, you should use `udisksctl`_:
 
 ::
 
@@ -254,6 +252,35 @@ used; so the device above *key64G001* is mounted as
 The directory ``/media/<user>`` belongs to root, but has an ACL giving
 you the ``r-x`` access. ``/media/<user>/key64G001`` and entry below
 belongs to to you with ``rwx`` access.
+
+Mounting a partition in a FileManager
+-------------------------------------
+
+The modern file managers like *Nautilus*, *Thunar*, *Pcmanfm* use
+*gvfs* and *udisk2* to mount removabele media. They accept that you
+give them a *gvfs* mountpoint.
+
+They also list a list of partition, either yet mounted, or unmouted,
+and allow to mount removable partitions.
+
+Partitions listed in ``/etc/fstab`` would (by default) only show up if
+they are mounted under ``/media``, ``$HOME`` or ``/run/media/$USER``
+or if there is an entry in fstab for them pointing to these
+directories.
+
+If you want the partition to be mounted under a different directory
+(e.g. ``/mnt``) and still be shown in the sidebar, you can override the
+default behaviour by adding ``x-gvfs-show`` to your mount options in
+fstab:
+
+
+Partitions not listed in ``/etc/fstab`` are handled by udisks2 and will be
+mounted under ``/run/media/$USER/VolumeName`` or ``/media/VolumeName``
+depending on the value of ``UDISKS_FILESYSTEM_SHARED`` (see
+:man:`udisks` you can `change it in an udev rule
+<https://wiki.archlinux.org/index.php/udisks#Mount_to_.2Fmedia_.28udisks2.29>`_),
+hence they will be shown under Devices in the sidebar.
+
 
 Front ends
 ----------
@@ -323,3 +350,11 @@ Udisks references
 -   `Gentoo: Udisks <http://wiki.gentoo.org/wiki/Udisks>`_.
 -   `Introduction to Udisks
     <http://blog.fpmurphy.com/2011/08/introduction-to-udisks.html>`_.
+
+
+..  _udisksctl:
+    http://udisks.freedesktop.org/docs/latest/udisksctl.1.html
+..  _udisk disk manager:
+    http://udisks.freedesktop.org/docs/latest/
+..  _udisdk daemon:
+    http://udisks.freedesktop.org/docs/latest/udiskd.8.html
