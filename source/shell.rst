@@ -1,5 +1,10 @@
 Shell Memo
 ==========
+
+.. contents::
+   :local:
+   :depth: 1
+
 I only give some points which are sometime tricky in shell. There are
 many good shell scripting guides, to which you can refer.
 
@@ -15,16 +20,17 @@ can use
 .
 
 Most of the constructs given here for bash work also in the same way
-for zsh which is very similar for scripting, the main [differences are
-in the interactive use as set
-`in linux Magazine <http://www.linux-mag.com/id/1053/>`_ and
-`in zsh wiki <http://zshwiki.org/home/convert/bash>`_.
+for zsh which is very similar for scripting. bash and zsh differences
+are mainly in the interactive. use It is explained
+`in this linux Magazine article <http://www.linux-mag.com/id/1053/>`_
+and `in zsh wiki <http://zshwiki.org/home/convert/bash>`_.
+
 I summarise the scripting differences in the next
 paragraph.
 
-..  index:
-    single: bash, vs zsh
-    single: zsh, vs bash
+..  index::
+    single: bash; vs zsh
+    single: zsh; vs bash
 
 Differences between zsh and bash scripts.
 -----------------------------------------
@@ -97,7 +103,7 @@ Differences between zsh and bash scripts.
 
    Is correct in any shell: bash, zsh, or dash.
 
-..  index:
+..  index::
     pair: shell; exit
     pair: shell; return
 
@@ -131,7 +137,7 @@ exit
 parent. If n is omitted, the exit status is that of the last command
 executed. Any trap on EXIT is executed before the shell terminates.
 
-..  index:
+..  index::
     query string
     single: html; query
 
@@ -214,7 +220,7 @@ in
 Links
 -----
 
-..  index:
+..  index::
     symlink
 
 Symlinks
@@ -249,7 +255,7 @@ and the absolute path stripped from any symbolic link component, any
     $ readlink --canonicalize name
     $ readlink -f name
 
-..  index:
+..  index::
     hardlink
 
 Hardlinks
@@ -269,7 +275,7 @@ You create hardlinks with:
     $ ln  existing-path alias-or-directory
     $ cp --link name1 name2
 
-..  index:
+..  index::
     reflink
 
 Reflinks
@@ -298,6 +304,8 @@ See also:
     `libc manual: Hardlinks
     <http://www.gnu.org/savannah-checkouts/gnu/libc/manual/html_node/Hard-Links.html>`_
 
+..  index::
+    input; caturing
 
 capturing input
 ---------------
@@ -312,6 +320,11 @@ capture only the input. I achieve it by using:
 ..  code-block:: shell-session
 
      $ cat /dev/stdin|tee /tmp/session_input| application
+
+..  index::
+    return; status
+    command; return status
+
 
 command return status
 ---------------------
@@ -349,15 +362,21 @@ command return status
     directly in an if expression.
 -   **avoid this**: ``[ 1 ]`` is **true** so a test like ``[ $? ]`` fail
     when ``$?`` is not defined, but succeed with both 0 and 1 values.
+-   an alternative is to use a number comparison:
 
-Command Epansion.
------------------
+    ..  code-block:: shell-session
+
+        if [ $? -eq 0 ]; then echo "ok"; fi
+
+..  index::
+    command; expansion
+
+Command Expansion.
+------------------
 
 
-The `bash reference
-<http://www.gnu.org/software/bash/manual/bashref.html>`_
-gives a long description of `command expansion
-<http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion>`_
+The `Bash Reference`_ gives a long description of
+`Command Expansion`_.
 
 The order of expansion is very important; it is: brace expansion;
 tilde expansion, parameter and variable expansion, arithmetic
@@ -369,7 +388,11 @@ To quote the manual: *Only brace expansion, word splitting, and
 filename expansion can change the number of words of the expansion;
 other expansions expand a single word to a single word.*
 
-parameter and command substitution.
+..  index::
+    parameter; substitution
+    command; substitution
+
+Parameter and Command Substitution.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The order of parameter and command substitution explain why we have:
@@ -384,7 +407,12 @@ the assignement*. You can find more on this subject in
 `Bruce Barnett Grymoire - sh, a subtle point
 <http://www.grymoire.com/Unix/Sh.html#uh-14>`_.
 
-parameter expansion, splitting and quote removal.
+..  index::
+    parameter; expansion
+    word; splitting
+    quote; removal
+
+Parameter Expansion, Splitting and Quote Removal.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The order of the previous operation explains we have:
@@ -419,26 +447,27 @@ But when we have:
 In these four the input file descriptor is built before the read, and
 the three input are the same.
 
+..  index::
+    command; expansion
+    assignment; expansion
+    word; splitting
+    string; quoting
+
+..  _expansion:
 
 
 Quoting and splitting.
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The bash reference decribe
-`quoting
-<http://www.gnu.org/software/bash/manual/bashref.html#Quoting>`_,
-but sometime the combination of quoting with  *command expansion*
-can be difficult to sort out.
+The bash reference describe `Quoting`_ but sometime the combination of
+quoting with `Command Expansion`_ can be difficult to sort out.
 
 If you set a variable to a string, when use it as parameter in the
-process of `simple command expansion
-<http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion>`__
-it is subject to `shell expansion
-<http://www.gnu.org/software/bash/manual/bashref.html#Shell-Expansions>`__
-a complex process which involves `shell parameter expansion
-<http://www.gnu.org/software/bash/manual/bashref.html#Shell-Parameter-Expansion>`__
-and then  `word splitting
-<http://www.gnu.org/software/bash/manual/bashref.html#Word-Splitting>`__.
+process of `Simple Command Expansion`_ it is subject to
+`Shell Expansion`_ a complex process which involves
+`Shell Parameter Expansion`_ *Command Substitution*, *Arithmetic
+Expansion*, *Process Substitution*, and then `Word Splitting`_
+followed by `Filename Expansion`_ and *Quote removal*.
 
 Let's apply with a simple command, made from a simple script named
 ``countargs``:
@@ -466,13 +495,13 @@ Let's apply with a simple command, made from a simple script named
 Very simple indeed, this is the expected behavior of quotting and word
 splitting.
 
+..  _assignment_expansion:
+
 But if you use your parameter in assignment the
 rules are different, **assignment are not commands** but a preliminary to
-`Simple Command Expansion
-<http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion>`__
-and quoting this section
-..   highlights:
+`Simple Command Expansion`_ and quoting this section
 
+..   highlights:
      The text after the ‘=’ in each variable
      assignment undergoes tilde expansion, parameter expansion,  command
      substitution, arithmetic expansion, and quote removal before being
@@ -491,6 +520,103 @@ valids and equivalents:
      $ echo $z
      one two three
 
+Now if you use the special characters used for glob patterns like
+``?`` and ``*`` in a word assigned to a variable, and evaluate the
+variable afterward the `Filename Expansion`_ can occur so you get:
+
+..  code-block:: shell-session
+
+    $ x=sound*
+    $ echo $x
+    sound.wav
+    $ echo "$x"
+    sound*
+    $ y=$x
+    $ echo "$y"
+    sound*
+    $ y=$(echo $x)
+    $ echo "$y"
+    sound.wav
+    $ y="$(echo $x)"
+    $ echo "$y"
+    sound.wav
+
+Note that in the first assignement we have not used quotes, because as
+:ref:`set previously<assignment_expansion>` in the text after an
+assignement the is no `Filename expansion`_ but of course there is
+quote removal, so the three following assignements are identical:
+
+..  code-block:: shell-session
+
+    $ x='sound*'
+    $ x="sound*"
+    $ x='sound*'
+
+
+In the same way the line breaks in a string assigned to a variable are
+used for word splitting so:
+
+..  code-block:: shell-session
+
+    $ x="
+    > one
+    > two
+    > three"
+    5231$ echo $x
+    one two three
+    5232$ echo "$x"
+
+    one
+    two
+    three
+    $ y=$x
+    $ echo "$y"
+
+    one
+    two
+    three
+
+
+As usual a trailing backslach remove the following newline:
+
+..  code-block:: shell-session
+
+    $ x="one \
+    two \
+    three"
+    $ echo "$x"
+    one two three
+
+The other backslash escape are uninterpreted, but you can force the
+interpretation with the command :man:`echo` with the ``-e`` argument
+or the command :man:`printf`. Both commands exists as
+`Bash builtins`_.
+As *printf* is not a dash builtin, and the dash ``echo`` builtin does
+not support the  ``-e`` argument; in portable shell you better rely on
+the command :man:`printf` or the command :man:`echo`.
+
+..  code-block:: shell-session
+
+    $ x="one\ntwo\nthree"
+    $ echo $x
+    one\ntwo\nthree
+    $ echo -e $x
+    one
+    two
+    three
+    $ printf "%b\n" $x
+    one
+    two
+    three
+
+
+..  index::
+    see: file descriptor; fd
+    fd
+    redirection
+
+
+
 
 file descriptors
 ----------------
@@ -500,14 +626,26 @@ Reference
 -   `Wikipedia: File descriptor
     <https://en.wikipedia.org/wiki/File_descriptor>`_
 -   Redirections are described in the
-    `Redirection section of the bash reference manual
-    <http://www.gnu.org/software/bash/manual/bashref.html#Redirections>`_,
+    `Redirections`_ section of the `Bash Reference`_  Manual.
 -   Advanced bash scripting guide has also a `section on redirection
     <http://tldp.org/LDP/abs/html/io-redirection.html>`_
     that has more elaborated examples, than the following recipes.
+-   There are also many topics on redirection in the
+    `Bash FAQ <http://mywiki.wooledge.org/BashFAQ>`_ :
+    `Redirect stderr to a pipe
+    <http://mywiki.wooledge.org/BashFAQ/047>`_,
+    `Redirect the output of multiple commands at once
+    <http://mywiki.wooledge.org/BashFAQ/014>`_,
+    `Send all  output to a log file
+    <http://mywiki.wooledge.org/BashFAQ/106>`_.
 
-Opening - Closing -Listing
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. index::
+   fd; open
+   fd; close
+   fd; list
+
+Opening - Closing - Listing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To assign fd 3 to myfile:
 
 ..  code-block:: shell-session
@@ -520,7 +658,7 @@ To close fd 3:
 
     $ exec >&3-
 
-For input descripors:
+For input descriptors:
 
 ..  code-block:: shell-session
 
@@ -545,11 +683,16 @@ or:
 
     $ lsof -a -p $$ -d 0-10
 
+..  index::
+   fd; copy
+   fd; move
+
 Copying - Moving
 ^^^^^^^^^^^^^^^^
 To copy a file descriptor you can use:
 
 ..  code-block:: shell-session
+    :linenos:
 
     $ exec 3>&1
     $ exec 1>|/tmp/output1
@@ -557,23 +700,30 @@ To copy a file descriptor you can use:
     $ exec 1>&3
     $ exec 3>&-
 
-The file descriptor 1 is copied to fd 3, then 1 is redirected to the
-file ``/tmp/output1``, the first ls goes in this file, then fd 3 is
-copied back to fd 1 which comes back to it's previous value; the
+In line *(1)* the file descriptor 1 is copied to fd 3, then *(2)* 1 is redirected to the
+file ``/tmp/output1``, *(3)* the first ls goes in this file, then *(4)* fd 3 is
+copied back to fd 1 which comes back to it's previous value; *(5)* the
 descriptor 3 is then closed.
 
-The last two lines can be abbreviated in:
+In Bash *but not dash* the last two lines can be abbreviated in:
 
 ..  code-block:: shell-session
 
     $ exec 1>&-3
 
-Swapping stdout and stderr
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+..  index::
+    fd; swap
+
+Swapping stdout and stderr.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ..  code-block:: shell-session
+    :linenos:
 
     $ f(){ echo out; echo error >&2; }
+    $ f
+    out
+    error
     $ x=$(f)
     error
     $ echo $x
@@ -586,10 +736,113 @@ Swapping stdout and stderr
     error
     $ echo $x
 
+    $ x=$(f 3>&2 2>&1 1>&3)
+    out
+    $ echo $x
+    error
+    $ exec 3>&2; x=$(f 2>&1 1>&3); 3>&-
+    out
+    $ echo $x
+    error
     $ exec 3>&1; x=$(f 2>&1 1>&3); 3>&-
     out
     $ echo $x
     error
+
+
+\(2)
+    Normal call to ``f``, both error and output go to standard output.
+
+\(5)
+    The output is assigned to ``x`` and the error go to stdout.
+
+\(9)
+    The output fd replace the error, so both fd go to stdout and are
+    assigned to ``x``.
+
+\(12)
+    The error fd replace the output, so both echos are going to error
+    and nothing on stdout, ``x`` is empty.
+
+\(17)
+    We execute f in a context where error is saved as fd 3, then
+    output replacing error, previous saved error replace output.
+
+\(21)
+    is similar to *(17)* except that we save stderr before evaluating
+    the expression.
+
+\(25)
+    Is harder to understand, and can seem paradoxal first, what use of
+    saving fd (**f**\ ile **d**\ escriptor) 1 for copying it later to
+    the same fd 1?
+
+    But the standard output outside and inside of the `Command
+    Substitution`_ are not the same.  Before the `Command
+    Substitution`_ the current output is untouched, if we execute this
+    script from a pseudo terminal it is /dev/pts/0 and this value is
+    saved to fd 3.
+
+    Inside ``$(...)`` which is a `Command Substitution`_ construct,
+    the standard output is redirected to a pipe to capture the output;
+    we copy this pipe to fd 2 with ``2>&1``, then the fd 3 containing
+    the original output is copied back to the current output that is
+    fd 1.
+
+    We execute the function in this context and affect the content of
+    the pipe, that is what goes to stderr inside the function, to the
+    variable; then fd 3 is closed.
+
+..  index::
+    read; from text bloc
+    read; from string
+
+
+Reading from a bloc of text.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The shell builtin **read** first aim is reading from standard input or
+any file descriptor. But we can use it with `Here Documents`_, or with
+`Here Strings`_ *in bash or zsh but not dash, it is not a portable
+construct*, in a pipe, or with process substitution.
+
+In standard shell like dash when we read from an `Here Documents`_
+the builtin *read* read one line each time. In
+bash or zsh we can change the delimiter and read the whole *Here
+Document* or *Here String* in a single shell variable.
+
+..  code-block:: shell-session
+    :linenos:
+
+    $ f=foo
+    $ read -d'' x <<EOF
+    $f and bar
+            go in a boat
+    EOF
+    $ echo "$x"
+    foo and bar
+            go in a boat
+    $ read -d'' x << "EOF"
+    $f and bar
+            go in a boat
+    EOF
+    $ echo "$x"
+    $f and bar
+        go in a boat
+    $ read -d'' x <<- EOF
+    $f and bar
+            go in a boat
+    EOF
+    $ echo "$x"
+    foo and bar
+    go in a boat
+
+As seen in the previous example *(9)* quoting the end string disable
+variable expansion, and *(16)* using ``<<-`` delete initial
+tabulations.
+
+..  index::
+    substring; extract
 
 Extracting the parts of a string.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -634,7 +887,7 @@ But we can use only the shell even basic bourne shell or dash.
     v2=$2
     v3=$3
 
-Or using *Here Documents* that is found in any shell:
+Or using `Here Documents`_ that is found in any shell:
 
 ..  code-block:: bash
 
@@ -645,8 +898,7 @@ Or using *Here Documents* that is found in any shell:
 
 We can also use in dash, busybox ash, yash, bash, zsh and others POSIX
 compatibles shells
-`parameter expansion
-<http://www.gnu.org/software/bash/manual/bashref.html#Shell-Parameter-Expansion>`_:
+`Shell Parameter expansion`_
 
 ..  code-block:: bash
 
@@ -750,8 +1002,13 @@ want to use the result of the previous process in the subsequent
 one. But it can be more difficult to get the result of a subprocess
 inthe parent process. This is the subject of next paragraph.
 
+..  index::
+    seealso: processes; shell subprocess
+    shell subprocess; asynchronous
+
 Using an asynchronous subprocess.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A pipe open a subshell. As variables in a subshell are inaccessible
 from the parent shell,  all the variables set inside a pipe are also
 unavailable out of the pipe.
@@ -865,6 +1122,8 @@ we can store the output of the first command in a string and read from
 that string this is illustrated by the paragraph on splitting output
 of a command.
 
+..  index::
+    command; time
 
 Elapsed time of a command
 -------------------------
@@ -900,6 +1159,12 @@ To know the elaped time of some part of a script we can also use the
     after="$(date +%s)"
     echo "elapsed: $(date -u -d @$(($after - $before)) +%H:%M:%S)"
 
+
+..  index::
+    seealso : arrays;  shell array
+    shell array
+    shell array; index
+    shell array; globbing
 
 
 array indexes and globbing.
@@ -973,8 +1238,8 @@ Zsh can also test the regexp as a PCRE regular expression by setting the option
 ``RE_MATCH_PCRE``.
 
 
-Using ``getopts``
------------------
+Using ``getopts``.
+------------------
 ``getopts`` is a POSIX function; defined in bash and zsh.
 
 In bash the details are reviewed in `abs: example 11-8
@@ -1002,8 +1267,8 @@ When using it in a function it looks like that:
 
 If not in function replace ``local`` by ``declare``
 
-using ``getopt``
-----------------
+using ``getopt``.
+-----------------
 
 An example is given with :man:`getopt(1) <getopt>` in
 ``/usr/share/doc/util-linux/examples/``, it is recalled here:
@@ -1035,8 +1300,8 @@ An example is given with :man:`getopt(1) <getopt>` in
     echo "Remaining arguments:"
     for arg do echo '--> '"\`$arg'" ; done
 
-``getopt`` and whitespaces
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+``getopt`` and whitespaces.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 he old version of ``getopt`` does preserve whitespaces in arguments so you
 
@@ -1073,3 +1338,18 @@ a script:
     # code for new getopt
 
 The return value of 4 is the sign of the enhanced version.
+
+..  _Bash Reference: http://www.gnu.org/software/bash/manual/bashref.html
+..  _Command Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion
+..  _Command Substitution: http://www.gnu.org/software/bash/manual/bashref.html#Command-Substitution
+..  _Quoting: http://www.gnu.org/software/bash/manual/bashref.html#Quoting
+..  _Simple Command Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion
+..  _Shell Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Shell-Expansions
+..  _Shell parameter expansion: http://www.gnu.org/software/bash/manual/bashref.html#Shell-Parameter-Expansion
+..  _Word Splitting: http://www.gnu.org/software/bash/manual/bashref.html#Word-Splitting
+..  _Filename expansion: http://www.gnu.org/software/bash/manual/bashref.html#Filename-Expansion
+..  _Simple Command Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion
+..  _Here Documents: http://www.gnu.org/software/bash/manual/bashref.html#Here-Documents
+..  _Here Strings: http://www.gnu.org/software/bash/manual/bashref.html#Here-Strings
+..  _Bash Builtins: http://www.gnu.org/software/bash/manual/bashref.html#Bash-Builtins
+..  _Redirections: http://www.gnu.org/software/bash/manual/bashref.html#Redirections
