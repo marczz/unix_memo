@@ -31,6 +31,7 @@ Contents:
    ssh.rst
    wpa.rst
    pdf.rst
+   cd_dvd_burn.rst
    vi_cheatsheet
    nano.rst
    cups.rst
