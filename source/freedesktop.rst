@@ -4,15 +4,18 @@ FreeDesktop Structure
 These are notes of the structure of desktops following the Freedesktop
 specifications.
 
+..  index::
+    see: freedesktop; xdg
+
 
 References
 ----------
 
--   `freedesktop.org <http://www.freedesktop.org/>`__ a base platform
+-   `Freedesktop.org <http://www.freedesktop.org/>`__ a base platform
     (both software and standard) for desktop software.
 -   `Freedesktop Software <http://freedesktop.org/wiki/Software/>`__
--   `freedesktop
-    specifications <http://www.freedesktop.org/wiki/Specifications>`__:
+-   `freedesktop specifications
+    <http://www.freedesktop.org/wiki/Specifications>`__:
 
     -   `Menu specifications
         <http://standards.freedesktop.org/menu-spec/latest/>`__
@@ -28,16 +31,21 @@ References
         <http://standards.freedesktop.org/desktop-entry-spec/latest/ar01s06.html>`__
     -   `Recent File Specification
         <http://www.freedesktop.org/wiki/Specifications/recent-file-spec>`__
-    -    `Icon Themes Specification
-         <http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html>`__
-    -    `Desktop Application Autostart Specification
-         <http://standards.freedesktop.org/autostart-spec/latest/>`__
+    -   `Icon Themes Specification
+        <http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html>`__
+    -   `Desktop Application Autostart Specification
+        <http://standards.freedesktop.org/autostart-spec/latest/>`__
 
 -   `python-xdg <http://freedesktop.org/wiki/Software/pyxdg>`__ is a
-    python library to access freedesktop.org standards.
+    python library to access freedesktop.org standards, the
+    `python-xdg documentation
+    <http://pyxdg.readthedocs.org/en/latest/index.html>`_ is on
+    ReadTheDocs.
 
-    -   `python-xdg documentation
-        <http://pyxdg.readthedocs.org/en/latest/index.html>`__
+..  index::
+    pair: xdg; menu
+    pair: desktop; menu
+
 
 XDG menus
 ---------
@@ -72,47 +80,81 @@ XDG menus
     <https://wiki.debian.org/Proposals/DebianMenuUsingDesktopEntries>`__
     which compare Debian menus with ``.xdesktop`` files. An alternative
     is to switch debian packaging to freedesktop menus, it is developped
-    in `Debian and application-menu
-    policies <http://lwn.net/Articles/597697/>`__.
+    in `Debian and application-menu policies
+    <http://lwn.net/Articles/597697/>`__.
+
+..  index::
+    xdg; default application
+    default application
+    application; default
+    mime; action
+    mime; type
+    xdg-mime
+    xdg-open
 
 XDG Default application.
 ------------------------
 
-The freedesktop way of opening applications is thru ``xdg-open`` and the
-Mime type of the file, it is explained in Freedesktop `Desktop Entry
-Specification <http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html>`__,
-`Mime Actions
-Specification <http://standards.freedesktop.org/mime-apps-spec/latest/>`__
-and:
+The Freedesktop way of opening applications is through `xdg-open`_
+and the Mime type of the file.
 
--  `ArchLinux: Default
-   applications <https://wiki.archlinux.org/index.php/Default_Applications>`__
-   *describe mime database, xdg-open, xdg-mime, ect.* `Xdg user
-   directories <https://wiki.archlinux.org/index.php/XDG_user_directories>`__,
-   `Desktop
-   Entries <https://wiki.archlinux.org/index.php/Desktop_entries>`__
+Each application provide a ``.desktop`` file that conform to
+`Desktop Entry Specification
+<http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html>`__,
+amon many key, value pairs this file contain a key ``MimeType`` that
+indicates the MIME Types that an application knows how to handle.
+An application is expected to be able to reasonably open files of
+these types using the command listed in the ``Exec`` key.
+It is specified in `Mime Actions Specification
+<http://standards.freedesktop.org/mime-apps-spec/latest/>`__
 
-Some `alternatives are
-available <https://wiki.archlinux.org/index.php/Default_Applications#Utilities>`__,
-they try to provide more flexibility.
+Example::
 
-To know the mime file type of a file::
+  $ cat /usr/share/applications/feh.desktop
+  [Desktop Entry]
+  Name=Feh
+  .......
+  Exec=feh %F
+  Type=Application
+  .......
+  MimeType=image/jpeg;image/png;image/gif;image/tiff;image/bmp;
+           image/x-icon;image/x-xpixmap;image/x-xbitmap;
 
-    $ xdg-mime query filetype example.html
-    text/html
+`ArchLinux wiki <https://wiki.archlinux.org/>` has also many related
+documentation : `Default applications
+<https://wiki.archlinux.org/index.php/Default_Applications>`__
+*describe mime database, xdg-open, xdg-mime, ect.*
+`Xdg user directories
+<https://wiki.archlinux.org/index.php/XDG_user_directories>`__,
+`Desktop Entries
+<https://wiki.archlinux.org/index.php/Desktop_entries>`__
+
+It list also some `alternatives
+<https://wiki.archlinux.org/index.php/Default_Applications#Utilities>`__,
+that try to provide more flexibility than the official Freedesktop
+mechanism.
+
+To know the mime file type of a file we use `xdg-mime`_::
+
+    $ xdg-mime query filetype example.png
+    image/png
 
 What application open this file type::
 
-    $ xdg-mime query default text/html
-    qupzilla.desktop
+    $ xdg-mime query default image/png
+    feh.desktop
 
 Change the default application::
 
-    $ xdg-mime default firefox.desktop text/html
+    $ xdg-mime default geeqie.desktop image/png
 
-Open a file with the default application::
+Open a file with the default application with `xdg-open`_::
 
-    $ xdg-open manual.pdf
+    $ xdg-open example.png
+
+
+..  index::
+    xdg; directory
 
 Freedesktop Directories
 -----------------------
@@ -214,6 +256,10 @@ line option to make them comply with xdg satndard as explained in
 You can also symlink many of these files or directories inside the
 corresponding XDG Base directory.
 
+..  index::
+    xdg; menu
+    !menu
+
 Menu specification
 ------------------
 
@@ -235,6 +281,11 @@ see also the Gnome: `Desktop Menu Specification
     case of name conflict the first one is used.
 -   ``$XDG_DATA_DIRS/desktop-directories/`` contains .directory file
     giving directory entries in the menu layout.
+
+..  index::
+    pair: application; autostart
+    xdg; autostart
+
 
 Autostart applications
 ----------------------
@@ -258,3 +309,9 @@ additional keys:
 -   ``TryExec``: Tha application is started only when the named exec
     exist. It can be an absolute path or a name to be looked for in
     ``$PATH``.
+
+..  _xdg-open: https://portland.freedesktop.org/doc/xdg-open.html
+..  _xdg-mime: https://portland.freedesktop.org/doc/xdg-mime.html
+..  _xdg-desktop-menu:
+    https://portland.freedesktop.org/doc/xdg-desktop-menu.html
+..  _xdg-settings: https://portland.freedesktop.org/doc/xdg-settings.html
