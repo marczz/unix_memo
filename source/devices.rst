@@ -250,8 +250,18 @@ used; so the device above *key64G001* is mounted as
 ``/media/<user>/key64G001``.
 
 The directory ``/media/<user>`` belongs to root, but has an ACL giving
-you the ``r-x`` access. ``/media/<user>/key64G001`` and entry below
-belongs to to you with ``rwx`` access.
+you the ``r-x`` access. The directory ``/media/<user>/key64G001`` and
+its content belongs to to you with ``rwx`` access.
+
+You can also use `udisksctl`_ to mount a loop device:
+
+::
+
+    $ udisksctl loop-setup -f someimage.iso
+    Mapped file someimage.iso as /dev/loop0.
+    $ udisksctl mount -b /dev/loop0
+    Mounted /dev/loop0 at /media/john/someimage.
+
 
 Mounting a partition in a FileManager
 -------------------------------------
