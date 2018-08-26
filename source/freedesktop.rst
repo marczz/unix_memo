@@ -19,8 +19,7 @@ References
 
     -   `Menu specifications
         <http://standards.freedesktop.org/menu-spec/latest/>`__
-    -   `Mime Actions Specification
-        <http://standards.freedesktop.org/mime-apps-spec/latest/>`__
+    -   `Mime Actions Specification`_
     -   `Shared Mime Info Specification
         <http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec>`__
     -   `Base-Directory Specification
@@ -105,8 +104,8 @@ amon many key, value pairs this file contain a key ``MimeType`` that
 indicates the MIME Types that an application knows how to handle.
 An application is expected to be able to reasonably open files of
 these types using the command listed in the ``Exec`` key.
-It is specified in `Mime Actions Specification
-<http://standards.freedesktop.org/mime-apps-spec/latest/>`__
+It is specified in `Mime Actions Specification`_.
+
 
 Example::
 
@@ -134,10 +133,17 @@ It list also some `alternatives
 that try to provide more flexibility than the official Freedesktop
 mechanism.
 
+Managing default applications with xdg-utils.
+---------------------------------------------
+
 To know the mime file type of a file we use `xdg-mime`_::
 
     $ xdg-mime query filetype example.png
     image/png
+
+An URI is associated with a special mime type ``x-scheme-handler/scheme`` where
+``scheme`` is the URI scheme like ``http``, ``https``, ``ftp``, ``mms``, ``rtsp`` ....
+(see `URI scheme handlers`_ in freedesktop specification)
 
 What application open this file type::
 
@@ -152,9 +158,106 @@ Open a file with the default application with `xdg-open`_::
 
     $ xdg-open example.png
 
+The command `xdg-settings`_ allow to change at once all defaults for web scheme handlers
+or other url scheme handlers::
+
+  $ xdg-mime query default x-scheme-handler/http
+  org.kde.falkon.desktop
+  $ xdg-mime query default x-scheme-handler/https
+  org.kde.falkon.desktop
+  $ xdg-settings get default-web-browser
+  org.kde.falkon.desktop
+  $ xdg-settings set default-web-browser firefox.desktop
+  $ xdg-settings get default-web-browser
+  firefox.desktop
+  $ xdg-mime query default x-scheme-handler/http
+  firefox.desktop
+  $ xdg-settings get default-url-scheme-handler http
+  firefox.desktop
+  $ xdg-settings get default-url-scheme-handler mms
+  smplayer.desktop
+  $ xdg-mime query default x-scheme-handler/mms
+  smplayer.desktop
+
+As seen above `xdg-settings`_ is a convenience tool that replace one or many operations
+that can also be done with `xdg-mime`_, but usually we want to use the same browser for
+all web url
+
+If you have the :man:`gio` command from the ``libglib2.x-bin`` package
+(glib is used in GTK+ and Gnome applications) you can use it to see all packages that
+declare the mime type by issuing a query like::
+
+  $ gio mime x-scheme-handler/http
+
+*you can use any mime type*. With gio you don't have to dig manually in the mime
+databases, in the file system, that we now describe.
+
+
+
+The *mimeapps* file.
+--------------------
+Each *mimeapps* file is composed of many sections:
+
+   1. *Default Applications*: are made of lines like::
+
+        mimetype=application1.desktop;application2.desktop...
+
+      They give the default to open this mime type, many defaults can be specified in
+      the same or different *mimeapps* file they are used in their order in the file or
+      in the *mimeapps* browse order. The first application installed is used *some may
+      be missing*.
+
+   2. *Added Associations*: The association between an application and the mime types
+      elle can open is usually defined in the desktop file, but this section define some
+      added associations.
+
+   3. *Removed Associations*: removes associations of applications with mimetypes, this
+      mean that this asociation is not used, even if present in a desktop.
+
+   Added associations should be in preference order, if a valid default application is
+   not used the higher preferrence association will be used.
+
+   The adding and removal of associations only applies to desktop files in the current
+   directory, or a later one, this mean that if a desktop file is defined say in
+   ``/etc/xdg`` directory you cannot add or remove an association related to it in
+   ``/usr/local/share/applications/mimeapps.list`` that has a lower priority.
+
+
+You can see all applications are defined for each mime type in
+``/usr/share/applications/mimeinfo.cache``, they are not prioritized in this file which
+only summarize the ``MimeType=`` field of each desktop file.
+
+The priority for each type is shown in the first file with this type in this list:
+``~/.config/$desktop-mimeapps.list``, ``~/.config/mimeapps.list``,
+``/etc/xdg/$desktop-mimeapps.list``, ``/etc/xdg/mimeapps.list``,
+``/usr/local/share/applications/$desktop-mimeapps.list``,
+``/usr/local/share/applications/mimeapps.list``,
+``/usr/share/applications/$desktop-mimeapps.list``,
+``/usr/share/applications/mimeapps.list``.
+
+Each of these files can be absent, the ``$desktop-mimeapps.list`` are seldom used, in
+these entry *$desktop* is stand for ``$XDG_CURRENT_DESKTOP`` environment variable, which
+contain the desktop name in lowercase.
+
+Here we have used the defaults for the examined directories, of course you should use
+instead the `Freedesktop Directory environment variables`_ instead if they are not let
+at their default values.
+
+For a detailed description of the *mimeapps* traversal algorithm look at
+`Adding/removing associations`_ in `Mime Actions Specification`_.
+
+The previous utilities changes the entries in ``~/.config/mimeapps.list``.
+
+
+Follow the `Gnome System Administration Guide`_ instructions, if you want to
+`add a custom MIME type for all users`_ or
+`add a custom MIME type for individual users`_.
+
 
 ..  index::
     xdg; directory
+
+..  _freedesktop_directories:
 
 Freedesktop Directories
 -----------------------
@@ -169,8 +272,8 @@ The Base Directories are used when looking for for user configuration.
     catalog software using the XDG Base Directory Specification.
 -   `GNOME Goal: XDG Base Directory Specification Usage
     <https://wiki.gnome.org/Initiatives/GnomeGoals/XDGConfigFolders>`__
-    explains why and how gnome software should implement XDG base
-    directories, and list the present support in gnome programs.
+    explains why and how Gnome software should implement XDG base
+    directories, and list the present support in Gnome programs.
 -   `ArchWiki: XDG user directories
     <https://wiki.archlinux.org/index.php/XDG_user_directories>`__
 
@@ -179,6 +282,8 @@ The `freedesktop base directories
 that follow is used by all freedesktop compatible application. They have
 a default that can be overrided by exporting in your environment the
 variables.
+
+..  _freedesktop directory environment variables:
 
 -   ``$XDG_DATA_HOME`` default ``$HOME/.local/share`` contains
     user-specific data files.
@@ -248,7 +353,7 @@ under ``$HOME`` is:
 
 The `Debian Wiki <https://wiki.debian.org/DotFilesList>`__ list the
 dotfiles we can find in a Debian system, their role and the programs
-that use them. TMost of them are not yet following the XDG standard,
+that use them. Most of them are not yet following the XDG standard,
 many programs may be launched with a specific environment on command
 line option to make them comply with xdg satndard as explained in
 `ArchWiki: XDG Base Directory support
@@ -260,8 +365,8 @@ corresponding XDG Base directory.
     xdg; menu
     !menu
 
-Menu specification
-------------------
+Menu specification.
+-------------------
 
 The reference is `Freedesktop Menu Specification
 <http://www.freedesktop.org/wiki/Specifications/menu-spec>`__
@@ -276,10 +381,10 @@ see also the Gnome: `Desktop Menu Specification
 -   ``$XDG_CONFIG_DIRS/menus/applications-merged/`` is the default merge
     directory included in the ``<DefaultMergeDirs>`` element of the
     previous file.
--  ``$XDG_DATA_DIRS/applications/`` contains a .desktop file for each
-    menu item, desktop entries are collected from all of them, but in
+-   ``$XDG_DATA_DIRS/applications/`` contains a ``.desktop`` file for each
+    menu item. Desktop entries are collected from all of them, but in
     case of name conflict the first one is used.
--   ``$XDG_DATA_DIRS/desktop-directories/`` contains .directory file
+-   ``$XDG_DATA_DIRS/desktop-directories/`` contains ``.directory`` files
     giving directory entries in the menu layout.
 
 ..  index::
@@ -315,3 +420,15 @@ additional keys:
 ..  _xdg-desktop-menu:
     https://portland.freedesktop.org/doc/xdg-desktop-menu.html
 ..  _xdg-settings: https://portland.freedesktop.org/doc/xdg-settings.html
+..  _Mime Actions Specification:
+    https://specifications.freedesktop.org/mime-apps-spec/latest/
+..  _URI scheme handlers:
+    https://specifications.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html#idm140625828587776
+..  _Adding/removing associations:
+    https://specifications.freedesktop.org/mime-apps-spec/latest/ar01s03.html
+..  _Gnome System Administration Guide:
+    https://help.gnome.org/admin/system-admin-guide/stable/
+..  _add a custom MIME type for all users:
+    https://help.gnome.org/admin/system-admin-guide/stable/mime-types-custom.html.en
+..  _add a custom MIME type for individual users:
+    https://help.gnome.org/admin/system-admin-guide/stable/mime-types-custom-user.html.en
