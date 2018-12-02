@@ -478,4 +478,5 @@ extlinks = {
     'mzlinux':('http://www.mzlinux.org/node/%s', ''),
     'cups':('http://www.cups.org/documentation.php/%s', ''),
     'locups':('http://localhost:631/help/%s', ''),
+    'archwiki':('https://wiki.archlinux.org/index.php/%s', ''),
     }

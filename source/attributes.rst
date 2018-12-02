@@ -10,10 +10,7 @@ References
    <http://www.lesbonscomptes.com/pages/extattrs.html>`_
 -  :wikipedia:`chattr`
 -  man pages: :man:`lsattr(1)`, :man:`chattr(1)`
--  ArchWiki: `File attributes
-   <https://wiki.archlinux.org/index.php/Attributes#File_attributes>`_,
-   `Extended attributes
-   <https://wiki.archlinux.org/index.php/Attributes#Extended_attributes>`_.
+----------
 
 attributes memo
 ===============
@@ -47,6 +44,9 @@ capability can set or clear attribute.
 
 Attribute are listed py :man:`lsattr(1)` and changed by
 :man:`chattr(1)`
+-  ArchWiki: :archwiki:`File attributes
+   <File_permissions_and_attributes#File_attributes>`.
+
 
 Extended file attributes
 ========================
@@ -57,3 +57,6 @@ enabled in the kernel configuration. Any regular file or directory may
 have extended attributes consisting of a name and associated data.
 
 :man:`getfattr(1)` and :man:`setfattr(1)` utilities retrieve and set xattrs.
+-  ArchWiki: :archwiki:`Extended attributes
+   <File_permissions_and_attributes#Extended_attributes>`.
+

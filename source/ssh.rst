@@ -56,7 +56,7 @@ You can get more information in
 -   `sshf README <https://github.com/libfuse/sshfs/blob/master/README.md>`_
 -   `Ubuntu: sshfs <https://help.ubuntu.com/community/SSHFS>`_
     explains the usage, including mounting from fstab.
--   `ArchWiki: sshfs <https://wiki.archlinux.org/index.php/Sshfs>`_
+-   `ArchWiki: :archwiki:`Sshfs`
 -   `Gentoo Wiki: SSHFS <https://wiki.gentoo.org/wiki/SSHFS>`_
 
 
@@ -315,7 +315,7 @@ But is is always better to put these option in  :bsdman:`ssh_config`.
 We can also manually copy the key, if we can ssh to the server by::
 
   $ cat ~/.ssh/mykeyid_rsa.pub | ssh username@remote-server.org \
-  'sh -c "cat >> ~/.ssh/authorized_key; chmod 0600  ~/.ssh/authorized_key"
+  'sh -c "cat >> ~/.ssh/authorized_key; chmod 0600  ~/.ssh/authorized_key"'
 
 which is similar to the previous ``ssh-copy``.
 
@@ -340,10 +340,9 @@ such as user names and passwords encrypted in a keyring file in the
 user's home folder. The default keyring uses the login password for
 encryption.
 
--   `ArchLinux: Gnome Keyring
-    <https://wiki.archlinux.org/index.php/GNOME_Keyring>`_
-    describe also how to `use it without gnome
-    <https://wiki.archlinux.org/index.php/GNOME_Keyring#Use_without_GNOME.2C_and_without_a_display_manager>`_.
+-   ArchLinux: :archwiki:`GNOME Keyring`
+    describe also how to :archwiki:`use it without gnome
+    <GNOME_Keyring#Use_without_GNOME.2C_and_without_a_display_manager>`.
 -   `mozilla-gnome-keyring
     <https://github.com/infinity0/mozilla-gnome-keyring>`_
     is a mozilla extension to replace the default password manager in
@@ -392,8 +391,8 @@ or adding to your .xinitrc::
 
   eval $(ssh-agent)
 
-It is also possible to `start it as a systemd user service
-<https://wiki.archlinux.org/index.php/SSH_keys#Start_ssh-agent_with_systemd_user>`_
+It is also possible to :archwiki:`start it as a systemd user service
+<SSH_keys#Start_ssh-agent_with_systemd_user>`,
 and you will have a global ssh-agent for your global user session,
 whatever it run X or not.
 
@@ -410,8 +409,7 @@ agent both for gpg keys and ssh keys if it is run with the argument
     fi
 
 in the same way used for ssh you can prefer to
-`start gpg-agent with systemd user
-<https://wiki.archlinux.org/index.php/GnuPG#Start_gpg-agent_with_systemd_user>`_
+:archwiki:`start gpg-agent with systemd user <GnuPG#Start_gpg-agent_with_systemd_user>`.
 
  Refs: :bsdman:`ssh-agent`, `gpg-agent
  <https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html>`_
@@ -598,8 +596,7 @@ in most distributions.
 
 -   `Gentoo Guide: Keychain
     <http://www.gentoo.org/doc/en/keychain-guide.xml>`_.
--   `ArchWiki: Keychain
-    <https://wiki.archlinux.org/index.php/SSH_keys#Keychain>`_
+-   `ArchWiki: Keychain <SSH_keys#Keychain>`.
 -   `man: keychain(1) <http://man.cx/keychain(1)>`_
 
 ..  _gpg_exec:
@@ -796,10 +793,10 @@ To use sshfs with autossh you can use:
 Even without using autossh you can restart automaticaly restart a ssh
 tunnel started from systemd by using the ``Restart`` option in your
 unit file as shown in this `ArchWiki example
-<https://wiki.archlinux.org/index.php/Secure_Shell#Automatically_restart_SSH_tunnels_with_systemd>`_.
+<Secure_Shell#Automatically_restart_SSH_tunnels_with_systemd>`.
 
 -  `ArchWiki: autossh
-   <https://wiki.archlinux.org/index.php/Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`_
+   <Secure_Shell#Autossh_-_automatically_restarts_SSH_sessions_and_tunnels>`.
 
 
 mosh
@@ -1207,11 +1204,9 @@ SSH References
 |:bsdman:`ssh-keysign`            |Helper program for host based authentication.            |
 +---------------------------------+---------------------------------------------------------+
 
--   `ArchWiki: ssh <https://wiki.archlinux.org/index.php/Secure_Shell>`_,
-    `sshfs <archwiki_sshfs_>`_,
-    `SSH Keys <https://wiki.archlinux.org/index.php/SSH_keys>`_,
-    `Sshguard <https://wiki.archlinux.org/index.php/Sshguard>`_ *daemon
-    that protects SSH and other services against brute-force attacts*.
+-   ArchWiki: :archwiki:`ssh <https://wiki.archlinux.org/index.php/Secure_Shell>`,
+    :archwiki:`Sshfs`, :archwiki:`SSH Keys`, :archwiki:`Sshguard` *daemon    that
+    protects SSH and other services against brute-force attacts*.
 -   `Red Hat Entreprise System Administrator's Guide - Chapter 9
     OpenSSH
     <https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7-Beta/html/System_Administrators_Guide/ch-OpenSSH.html>`_
@@ -1249,13 +1244,6 @@ SSH References
     `Blargh: OpenSSH certificates tutorial
     <http://blog.habets.pp.se/2011/07/OpenSSH-certificates>`_,
     `Using a CA with SSH <http://www.lorier.net/docs/ssh-ca>`_.
-
-..  comment
-
-    this indirect target is necessary, because there are two sshfs
-    targets.
-
-..  _archwiki_sshfs: https://wiki.archlinux.org/index.php/Sshfs
 
 ..  comment
 

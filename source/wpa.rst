@@ -18,8 +18,7 @@ Wpa_supplicant
 -  `Quick Start Guide to Debian and WPA Wireless
    Security <http://www.fmepnet.org/debian_wpa.html>`_ by Mike Shuey -
    2006.
--  `ArchWiki: WPA
-   supplicant <https://wiki.archlinux.org/index.php/WPA_supplicant>`_
+-  ArchWiki: :archwiki:`WPA supplicant`.
 -  Ubuntu `WiFi Doc <https://help.ubuntu.com/community/WifiDocs>`_: `WPA
    HowTo <https://help.ubuntu.com/community/WifiDocs/WPAHowTo>`_, `WiFi
    HowTo <https://help.ubuntu.com/community/WifiDocs/WiFiHowTo>`_

@@ -50,8 +50,7 @@ XDG menus
 ---------
 
 -   `XDG Menu in LXDE <http://wiki.lxde.org/en/Main_Menu>`__
--   `ArchLinux: xdg-menu
-    <https://wiki.archlinux.org/index.php/Xdg-menu>`__.
+-   ArchLinux: :archwiki:`Xdg-menu`
 -   `xdg-utils <http://portland.freedesktop.org/>`__
     is a set of command line utilities for Free Desktop: creating
     menus, opening files, setting mime types it includes the command
@@ -60,8 +59,7 @@ XDG menus
     compatible environments.
 -   To build the full desktop menu many distribution use a command to
     browse the freedesktop menu hierarchy :man:`xdg-menu`.
-    It is decribed in `Archlinux: XdgMenu
-    <https://wiki.archlinux.org/index.php/Xdg-Menu>`__.
+    It is decribed in Archlinux :archwiki`Xdg-Menu`.
 -   In Debian the freedesktop menus are generated from
     `Debian Menus System
     <http://www.debian.org/doc/packaging-manuals/menu.html/>`__ by
@@ -120,16 +118,12 @@ Example::
            image/x-icon;image/x-xpixmap;image/x-xbitmap;
 
 `ArchLinux wiki <https://wiki.archlinux.org/>` has also many related
-documentation : `Default applications
-<https://wiki.archlinux.org/index.php/Default_Applications>`__
+documentation : :archwiki:`Default applications`
 *describe mime database, xdg-open, xdg-mime, ect.*
-`Xdg user directories
-<https://wiki.archlinux.org/index.php/XDG_user_directories>`__,
-`Desktop Entries
-<https://wiki.archlinux.org/index.php/Desktop_entries>`__
+:archwiki:`Xdg user directories, :archwiki:`Desktop Entries`.
 
-It list also some `alternatives
-<https://wiki.archlinux.org/index.php/Default_Applications#Utilities>`__,
+
+It list also some :archwiki:`alternatives <Default_Applications#Utilities>`,
 that try to provide more flexibility than the official Freedesktop
 mechanism.
 
@@ -267,15 +261,13 @@ The Base Directories are used when looking for for user configuration.
 -   XDG Base Directories are specified in
     `Freedesktop Base-Directory Specification
     <http://standards.freedesktop.org/basedir-spec/latest/>`__.
--   `ArchWiki: XDG Base Directory support
-    <https://wiki.archlinux.org/index.php/XDG_Base_Directory_support>`__
+-   ArchWiki: :archwiki:`XDG Base Directory support`.
     catalog software using the XDG Base Directory Specification.
 -   `GNOME Goal: XDG Base Directory Specification Usage
     <https://wiki.gnome.org/Initiatives/GnomeGoals/XDGConfigFolders>`__
     explains why and how Gnome software should implement XDG base
     directories, and list the present support in Gnome programs.
--   `ArchWiki: XDG user directories
-    <https://wiki.archlinux.org/index.php/XDG_user_directories>`__
+-   ArchWiki: :archwiki:`XDG user directories`.
 
 The `freedesktop base directories
 <http://standards.freedesktop.org/basedir-spec/latest/>`__
@@ -356,8 +348,7 @@ dotfiles we can find in a Debian system, their role and the programs
 that use them. Most of them are not yet following the XDG standard,
 many programs may be launched with a specific environment on command
 line option to make them comply with xdg satndard as explained in
-`ArchWiki: XDG Base Directory support
-<https://wiki.archlinux.org/index.php/XDG_Base_Directory_support>`__.
+ArchWiki: :archwiki:`XDG Base Directory support`.
 You can also symlink many of these files or directories inside the
 corresponding XDG Base directory.
 
@@ -395,10 +386,7 @@ see also the Gnome: `Desktop Menu Specification
 Autostart applications
 ----------------------
 
--   `ArchWiki Autostarting
-    <https://wiki.archlinux.org/index.php/Autostarting>`__
--   `ArchWiki Desktop entries
-    <https://wiki.archlinux.org/index.php/Desktop_entries#Autostart>`__
+-   ArchWiki :archwiki:`Autostarting`, :archwiki:`Desktop entries`
 
 Applications referenced by a ``.desktop`` file in
 ``$XDG_CONFIG_DIRS/autostart`` and ``$XDG_CONFIG_HOME`` may be

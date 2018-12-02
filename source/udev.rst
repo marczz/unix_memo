@@ -60,8 +60,7 @@ Using /sys keys
 
 Ref: `Writing udev rules by Daniel Drake
 <http://www.reactivated.net/writing_udev_rules.html>`_,
-`ArchWiki: udev
-<https://wiki.archlinux.org/index.php/udev>`_.
+ArchWiki: :archwiki:`udev`.
 
 We obtain the keys by looking for dev ``/sys`` info, with
 ``udevadm info``:

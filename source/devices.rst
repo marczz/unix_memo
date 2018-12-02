@@ -119,8 +119,7 @@ References
 ++++++++++
 
 -   `udisksctl`_
--   `ArchWiki: udisks
-    <https://wiki.archlinux.org/index.php/Udisks>`_
+-   ArchWiki: :archwiki:`Udisks`
 
 Using the *udev* level for usb devices.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -287,8 +286,8 @@ fstab:
 Partitions not listed in ``/etc/fstab`` are handled by udisks2 and will be
 mounted under ``/run/media/$USER/VolumeName`` or ``/media/VolumeName``
 depending on the value of ``UDISKS_FILESYSTEM_SHARED`` (see
-:man:`udisks` you can `change it in an udev rule
-<https://wiki.archlinux.org/index.php/udisks#Mount_to_.2Fmedia_.28udisks2.29>`_),
+:man:`udisks` you can :archwiki:`change it in an udev rule
+<udisks#Mount_to_.2Fmedia_.28udisks2.29>`),
 hence they will be shown under Devices in the sidebar.
 
 
@@ -356,7 +355,7 @@ All modern file managers can automount devices for lxde desktops see
 Udisks references
 -----------------
 
--   `ArchWiki: Udisks <https://wiki.archlinux.org/index.php/Udisks>`_.
+-   `ArchWiki: :archwiki:`Udisks`.
 -   `Gentoo: Udisks <http://wiki.gentoo.org/wiki/Udisks>`_.
 -   `Introduction to Udisks
     <http://blog.fpmurphy.com/2011/08/introduction-to-udisks.html>`_.

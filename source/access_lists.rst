@@ -7,8 +7,7 @@ ACL References
 
 -  Acl is described in :man:`acl` (5), its use is in :man:`setfacl` (1)
    and :man:`getfacl` (1).
--  `ArchWiki: Access Control Lists
-   <https://wiki.archlinux.org/index.php/Access_Control_Lists>`_
+-  ArchWiki: :archwiki:`Access Control Lists`.
 -  `POSIX Access Control Lists on Linux
    <http://www.suse.de/~agruen/acl/linux-acls/online/>`_ by
    Andreas Grünbacher discuss ACL and extended attributes on Linux file
