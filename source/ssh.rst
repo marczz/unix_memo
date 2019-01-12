@@ -86,17 +86,20 @@ You can find below
 ssh keys.
 ---------
 
+.. _key_encryption:
+
 Key encryption
 ~~~~~~~~~~~~~~
 
 SSH protocol 2 supports
 :wikipedia:`DSA
-<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>`,
+<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>`
+that ssh report as ``ssh-dss``,
 :wikipedia:`RSA
 <https://en.wikipedia.org/wiki/RSA_(cryptosystem)>`
 :wikipedia:`ECDSA
 <https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm>`,
-:wikipedia:`Ed25519 <https://en.wikipedia.org/wiki/EdDSA>`
+:wikipedia:`Ed25519 <https://en.wikipedia.org/wiki/EdDSA#Ed25519>`
 keys, the two last being instance of
 :wikipedia:`Curve algorithm <https://en.wikipedia.org/wiki/Curve25519>`;
 protocol 1 only supports RSA keys.
@@ -108,9 +111,25 @@ and it is supposed that NSA could have put backdoors in this
 algorithm, as Ed25519 is also technically superior we can always
 prefer it.
 
-The more portable key is RSA, Ed25519 will give you the best security
-and performance but requires recent versions of client & server,
-Ed25519 and ECDSA are not supported by gnome keyring as of March 2016.
+If we look at the `SSH implementation comparison - hostkey format
+<https://ssh-comparison.quendi.de/comparison/hostkey.html>`_  we see that the widder
+support is for *dss* and :wikipedia:`RSA
+<https://en.wikipedia.org/wiki/RSA_(cryptosystem)>`, then :wikipedia:`ECDSA
+<https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm>` and
+:wikipedia:`Ed25519 <https://en.wikipedia.org/wiki/EdDSA#Ed25519>`.
+:wikipedia:`Ed25519 <https://en.wikipedia.org/wiki/EdDSA#Ed25519>`
+will give you the best security,and performance but requires recent versions of
+client & server.
+
+Ed25519 and ECDSA are not supported by gnome keyring until v 3.27.2 released in november
+2017, so in Debian your safe with at least *buster*.
+
+You can ever disable gnome keyring, and keep as key provider :ref:`ssh-agent` or
+:ref:`gpg-agen <gpg-agent_for_ssh>` optionally enhanced by keychain or gpg-exec this is
+also what `suggest Kyle Manna
+<https://blog.kylemanna.com/linux/use-funtoos-keyhain-insetad-of-gnome-keyring/>`_,
+`Ryan Daniels <https://ryandaniels.ca/blog/upgrade-ssh-keys-gpg-agent-ed25519/>`_ among
+others.
 
 `SSH implementation comparison: hostkey
 <http://ssh-comparison.quendi.de/comparison/hostkey.html>`
@@ -120,15 +139,15 @@ ssh-RSA is required to be supported by ssh RFC, so is always present
 <https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm>`
 is widely present; but
 :wikipedia:`SSH-Ed25519 <https://en.wikipedia.org/wiki/EdDSA>`
-is only supported by OpenSSH, and few other softare like
-the windows clients :wikipedia:`PuTTY` and
+is only supported by OpenSSH, and few other software like
+the windows clients :wikipedia:`PuTTY` (since 2016) and
 `smartFTP <https://www.smartftp.com/>`_, the iOS and Android client
 `TinyTerm <http://www.censoft.com/products/mobile/>`_, and the linux
 tiny client `TinySSH <https://tinyssh.org/index.html>`_.
 
 You  can also find a list of `Things that use Ed25519
-<https://ianix.com/pub/ed25519-deployment.html>` including a list of
-ssh software
+<https://ianix.com/pub/ed25519-deployment.html>`_ including a list of
+ssh software.
 
 Even if Ed25519 is both secure and fast, most often for ssh what
 matter is the ref:`cipher performance` not the authentication speed.
@@ -150,7 +169,7 @@ If you use Ed25519 all keys are 256 bits.
 You can consult a list of `Summary of keylength recommendations of
 well-known security organizations <https://www.keylength.com/>`_
 
-If you wantto explore thie keylength topic you have first to
+If you wantto explore the keylength topic you have first to
 understand why `symmetric cryptography have smaller key than
 asymmetric cryptography
 <https://blog.cloudflare.com/why-are-some-keys-small/>`_.
@@ -163,11 +182,7 @@ If you really want a stronger key you can use Ed25519 with::
   $ ssh-keygen -t ed25519
 
 But it is a good choice only to communicate with recent OpenSSH
-servers, older version and some other ssh servers don't support it,
-there is a list of `Things that use Ed25519
-<https://ianix.com/pub/ed25519-deployment.html>` including a list of
-ssh software, note that as far as april 2016 the windows popular
-client PutTTY support Ed25519 in its snapshot version.
+as dicussed :ref:`above <key_encryption>`.
 
 .. _new key format:
 
@@ -181,8 +196,9 @@ the option ``-o``::
 
 See :ref:`below <bcrypt_private_key>` for details on this new format.
 
-To know what keys are supported by your ssh software issue::
+To know what keys and ciphers are supported by your ssh software issue::
 
+  $ ssh -Q key
   $ ssh -Q cipher
 
 It is not advisable to have a key without password since any one that
@@ -227,7 +243,7 @@ Refs: :bsdman:`ssh-keygen`, :bsdman:`openssl`
 
 You can convert your old key to `new key format`_ by::
 
-  $ ssh-keygen -o -p -a 64 -f id_rsa
+  $ ssh-keygen -opa 64 -f .ssh/id_rsa
 
 The ``-a`` give the number of bcrypt rounds, and default to 16, the
 bigger they are the longer is the password verification time, and the
@@ -266,6 +282,26 @@ For the new format ::
   -----BEGIN OPENSSH PRIVATE KEY-----
   (base64 blurb)
 
+.. _key_fingerprint:
+
+You can list the type and sha256 fingerprint on any of your key  with
+::
+
+  $ ssh-keygen -lf ~/.ssh/myid
+
+or ::
+
+  $ ssh-keygen -lf ~/.ssh/myid.pub
+
+This command look in the public key, and report information there, if you provide the
+private key it will simply look for the public one in the same directory.
+
+If combined with -v, a visual ASCII art representation of the key is supplied with the
+fingerprint.
+::
+
+     $ ssh-keygen -lfv ~/.ssh/myid
+
 .. _authorized-keys:
 
 authorized-keys.
@@ -293,20 +329,22 @@ authorized-keys.
 
 copying the key to a remote server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 You can use :bsdman:`ssh-copy-id` to copy the file to the remote server::
 
   $ ssh-copy-id -i ~/.ssh/mykeyid_rsa.pub username@remote-server.org
 
 If you omit the id it will add all your keys to the remote server,
-either the keys returned bi ``ssh-add -L``, if nothing is in your
+either the keys returned by :bsdman:`ssh-add -L <ssh-add>`, if nothing is in your
 agent it will use the most recent file that matches: ``~/.ssh/id*.pub``.
-When using the ssh-agent key, :bsdman:`ssh-copy-id` will loose your
+
+When using the :ref:`ssh-agent` keys, :bsdman:`ssh-copy-id` will loose your
 comment. When you have multiple keys the comment is very usefull to
-remember the key role, so it is better to always givr the key file
+remember the key role, so it is better to always give the key file
 with the ``-i`` option.
 
 It is allowed but not recommended to specify the port or other options
-with ssh-copylike this::
+with :bsdman:`ssh-copy-id` like this::
 
   $ ssh-copy-id -i ~/.ssh/mykeyid_rsa.pub -p 27654 -o 'X11Forward=Yes' username@remote-server.org
 
@@ -319,11 +357,17 @@ We can also manually copy the key, if we can ssh to the server by::
 
 which is similar to the previous ``ssh-copy``.
 
-If you have not yet an ssh access to the server, you can copy the key
-by any mean like ftp, webdav, shared cloud ... to the server, if the
-transport media is not protected it is more secure to encrypt it
-during the transport with gpg or symetric encryption; the on the
-server::
+In some case you have not yet an ssh access to the server, which is the case when the
+remote :bsdman:`sshd has an option <sshd_config>` of ``PasswordAuthentication no`` or
+the default for root of ``PermitRootLogin prohibit-password``.
+
+You can still copy the key to the server by any mean like ssh to an allowed account,
+ftp, webdav, shared cloud ... If the transport media is not protected, to avoid the key
+being tampered, you can consider that is more secure to encrypt it during the transport
+with gpg or symetric encryption, but the simpler may be to compare visually the keys or
+some checksum.
+
+Manually install the key on the server::
 
   $ mkdir ~/.ssh
   $ chmod 700 ~/.ssh
