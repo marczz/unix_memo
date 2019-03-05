@@ -1,6 +1,58 @@
 Working with PDF/DJVU
 =====================
 
+Selecting and merging.
+----------------------
+
+Selecting pages with pdftk
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Select pages 1 to 4 and 6 from a pdf document:
+::
+
+    $ pdftk document.pdf cat  1-4 7  output mymix.pdf
+
+Merge pages from two documents:
+::
+
+    $ pdftk A=doc1.pdf B=doc2.pdf cat A1-5 B3 A6-8 output mymix.pdf
+
+To create a blank page:
+::
+
+    $ echo "" | ps2pdf -sPAPERSIZE=a4  - /tmp/blank.pdf
+    $ convert -size 1024x1448 xc:white /tmp/blank.pdf
+
+
+Insert the blank page at some position:
+::
+
+    $ pdftk A=document.pdf B=/tmp/blank.pdf cat A1-3 B1 A4-230 B1 A231-250 output combined.pdf
+
+Reference: :man:`pdftk` manual.
+
+Selecting pages with qpdf
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Select pages 1 to 4 and 6 from a pdf document:
+::
+
+    $ qpdf document.pdf --pages document.pdf  1-4,7 -- mymix.pdf
+
+Merge pages from two documents:
+::
+
+    $ qpdf doc1.pdf --pages doc1.pdf 1-5 doc2.pdf 3 doc1.pdf 6-8 -- mymix.pdf
+
+Insert a blank page at some position:
+::
+
+    $ qpdf  document.pdf  --pages document.pdf 1-3 blank.pdf 1 document.pdf 4-230 \
+      blank.pdf 1 -- combined.pdf
+
+Reference:`QPDF Manual
+<http://qpdf.sourceforge.net/files/qpdf-manual.html>_ :
+`Page Selection Options
+<http://qpdf.sourceforge.net/files/qpdf-manual.html#ref.page-selection>`_.
 
 PDF compression
 ---------------
@@ -161,8 +213,8 @@ show the following results:
 
 
 
-Extracting from pdf
--------------------
+Extracting objects from pdf
+---------------------------
 
 using mutool
 ~~~~~~~~~~~~
@@ -372,20 +424,6 @@ The jbig2 options are:
 <https://raw.githubusercontent.com/agl/jbig2enc/master/doc/jbig2enc.html>`_
 
 
-Bundling pdf pages
-~~~~~~~~~~~~~~~~~~
-
-To create a blank page:
-::
-
-    $ echo "" | ps2pdf -sPAPERSIZE=a4  - /tmp/blank.pdf
-    $ convert -size 1024x1448 xc:white /tmp/blank.pdf
-
-
-To insert the page at some position:
-::
-
-    $ pdftk A=document.pdf B=/tmp/blank.pdf cat A1-3 B1-1 A4-230 B1-1 A231-250 output combined.pdf
 
 Creating djvu document
 ----------------------
