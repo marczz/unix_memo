@@ -29,8 +29,10 @@ total amount of space that could be used is 1.1G
 
 2G of swap are unused.
 
-You can find more explanations `there
-<http://www.linuxatemyram.com/play.html>`_.
+You can find more explanations in `Linux ate my ram
+<http://www.linuxatemyram.com/play.html>`_
+and in `Tips for Optimizing Linux Memory Usage
+<https://www.linuxjournal.com/article/2770>`_.
 
 A very good ref is also
 `Tuning the Memory Management Subsystem
