@@ -290,8 +290,12 @@ See `sed manual <sed>`_ and
    ``sed 's/\x0D$//'``%Dos to unix eol
    ``sed 's/$/\\r/'``%Unix to dos eol
 
-:wikipedia:`ACL` and :wikipedia:`Extended Attributes`
------------------------------------------------------
+:wikipedia:`File attributes <chattr>`, :wikipedia:`Extended Attributes` and  :wikipedia:`ACL`
+---------------------------------------------------------------------------------------------
+They are three different sets of attributes that can be supported from filesytems.
+For more details look at the :ref:`File attributes section <file_attributes>` and
+the :ref:`ACL section <access_control_list>`.
+
 *Note: for ext 2/3/4 fs you may need to (re)mount with "acl" or
 "user_xattr" options. Or set the filesystem default with tune2fs. On
 btrfs acl and xattr are enabled by default.*
@@ -300,14 +304,14 @@ btrfs acl and xattr are enabled by default.*
    :delim: %
    :widths: 50, 60
 
-   :man:`getfacl` .%Show ACLs for file.
-   :man:`setfacl` -m u:nobody:r .%Allow a specific user to read file.
-   :man:`setfacl` -x u:nobody .%Delete a specific user's rights to file.
+   :man:`getfacl` foo%Show ACLs for file.
+   :man:`setfacl` -m u:nobody:r foo.txt%Allow a specific user to read file.
+   :man:`setfacl` -x u:nobody foo.txt%Delete a specific user's rights to file.
    :man:`setfacl` |min2|\ default -m group:users:rw- dir/%Set umask for a for a specific dir.
    :bsdman:`getcap` file%Show capabilities for a program.
    :bsdman:`setcap` cap_net_raw+ep your_gtk_prog%Allow gtk program raw access to network
-   `getfattr <http://linux.die.net/man/1/getfattr>`_ -m- -d%Show all extended attributes (includes selinux,acls,...)
-   `setfattr <http://linux.die.net/man/1/getfattr>`_ -n "user.foo" -v "bar" .%Set arbitrary user attributes
+   :man:`getfattr` -m- -d%Show all extended attributes (includes selinux,acls,...)
+   :man:`setfattr` -n "user.foo" -v "bar" .%Set arbitrary user attributes
 
 Desktop management
 ------------------
