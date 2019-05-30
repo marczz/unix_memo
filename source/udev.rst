@@ -4,13 +4,21 @@ Udev device Management and usb devices
 ======================================
 ..  highlight:: shell-session
 
--  :mzlinux:`MZlinux udev/hotplug Page </node/151>`
--  :man:`udev(7)`
--  :man:`lsusb(8)`.
--  :man:`udevadm(8)`.
--  to detect hardware including bus information :man:`lspci(8)`,
-   :man:`lshw(1)` and the *Suse* tool
-   `hwinfo <https://github.com/openSUSE/hwinfo>`_ (also in debian).
+References
+----------
+
+- :man:`udev(7)` explains the key and variables you can use in rules.
+- :man:`lsusb(8)`.
+- :man:`udevadm(8)`.
+- ArchWiki: :archwiki:`udev`.
+- `Writing udev rules by Daniel Drake
+  <http://www.reactivated.net/writing_udev_rules.html>`_
+  *2008 - the udev command names are obsolete, but the guide is still useful*,
+- `Gentoo Wiki - Udev <https://wiki.gentoo.org/wiki/Udev>`_
+- To detect hardware including bus information use :man:`lspci(8)`,
+  :man:`lshw(1)` and the *Suse* tool
+  `hwinfo <https://github.com/openSUSE/hwinfo>`_ (also in debian).
+
 
 localrules
 ----------
@@ -23,8 +31,13 @@ permissions, add a symlink or a ``RUN`` action.
 We also need to check that each rule matches on all keys, and the rule
 match exactly one device.
 
-My local udev *pre* rule are: /etc/udev/pre-local.rules, and the *post*
-rules /etc/udev/post-local.rules
+You can put your rules in ``/etc/udev/rules.d/``, and as the rules are used in
+lexicographical order you give a proper priority such they are used before or after a
+corresponding rule in ``/lib/udev/rules.d/``.
+
+If you want to *replace* a provided rule in ``/lib/udev/rules.d/``, you can just write a
+rule with the same name in ``/etc/udev/rules.d/`` as they take precedence over the
+``/lib`` rules.
 
 finding usb devices
 -------------------
@@ -58,10 +71,6 @@ be used in udev configuration.
 Using /sys keys
 -------------------
 
-Ref: `Writing udev rules by Daniel Drake
-<http://www.reactivated.net/writing_udev_rules.html>`_,
-ArchWiki: :archwiki:`udev`.
-
 We obtain the keys by looking for dev ``/sys`` info, with
 ``udevadm info``:
 
@@ -70,23 +79,24 @@ We obtain the keys by looking for dev ``/sys`` info, with
     -   Report with ``udevadm info`` providing the device name
         ::
 
-            $ udevadm info --query=property  --name /dev/usb/lp0
+            $ udevadm info --query=property --name /dev/usb/lp0
 
    -   use the path that you also get from device by
        ::
 
-           $ udevadm info --query=path  --name /dev/usb/lp0
+           $ udevadm info --query=path --name /dev/usb/lp0
            /class/usb/lp0
 
        and get dev ``/sys`` info by
        ::
 
-           $ udevadm info --query=property  --path /class/usb/lp0
+           $ udevadm info --query=property --path /class/usb/lp0
 
-2.  We can then find appropriate keys to identify uniquely our device::
+2.  We can then find appropriate keys to identify uniquely our device:
 
+.. code-block:: cfg
 
-        SYSFS{manufacturer}=="Hewlett-Packard "
+        SYSFS{manufacturer}=="Hewlett-Packard"
         SYSFS{product}=="DeskJet 840C"
 
 3.  We then add our rule in /etc/udev/rules.d/10-local.rules
@@ -97,15 +107,15 @@ We obtain the keys by looking for dev ``/sys`` info, with
 
 4.  Reload udev conf by::
 
-        $ udevcontrol reload_rules
+        $ udevadm control --reload
 
 5.  Test the config with::
 
-        $ udevtest   $(udevadm info -q path -n /dev/usb/lp0)
+        $ udevadm test $(udevadm info -q path -n /dev/usb/lp0)
 
     or::
 
-        $ udevtest /class/usb/lp0 usb
+        $ udevadm test /class/usb/lp0 usb
         main: looking at device '/class/usb/lp0' from subsystem 'usb'
         main: opened class_dev->name='lp0'
         udev_rules_get_name: reset symlink list
@@ -131,8 +141,8 @@ We obtain the keys by looking for dev ``/sys`` info, with
         $ ls -l /dev/deskjet
         lrwxrwxrwx  1 root root 7 Apr  7 18:23 /dev/deskjet -> usb/lp0
 
-In the same way we can mount a specific mass-storage by looking at the
-keys by::
+In the same way we can link a specific mass-storage to a special ``/dev`` entry by
+looking at the keys by::
 
     $ udevadm info -a -p $(udevadm info -q path -n /dev/uba1)
 
@@ -142,65 +152,84 @@ then add in /etc/udev/rules.d/10-local.rules
 
     BUS="usb", SYSFS{serial}="0402170100000020EB5D00000000000", KERNEL="ub?1", NAME="%k", SYMLINK="usbfoo"
 
-Note that you can find all disk devices by::
 
-    $ ls -l /dev/disk/by-uuid/
+But usually it it is better to use the provided symlinks which yet allow
+:ref:`persistent naming`.
 
-that gives something like::
 
-    lrwxrwxrwx 1 root root 10 Jul 26 22:31 0ae675ac-482e-4789-a7cc-e1505adf539a -> ../../hda1
-    lrwxrwxrwx 1 root root 10 Jul 26 22:31 15d94fad-67ea-4de5-b304-ec224eeb4554 -> ../../hda5
-    lrwxrwxrwx 1 root root 10 Jul 31 16:20 37712fde-ab06-4957-b9cb-13d2978532a8 -> ../../uba1
-
-You can also use their **id** with::
-
-    $ ls -l/dev/disk/by-id
-
-you will get more devices by id than
-uuid, because some devices does not contain (at least at first level) a
-file system so have no fs uuid, like a lvm partition or an full disk.
-
-There is some information in `Gentoo HOWTO USB Mass Storage
-Device <http://gentoo-wiki.com/HOWTO_USB_Mass_Storage_Device>`__
-
-Automounting USB devices
-------------------------
-
-/etc/udev/rules.d/sda.rules:
+If we want to automount some removable storage we can create a rule in
+``/etc/udev/rules.d/`` and use :man:`systemd-mount` to mount it. As the recent man page
+explain in the section :man:`The udev database <systemd-mount#THE_UDEV_DATABASE>`
+a udev rule like the following automatically mount all USB storage plugged in:
 
 .. code-block:: cfg
 
-    KERNEL=="sd[a-z]", NAME="%k", SYMLINK+="usbhd-%k", GROUP="users", OPTIONS="last_rule"
-    ACTION=="add", KERNEL=="sd[a-z][0-9]", SYMLINK+="usbhd-%k", GROUP="users", NAME="%k"
-    ACTION=="add", KERNEL=="sd[a-z][0-9]", RUN+="/bin/mkdir -p /media/usbhd-%k"
-    ACTION=="add", KERNEL=="sd[a-z][0-9]", PROGRAM=="/sbin/vol_id -t %N", RESULT=="vfat", RUN+="/bin/mount -t vfat -o rw,noauto,sync,dirsync,noexec,nodev,noatime,dmask=000,fmask=111 /dev/%k /media/usbhd-%k", OPTIONS="last_rule"
-    ACTION=="add", KERNEL=="sd[a-z][0-9]", RUN+="/bin/mount -t auto -o rw,noauto,sync,dirsync,noexec,nodev,noatime /dev/%k /media/usbhd-%k", OPTIONS="last_rule"
-    ACTION=="remove", KERNEL=="sd[a-z][0-9]", RUN+="/bin/umount -l /media/usbhd-%k"
-    ACTION=="remove", KERNEL=="sd[a-z][0-9]", RUN+="/bin/rmdir /media/usbhd-%k", OPTIONS="last_rule"
+  ACTION=="add", SUBSYSTEMS=="usb", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", \
+  RUN{program}+="/usr/bin/systemd-mount --no-block --automount=yes --collect $devnode"
+
+In this case ``systemd-mount`` honors the of additional udev properties
+``SYSTEMD_MOUNT_OPTIONS=`` to give additional mount options, ``SYSTEMD_MOUNT_WHERE=``
+The file system path to place the mount point at, instead of ``/run/media/system/``.
 
 
-If you are using any fixed devices
-(for example SATA hard disks - check your /etc/fstab) which are
-recongized as /dev/sdX change all occurrences of sd[a-z] to the first
-unused letter for a sd\* device.
+Here to mount a specific usb key we create a rule by using some keys to identify the
+file system using keys from the top sysfs entry and possibly also from a parent, like
+this:
+
+.. code-block:: cfg
+
+  ACTION=="add"
+  SUBSYSTEMS=="usb"
+  SUBSYSTEM=="block"
+  ATTRS{serial}=="0709289778d6a5"
+  ATTR{partition}=="1"
+  RUN{program}+="/usr/bin/systemd-mount --no-block --automount=yes --discover $devnode"
+
+Here the ``serial`` identify the usb key so I have to add a partition number to properly
+identify the partition.  The mounted device in ``/run/media/system`` directory
+
+For disk devices you can use any :ref:`persistent naming` for identifying them.
+The same information used by symlinks in ``/dev/disk/`` tree and ref:`reported by ldblk
+<uuid_with_lsblk>`, is also reported by::
+
+  $ udevadm info --query=property -n /dev/sdc
+
+as ``ID_SERIAL``, ``ID_SERIAL_SHORT``, ``ID_WWN``   for a disk and also for a partition
+filesystem ``ID_FS_UUID``, ``ID_FS_LABEL``, ``ID_PART_ENTRY_UUID`` (instead of ``PARTUUID``
+for lbslk). These variables are available in udev rules as ``ENV{``*variable*``}``.
+
+If I add a label on the partition of my usb key, I can now use:
+
+.. code-block:: cfg
+
+  ACTION=="add"
+  SUBSYSTEMS=="usb"
+  SUBSYSTEM=="block"
+  ENV{ID_FS_LABEL}=="VFAT_SHARE"
+  ENV{SYSTEMD_MOUNT_OPTIONS}="gid=john,uid=john"
+  ENV{SYSTEMD_MOUNT_WHERE}="/run/media/john/$env{ID_FS_LABEL}"
+  RUN{program}+="/usr/bin/systemd-mount --no-block --automount=yes $devnode"
+
+and I find the mounted device at ``/run/media/john/VFAT_SHARE`` with the *john* user and
+group.
 
 debugging udev
 ~~~~~~~~~~~~~~
 
 To debug udev we can:
 
-1.  use ``udevtest``
-2.  log ``udevd`` by issuing::
+1.  use ``udevadm test``
+2.  log ``udevd`` by issuing:
 
-    ..  code-block: cfg
+    ..  code-block:: cfg
 
         log="yes"
 
-3.  in /etc/udev.conf and change the level of debugging with::
+    in ``/etc/udev.conf`` and change the level of debugging with::
 
-        $ udevcontrol log_priority=level
+        $ udevadm control log_priority=level
 
 the priority is a  numerical or symbolic level from systlog
 **err**, **info** and **debug**
 
--  ``udevmonitor`` reports to the console the udevd activity
+3. ``udevadm monitor`` reports to the console the udevd activity
