@@ -420,6 +420,119 @@ You can find more on this subject in
 <http://www.grymoire.com/Unix/Sh.html#uh-14>`_.
 
 ..  index::
+    filename; expansion
+
+Filename expansion
+^^^^^^^^^^^^^^^^^^
+After `word splitting`_ comes `filename expansion` where all the `patterns
+<Pattern Matching>`_ found in the filename are expanded.
+
+The following are done with default shopt settings which disable ``dotglob`` and ``nullglob``.
+
+..  code-block:: shell-session
+
+    $ mkdir dir
+    $ cd dir
+    $ touch b .b a aa aaa .a .aa ..a ba ab bab
+    $ echo a*
+    a  aa  aaa  ab
+    $ echo *a
+    a aa aaa ba
+    $ echo a?
+    aa ab
+    $ echo ?a
+    aa ba
+    $ echo ??
+    aa ab ba
+    $ echo *
+    a aa aaa ab b ba bab
+    $ echo .*
+    . .. .a ..a .aa .b
+    $ echo * .*
+    a aa aaa ab b ba bab . .. .a ..a .aa .b
+    $ echo .?*
+    .. .a ..a .aa .b
+    $ echo .??*
+    ..a .aa
+
+As we see there is no easy way to catch all files from a directory, the default does not
+match dotfiles, and if we add the initial dot we catch too less or too much.
+If we use bash you we can set an option ``dotglob`` so pattern can cath the dot, let try
+again:
+
+..  code-block:: shell-session
+
+    $ shopt -s dotglob
+    $ echo *a
+    a  .a  ..a  aa  .aa  aaa  ba
+    $ echo a?
+    aa  ab
+    $ echo ?a
+    .a  aa  ba
+    $ echo ??
+    .a  aa  ab  .b  ba
+    $ echo *
+    a .a ..a aa .aa aaa ab b .b ba bab
+    $ echo .*
+    . .. .a ..a .aa .b
+    $ echo .?*
+    .. .a ..a .aa .b
+    $ echo .??*
+    ..a .aa
+
+It is now easy to catch all files from the directory, but
+as we see for the last three commands none of these patterns expand to the *dotfiles*,
+the first catch also the directory itself and the parent directory, the next one catch
+also the  parent directory, and the last one miss some filenames. Making an operation
+only on dotfiles is quite common so we must find a way to match all of them, and only
+them.
+
+In bash we have an environment variable ``GLOBIGNORE`` which is not set by default, f
+``GLOBIGNORE`` is set, each matching file name that also matches one of the patterns in
+``GLOBIGNORE`` is removed from the list of matches.
+After setting globignore by ``GLOBIGNORE=.:..`` we get
+
+..  code-block:: shell-session
+
+   $ echo .*
+   .a ..a .aa .b
+
+which is the proper list of dotfiles.
+
+A special feature is that setting ``GLOBIGNORE`` to a non null value always disable matching
+``.`` and ``..`` so we have had the same result by setting ``GLOBIGNORE=qwertyuop`` !
+
+Note that if we want to change ``GLOBIGNORE`` only for some expansions we ca do it in a
+subshell.
+
+..  code-block:: shell-session
+
+    $ (GLOBIGNORE=.:..; echo .*)
+    .a ..a .aa .b
+
+but as  :ref:`explained above <parameter_and_command_substitution>`,
+the following does not work :
+
+..  code-block:: shell-session
+
+    $ GLOBIGNORE=.:.. echo .*
+    . .. .a ..a .aa .b
+
+The previous use of ``shopt`` is only possible in bash, these options don't exist in
+plain bourne shell. But we can always match all dotfiles with
+
+..  code-block:: shell-session
+
+    $ echo .[!.]* ..?*
+    .a .aa .b ..a
+    $ echo .[^.] .??*
+    .a .b ..a .aa
+
+When a range match begins with ``!`` or a ``^`` any character not
+enclosed is matched, so with these two patterns we get rid of the unwanted ``.`` and
+``..``.
+
+..  index::
     parameter; expansion
     word; splitting
     quote; removal
