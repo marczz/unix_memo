@@ -283,10 +283,10 @@ Reflinks
 Reflinks are :wikipedia:`Copy-on-write` *COW* of a file; they are available
 on :wikipedia:`OCFS2` and :wikipedia:`Btrfs` file systems. Reflinks
 creates a new inode that shares the same disk blocks as the original
-file. Reflinks works only inside the boundaries of a file system; but
-in contrast to hardlinks changes to a file are not reflected to the copy.
+file. Reflinks works only inside the boundaries of a file system; and
+in contrast to hardlinks, changes to a file are not reflected to the copy.
 
-You create hardlinks with:
+You create manually reflinks with:
 
 ..  code-block:: shell-session
 
@@ -374,14 +374,13 @@ command return status
 Command Expansion.
 ------------------
 
-
-The `Bash Reference`_ gives a long description of
-`Command Expansion`_.
+The `Bash Reference`_ gives a detailled description of each part of
+`shell expansion`_, wich takes place during `simple command expansion`_.
 
 The order of expansion is very important; it is: brace expansion;
-tilde expansion, parameter and variable expansion, arithmetic
-expansion, command substitution from left-to-right,
-word splitting; filename expansion, process substitution, quote
+tilde expansion, `parameter <parameter expansion>`_ and variable expansion, arithmetic
+expansion, `command substitution`_ from left-to-right,
+`word splitting`_, `filename expansion`_, `process substitution`_, quote
 removal.
 
 To quote the manual: *Only brace expansion, word splitting, and
@@ -392,18 +391,31 @@ other expansions expand a single word to a single word.*
     parameter; substitution
     command; substitution
 
-Parameter and Command Substitution.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..  _parameter_and_command_substitution:
 
-The order of parameter and command substitution explain why we have:
+Parameter and Command Substitution
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Parameter expansion commes before command substitution, it explains why we have:
 
 ..  code-block:: shell-session
 
     $ a=foo; a=bar echo $a
     foo
+    $ a=foo; a=bar /bin/echo $a
+    foo
+    $ a=foo; a=bar; echo $a
+    bar
+    $ a=foo; a=bar; /bin/echo $a
+    bar
+
 
 In the second assignement the parameter substitution is done *before
-the assignement*. You can find more on this subject in
+the assignment*.
+
+This is true for a builtin like ``echo`` or a command like ``/bin/echo``
+
+You can find more on this subject in
 `Bruce Barnett Grymoire - sh, a subtle point
 <http://www.grymoire.com/Unix/Sh.html#uh-14>`_.
 
@@ -415,7 +427,8 @@ the assignement*. You can find more on this subject in
 Parameter Expansion, Splitting and Quote Removal.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The order of the previous operation explains we have:
+As `parameter expansion`_ is done before `word splitting`_, and `quote removal`_
+after `word splitting`_, we have:
 
 ..  code-block:: shell-session
 
@@ -427,8 +440,6 @@ The order of the previous operation explains we have:
     $ IFS=: set -- "$string"; echo $1
     a b c
 
-as parameter expansion is done before word splitting, and quote
-removal after word splitting.
 
 But when we have:
 
@@ -465,9 +476,9 @@ quoting with `Command Expansion`_ can be difficult to sort out.
 If you set a variable to a string, when use it as parameter in the
 process of `Simple Command Expansion`_ it is subject to
 `Shell Expansion`_ a complex process which involves
-`Shell Parameter Expansion`_ *Command Substitution*, *Arithmetic
-Expansion*, *Process Substitution*, and then `Word Splitting`_
-followed by `Filename Expansion`_ and *Quote removal*.
+`Shell Parameter Expansion`_, `Command Substitution`_, *Arithmetic
+Expansion*, `Process Substitution`_, and then `Word Splitting`_
+followed by `Filename Expansion`_ and `Quote removal`_.
 
 Let's apply with a simple command, made from a simple script named
 ``countargs``:
@@ -804,7 +815,7 @@ Reading from a bloc of text.
 The shell builtin **read** first aim is reading from standard input or
 any file descriptor. But we can use it with `Here Documents`_, or with
 `Here Strings`_ *in bash or zsh but not dash, it is not a portable
-construct*, in a pipe, or with process substitution.
+construct*, in a pipe, or with `process substitution`_.
 
 In standard shell like dash when we read from an `Here Documents`_
 the builtin *read* read one line each time. In
@@ -1026,7 +1037,7 @@ read from the output of a pipe:
     unset unset
 
 We can use redirection to avoid a subshell, we can either use a
-temporary file, a fifo or process substitution.
+temporary file, a fifo or `process substitution`_.
 
 The use of a temporary file is allowed in bare bourne shell, dash,
 ash, yash and usefull for portable script.
@@ -1058,7 +1069,7 @@ But here changing IFS for only the read works as well.
     $ exec 4<&-
     $ rm /tmp/tmpfile
 
-If our shell and system admit process substitution, which is the case
+If our shell and system admit `process substitution`_, which is the case
 of bash, and zsh on systems that support named pipes (FIFOs) or the
 ``/dev/fd`` files:
 
@@ -1078,10 +1089,8 @@ Or simply, a more condensed form:
     $ echo $x $y
     a b
 
-This can even be used in yash with `Process redirection
-<https://yash.osdn.jp/doc/redir.html#process>`_ which differs from
-*Process substitution* thet is found in bash or zsh.
-The syntax is slightly different:
+This can even be used in yash with `process redirection`_ whose syntax is different
+from `process substitution`_ which is found in bash or zsh.
 
 ..  code-block:: shell-session
 
@@ -1089,7 +1098,7 @@ The syntax is slightly different:
     $ echo $x $y
     a b
 
-But these custom syntaxes are not in Posix; and for portability it is
+As these custom syntaxes are not in Posix; and for portability it is
 better to avoid them.
 
 A pipe create an implicit fifo, which imply to use a subshell,
@@ -1107,7 +1116,7 @@ using an explicit fifo. This is also available in any shell.
     [1]+  Done    echo a b > /tmp/fifo
     $ rm /tmp/fifo
 
-We illustrate the use of process substitution to parse the ouput of
+We illustrate the use of `process substitution`_ to parse the ouput of
 the ``route`` command to find the different fields of the default
 route; that we `did previously <parsing-route-1>` sequentially.
 
@@ -1186,7 +1195,7 @@ This is summarized by the next small script
     $ echo t[1]
     t1
 
-The same pathname expansion is done after an unset command, so doing
+The same pathname expansion is done after an ``unset`` command, so doing
 ``unset t[1]`` may result in unsetting the array element ``t[1]`` or
 the unsetting the variable ``t1`` or causing an error or doing
 nothing, depending on the presence of a file named ``t1`` and of the
@@ -1197,7 +1206,7 @@ So you are advised always quoting the argument of an ``unset`` and
 write: ``unset 't[1]'``.
 
 *Note that within an expression like* ``${t[1]}`` *braces disable pathname
-epansion*
+expansion*
 
 
 bash and zsh regex expressions.
@@ -1340,16 +1349,20 @@ a script:
 The return value of 4 is the sign of the enhanced version.
 
 ..  _Bash Reference: http://www.gnu.org/software/bash/manual/bashref.html
-..  _Command Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion
-..  _Command Substitution: http://www.gnu.org/software/bash/manual/bashref.html#Command-Substitution
-..  _Quoting: http://www.gnu.org/software/bash/manual/bashref.html#Quoting
-..  _Simple Command Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion
-..  _Shell Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Shell-Expansions
-..  _Shell parameter expansion: http://www.gnu.org/software/bash/manual/bashref.html#Shell-Parameter-Expansion
-..  _Word Splitting: http://www.gnu.org/software/bash/manual/bashref.html#Word-Splitting
-..  _Filename expansion: http://www.gnu.org/software/bash/manual/bashref.html#Filename-Expansion
-..  _Simple Command Expansion: http://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion
-..  _Here Documents: http://www.gnu.org/software/bash/manual/bashref.html#Here-Documents
-..  _Here Strings: http://www.gnu.org/software/bash/manual/bashref.html#Here-Strings
-..  _Bash Builtins: http://www.gnu.org/software/bash/manual/bashref.html#Bash-Builtins
-..  _Redirections: http://www.gnu.org/software/bash/manual/bashref.html#Redirections
+..  _Command Expansion:
+..  _Simple Command Expansion: https://www.gnu.org/software/bash/manual/bashref.html#Simple-Command-Expansion
+..  _Filename expansion: https://www.gnu.org/software/bash/manual/bashref.html#Filename-Expansion
+..  _Pattern Matching: https://www.gnu.org/software/bash/manual/bashref.html#Pattern-Matching
+..  _Command Substitution: https://www.gnu.org/software/bash/manual/bashref.html#Command-Substitution
+..  _Quoting: https://www.gnu.org/software/bash/manual/bashref.html#Quoting
+..  _Quote Removal: https://www.gnu.org/software/bash/manual/bashref.html#Quote-Removal
+..  _Shell Expansion: https://www.gnu.org/software/bash/manual/bashref.html#Shell-Expansions
+..  _parameter expansion:
+..  _Shell parameter expansion: https://www.gnu.org/software/bash/manual/bashref.html#Shell-Parameter-Expansion
+..  _Word Splitting: https://www.gnu.org/software/bash/manual/bashref.html#Word-Splitting
+..  _Here Documents: https://www.gnu.org/software/bash/manual/bashref.html#Here-Documents
+..  _Here Strings: https://www.gnu.org/software/bash/manual/bashref.html#Here-Strings
+..  _Bash Builtins: https://www.gnu.org/software/bash/manual/bashref.html#Bash-Builtins
+..  _Redirections: https://www.gnu.org/software/bash/manual/bashref.html#Redirections
+..  _Process Substitution: https://www.gnu.org/software/bash/manual/bashref.html#Process-Substitution
+..  _Process Redirection: https://yash.osdn.jp/doc/redir.html#process
