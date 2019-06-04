@@ -291,15 +291,16 @@ depending on the value of ``UDISKS_FILESYSTEM_SHARED`` (see
 hence they will be shown under Devices in the sidebar.
 
 
-Front ends
-----------
+Front ends for mounting removable devices.
+------------------------------------------
 You may also want to have some frontend that allows to alleviate the
 burden of remembering the commands or to read the manual, *but which add
 the the load of remembering the frontend api, and make you depend on
 the presence of an added piece of software*.
 
--   `bashmount <https://github.com/jamielinux/bashmount/>`__ is a bash
-    script to help mounting with *udisks2*.
+-   `bashmount <https://github.com/jamielinux/bashmount/>`__ is a bash script to help
+    mounting with *udisks2*. It is not updted since 2014 but there are more recent
+    forks.
 -   `lightweight device mounter
     (ldm) <https://github.com/LemonBoy/ldm>`_ (MIT License)
     is a lightweight daemon that mounts removable devices
@@ -312,17 +313,16 @@ the presence of an added piece of software*.
 -   `triggerhappy <https://github.com/wertarbyte/triggerhappy>`_ (GPL)
     is a hotkey daemon developed for small and embedded systems. It
     attaches to the input device files and executes scripts on events. It
-    is packaged in Debian.  *Last commit 2012*
+    is packaged in Debian.
 -   `udisk-glue <https://github.com/fernandotcl/udisks-glue>`_
     (BSD Licence) is a daemon that can perform user-configurable
     actions when a certain udisks event is detected. It can be
-    configured to automatically mount devices. It is packaged in
-    Debian.
+    configured to automatically mount devices. *Last commit 2013*.
 -   `udiskie <https://github.com/coldfix/udiskie>`_
     *(MIT License)* is an automounter for usb devices written in
     python. It uses the dbus interface through *udisks*.
     It comes with optional mount notifications and gtk
-    tray icon and a command-line client ``udiskie-mount``.
+    tray icon and a command-line client ``udiskie-mount``. It is in *pypi*.
 -   `UDisksEvt <https://github.com/dpx-infinity/udisksevt>`__ (GPL) by
     Vladimir Matveev is a daemon written ih haskell which listens for
     D-Bus signals emitted by UDisks daemon and execute configured
@@ -332,18 +332,16 @@ the presence of an added piece of software*.
     and unmounts removable devices. Udevil is written in C with libudev
     and glib without dependency on udisks or gvfs. It is part of the
     Spacefm project whose development stopped in April 2014.
--   `usbmount <http://usbmount.alioth.debian.org/>`_
+-   `usbmount <https://github.com/rbrito/usbmount>`_
     automatically mounts USB mass storage devices when they are
     plugged in, and unmounts them when they are removed. The
     mountpoints (``/media/usb[0-7]`` by default), filesystem types to
     consider, and mount options are configurable. If the device
     provides a model name, a symlink ``/var/run/usbmount/MODELNAME``
     pointing to the mountpoint is automatically created.
-    `usbmount git source
-    <https://alioth.debian.org/scm/browser.php?group_id=30641>`_
-    The old home page set that *usbmount* is unmaintained since 2007
-    at release 0.0.14.1, but development continued to 2012 release
-    0.0.22 which is packaged in Debian.
+    *usbmount* is unmaintained since 2007 as a debian package and the last release is in
+    *Jessie*, a `git repository <https://github.com/rbrito/usbmount>`_ contains some new
+    developpements.
 -   `udisksvm <https://github.com/berbae/udisksvm>`__ is a small (280
     loc) python GUI oriented script to automount removable medias using udisks.
 -   `udisks_functions <https://gist.github.com/ledti/838039>`_
