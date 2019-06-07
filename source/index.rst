@@ -23,6 +23,8 @@ Contents:
    swap.rst
    udev.rst
    devices.rst
+   btrfs.rst
+   lvm.rst
    vfs.rst
    encrypt.rst
    gnupg.rst
