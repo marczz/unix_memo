@@ -359,6 +359,93 @@ Udisks references
     <http://blog.fpmurphy.com/2011/08/introduction-to-udisks.html>`_.
 
 
+Loop Devices.
+-------------
+
+
+Mounting disk images
+~~~~~~~~~~~~~~~~~~~~
+
+As an example I want to mount a partition in a disk image disk.img.
+
+The output of *file* is:
+
+::
+
+    $ file disk.img
+    disk.img: DOS/MBR boot sector; partition 1 : ID=0x83, start-CHS (0x40,0,1),
+    end-CHS (0x3ff,3,32), startsector 8192, 2048000 sectors
+
+
+or with fdisk:
+
+::
+
+    $ fdisk -l disk.img
+    Disk disk.img: 1004 MiB, 1052770304 bytes, 2056192 sectors
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+    Disklabel type: dos
+    Disk identifier: 0x081bc7ef
+
+    Device     Boot Start     End Sectors  Size Id Type
+    disk.img1        8192 2056191 2048000 1000M 83 Linux
+
+So  first partition begin at 8192 x 512 = 4194304 bytes
+
+I can mount it with
+
+::
+
+    $ sudo mount -o ro,loop,offset=4194304 disk.img /tmp/mnt
+
+
+We can check the mount with :man:`findmnt(8)`
+
+::
+
+    $ findmnt /tmp/mnt
+    TARGET   SOURCE     FSTYPE OPTIONS
+    /tmp/mnt /dev/loop0 ext4   ro,relatime
+
+If you want to avoid the offset computing you can use :man:`kpartx(8)`, which
+set up device mappings for the partitions of any partitioned block
+device.
+
+
+You can also create loop devices for each partition in your disk with:
+
+::
+
+    $ sudo losetup -f -P disk.img
+    $ sudo mount -o ro,loop /dev/loop0p1
+
+We can also use *udisksctl* to mount the disk partition as user.
+
+::
+
+
+    $ udisksctl loop-setup --file disk.img --offset 4194304
+    Mapped file disk.img as /dev/loop0
+    $ udisksctl mount -b /dev/loop0
+    Mounted /dev/loop0 at /media/john/5853137f-ce83-4fa5-9845-42ff0de259b4
+
+For unmountting:
+
+::
+
+    $ udisksctl unmount -b /dev/loop0
+    $ udisksctl loop-delete -b /dev/loop0
+
+With :man:`udisksctl` you can also mount the whole disk, in contrast to :man:`losetup`
+no extra option is needed.
+
+::
+
+    $ udisksctl loop-setup --file disk.img
+    udisksctl mount -b /dev/loop0p1
+
 ..  _udisksctl:
     http://udisks.freedesktop.org/docs/latest/udisksctl.1.html
 ..  _udisk disk manager:
