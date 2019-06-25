@@ -34,6 +34,7 @@ Contents:
    wpa.rst
    pdf.rst
    cd_dvd_burn.rst
+   tmux.rst
    vi_cheatsheet
    nano.rst
    cups.rst
