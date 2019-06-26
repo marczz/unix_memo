@@ -24,6 +24,14 @@ The default command is ``new-session`` and can be omitted, so the command
 
 start a new *default* session.
 
+You can have a list of commands and keys by:
+
+::
+
+    $ tmux list-keys
+    $ tmux list-commands
+
+but usually you will get the keys by typing ``C-B ?`` inside a tmux session.
 
 
 Sessions
@@ -36,16 +44,17 @@ commands
    :widths: 20, 80
 
 
-   ``new -s myname``%start new *myname* session
+   ``new -s sessname``%start new *sessname* session
    ``attach``%attach to any open session
    ``a``%attach to any open session
-   ``attach -t myname``%attach to *myname* session
-   ``new -As myname``%s
+   ``attach -t sessname``%attach to *sessname* session
+   ``new -As sessname``%attach to a session *sessname*, create it if necessary.
    ``list-sessions``%list sessions
    ``ls``%list sessions
+   ``switch-client -t sessname``%switch to session *sessname*
    ``kill-session -a``%kill all sessions
-   ``kill-session -t myname``%kill  *myname* session
-   ``kill-session -at myname``%kill all sessions but *myname*
+   ``kill-session -t sessname``%kill  *sessname* session
+   ``kill-session -at sessname``%kill all sessions but *sessname*
 
 Keys
 ~~~~
@@ -54,10 +63,11 @@ Keys
    :delim: %
    :widths: 20, 80
 
-    ``s``%list sessions
+    ``s``%list and switch to sessions
     ``$``%name session
     ``d``%detach current client
-
+    ``(``%switch to the previous session
+    ``)``%switch to the next session
 
 Windows
 -------
@@ -218,7 +228,7 @@ or
      bind-key j choose-window 'join-pane -h -s "%%"'
      bind-key s choose-window 'join-pane -t "%%"'
 
-*take care that this* ``s`` *binding will hide the default* ``choose-tree``.
+*The* ``s`` *binding will hide the default binding for* ``choose-tree``.
 
 ..  _copy mode:
 
