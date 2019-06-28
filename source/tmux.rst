@@ -58,12 +58,12 @@ Windows
     ``f``%find window
     ``,``%name window
     ``&``%kill window
-    ``[``%enter :ref:`copy mode`
-    ``Page Up``%enter :ref:`copy mode` and scroll one page up
+    ``[``%enter :ref:`copy mode<copy mode>`
+    ``Page Up``%enter :ref:`copy mode<copy mode>` and scroll one page up
     ``]``%paste last coppied text
     ``#``%list all paste buffers
     ``=``%choose paste buffer and paste
-    ``?``%show keys in :ref:`copy mode`
+    ``?``%show keys inside a :ref:`copy mode<copy mode>` window
     ``:``%prompt for entering commands
     ``t``%show a big clock
 
@@ -100,6 +100,8 @@ Panes
     ``M-Right``% resize pane right by 5 lines
 
 ..   [*] if you type the number you go to this pane.
+
+..  _copy mode:
 
 Copy mode
 ~~~~~~~~~
@@ -355,10 +357,6 @@ or
 
      bind-key J choose-tree -w 'join-pane -h -s "%%"'
      bind-key S choose-tree -w 'join-pane -t "%%"'
-
-
-
-..  _copy mode:
 
 
 
