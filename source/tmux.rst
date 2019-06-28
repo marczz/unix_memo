@@ -1,63 +1,37 @@
 Tmux
 ====
 
-In this page I suppose that the tmux prefix is the default one that is ``Ctrl-B``, you
-can change the prefix, but it is easy to translate ``B`` to any other symbol.
+In this page I suppose that the tmux prefix is the default one that is ``C-B`` *Control
+B*, you can change the prefix, then replace ``B`` in the following page by the
+appropriate symbol.
 
 *In this memo the list of keys, commands, options of a command are not exhaustive. For a
 full list look at* :man:`tmux(1)`.
 
-Tmux commands
--------------
 
-All tmux commands can be either issued by a command line
-::
+The tmux server manage multiple **sessions** wich can be attached to zero, one or many
+clients. Each session is composed of **windows**  which are made up of one or more
+**panes**. Each pane run a pseudo terminal.
 
-    $ tmux <command> <flags>
+You lanch a new tmux session by the command:
 
-or in a tmux session by opening the command prompt with ``Ctrl_B :``.
-
-The default command is ``new-session`` and can be omitted, so the command
 ::
 
     $ tmux
 
-start a new *default* session.
+Which open a new window in a new session. You can interact with tmux with commands, the
+more usuals are bound to key shortcuts.
 
-You can have a list of commands and keys by:
 
-::
+When you're lost in a tmux session, you will get all the defined the keys
+by typing ``C-B ?`` inside the current window.
 
-    $ tmux list-keys
-    $ tmux list-commands
 
-but usually you will get the keys by typing ``C-B ?`` inside a tmux session.
-
+Table of Tmux Keys
+------------------
 
 Sessions
---------
-
-commands
 ~~~~~~~~
-.. csv-table::
-   :delim: %
-   :widths: 20, 80
-
-
-   ``new -s sessname``%start new *sessname* session
-   ``attach``%attach to any open session
-   ``a``%attach to any open session
-   ``attach -t sessname``%attach to *sessname* session
-   ``new -As sessname``%attach to a session *sessname*, create it if necessary.
-   ``list-sessions``%list sessions
-   ``ls``%list sessions
-   ``switch-client -t sessname``%switch to session *sessname*
-   ``kill-session -a``%kill all sessions
-   ``kill-session -t sessname``%kill  *sessname* session
-   ``kill-session -at sessname``%kill all sessions but *sessname*
-
-Keys
-~~~~
 
 .. csv-table::
    :delim: %
@@ -70,10 +44,7 @@ Keys
     ``)``%switch to the next session
 
 Windows
--------
-
-Keys
-~~~~
+~~~~~~~
 
 .. csv-table::
    :delim: %
@@ -96,31 +67,9 @@ Keys
     ``:``%prompt for entering commands
     ``t``%show a big clock
 
-Execute a shell command in a new window
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can create a new window with the command
-::
-
-    :new-window [-d] [-n window-name] <shell-command>
-
-- With ``-d`` the current window in unchanged.
-- ``neww`` is an alias to ``new window``.
-
-Examples:
-
-  ::
-
-    $ tmux neww 'vi ~/.tmux.conf'
-    $ tmux neww -d 'rsync -avz ~/documents ssh:example.org'
-
-
 
 Panes
------
-
-Keys
-~~~~
+~~~~~
 
 .. csv-table::
    :delim: %
@@ -152,88 +101,8 @@ Keys
 
 ..   [*] if you type the number you go to this pane.
 
-Synchronize panes
-~~~~~~~~~~~~~~~~~
-
-You can synchronize panes, i.e. send the keyboard to multiple panes with the command:
-
-::
-
-    :setw synchronize-panes
-
-Toggle it off again by repeating the command.
-
-Execute a shell command in a pane
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can create a new pane with the command:
-
-::
-
-    :split-window [-dhv] [p percentage] <shell-command>
-
-The flag ``-h`` means horizontal split, and ``-v`` stand for vertical split; if you add
-``d`` the new pane will not get the focus. ``splitw`` is an alias for ``split-window``.
-
-It is usefull to launch a long running command in forground.  Example:
-
-::
-
-    $ tmux splitw -dh htop
-    $ tmux splitw -v -p 90 man tmux
-
-These two command can also be entered at tmux command prompt with:
-
-::
-
-    C-b:splitw -dh htop
-    C-b:splitw -v -p 90 man tmux
-
-If you use often such commands, an alias makes it easier:
-
-::
-
-    alias tvspl "tmux splitw -dh'
-    alias thspl "tmux splitw -v"
-    alias tmman "tmux splitw -v -p 90 man"
-
-Move a window to a pane
-~~~~~~~~~~~~~~~~~~~~~~~
-
-When you want to bring an other window as pane in the current window you can use the
-command:
-
-::
-
-    :joinp -s :2
-
-Or you can prefer to send your window inside another one as new pane:
-
-::
-
-    :joinp -t :1
-
-The post `join window to pane <https://unix.stackexchange.com/a/14301/266187>`_
-propose to add to tmux.conf
-::
-
-    # pane movement
-    bind-key j command-prompt -p "join pane from:"  "join-pane -s '%%'"
-    bind-key s command-prompt -p "send pane to:"  "join-pane -t '%%'"
-
-or
-
-::
-
-     bind-key j choose-window 'join-pane -h -s "%%"'
-     bind-key s choose-window 'join-pane -t "%%"'
-
-*The* ``s`` *binding will hide the default binding for* ``choose-tree``.
-
-..  _copy mode:
-
-Copy mode:
-----------
+Copy mode
+~~~~~~~~~
 
 ``C-b [`` switch to *Copy mode*, then ``q`` comes back to default mode.
 
@@ -249,8 +118,6 @@ by the command ``setw mode-keys vi``, to make it permanent put in your configura
 
 In *vi mode* we use h, j, k, and l to move around our buffer.
 
-Keys
-~~~~
 
 The following keys are bound in copy mode *(for an exhaustive list see* :man:`tmux(1)` *)* :
 
@@ -328,6 +195,170 @@ The following keys are bound in copy mode *(for an exhaustive list see* :man:`tm
 |                 |Transpose chars          |              |C-t      |
 +-----------------+-------------------------+--------------+---------+
 
+
+Tmux commands
+-------------
+
+All tmux commands can be either issued by a command line
+::
+
+    $ tmux <command> <flags>
+
+or in a tmux session by opening the command prompt with ``Ctrl_B :``.
+
+The default command is ``new-session`` and can be omitted, so the command
+::
+
+    $ tmux
+
+start a new session.
+
+Common sessions commands
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table::
+   :delim: %
+   :widths: 20, 80
+
+
+   ``new -s sessname``%start new *sessname* session
+   ``attach``%attach to any open session
+   ``a``%attach to any open session
+   ``attach -t sessname``%attach to *sessname* session
+   ``new -As sessname``%attach to a session *sessname*, create it if necessary.
+   ``list-sessions``%list sessions
+   ``ls``%list sessions
+   ``switch-client -t sessname``%switch to session *sessname*
+   ``kill-session -a``%kill all sessions
+   ``kill-session -t sessname``%kill  *sessname* session
+   ``kill-session -at sessname``%kill all sessions but *sessname*
+
+
+
+
+Execute a shell command in a new window
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can create a new window with the command
+::
+
+    :new-window [-d] [-n window-name] <shell-command>
+
+- With ``-d`` the current window in unchanged.
+- ``neww`` is an alias to ``new window``.
+
+Examples:
+
+  ::
+
+    $ tmux neww 'vi ~/.tmux.conf'
+    $ tmux neww -d 'rsync -avz ~/documents ssh:example.org'
+
+
+
+
+Synchronize panes
+~~~~~~~~~~~~~~~~~
+
+You can synchronize panes, i.e. send the keyboard to multiple panes with the command:
+
+::
+
+    :setw synchronize-panes
+
+Toggle it off again by repeating the command.
+
+Execute a shell command in a pane
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can create a new pane with the command:
+
+::
+
+    :split-window [-dhv] [p percentage] <shell-command>
+
+The flag ``-h`` means horizontal split, and ``-v`` stand for vertical split; if you add
+``d`` the new pane will not get the focus. ``splitw`` is an alias for ``split-window``.
+*The name vertical split is somewhat confusing, it means that your panes will be
+separated by an horizontal line, and so are stacked vertically*.
+
+It is usefull to launch a long running command in forground.  Example:
+
+::
+
+    $ tmux splitw -dh htop
+    $ tmux splitw -v -p 90 man tmux
+
+These two command can also be entered at tmux command prompt with:
+
+::
+
+    C-b:splitw -dh htop
+    C-b:splitw -v -p 90 man tmux
+
+If you use often such commands, an alias makes it easier:
+
+::
+
+    alias thspl "tmux splitw -dh'
+    alias tvspl "tmux splitw -v"
+    alias tmman "tmux splitw -v -p 90 man"
+
+with the ``command-alias`` command you can also create the aliases inside the session.
+::
+
+    $ tmux set-option -s command-alias[10] vspl='split-window -v'
+
+and you can do either in command line
+::
+
+    $ tmux vspl
+
+or at command prompt
+::
+
+    vspl
+
+To know which cells of the array ``command-alias`` are used, and their content do:
+
+::
+
+    $ tmux show-options -s command-alias
+
+Move a window to a pane
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When you want to bring an other window as pane in the current window you can use the
+command:
+
+::
+
+    :joinp -s :2
+
+Or you can prefer to send your window inside another one as new pane:
+
+::
+
+    :joinp -t :1
+
+The post `join window to pane <https://unix.stackexchange.com/a/14301/266187>`_
+propose to add to tmux.conf
+::
+
+    # pane movement
+    bind-key J command-prompt -p "join pane from:"  "join-pane -s '%%'"
+    bind-key S command-prompt -p "send pane to:"  "join-pane -t '%%'"
+
+or
+
+::
+
+     bind-key J choose-tree -w 'join-pane -h -s "%%"'
+     bind-key S choose-tree -w 'join-pane -t "%%"'
+
+
+
+..  _copy mode:
 
 
 
