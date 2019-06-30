@@ -6,7 +6,7 @@ Operating on disk devices
 Listing devices.
 ----------------
 
-.. _lsblk:
+..  _lsblk:
 
 Using ``lsblk``.
 ~~~~~~~~~~~~~~~~
@@ -82,7 +82,7 @@ There are many way to know what partitions compose your storage
 devices like
 :ref:`proc filesystem <devices_proc_sys_fs>`, the
 :ref:`dev filesystem <dev_fs>`, or the commands: :man:`fdisk`, :man:`sfdisk`,
-:man:`gdisk`, :man:`sgdisk` or :man:`parted`.
+:man:`gdisk`, :man:`sgdisk` or `parted`_.
 
 You may have to use a second level when the partition is not a
 physical partition but a logical partition.
@@ -173,9 +173,8 @@ Using the *dev* filesystem.
 `/dev` entry also used symlinks to find device by *label*, *id*,
 or *uuid*, you may need to use also the option  ``--dereference`` (``-L``).
 
-:man:`file` give you how the type of boot sector of device, the type
-of partition, it can detect also the physical volumes of *LVM* and
-their *UUID*.
+:man:`file -s <file>` give dor a  device the type of boot sector, for a partition the
+file system type or  *LVM*  physical volumes and the *UUID*.
 ::
 
     $ sudo file -s /dev/dm-*
@@ -224,8 +223,8 @@ All these command are to be run as root.
 
 ..  _udisksctl_mount:
 
-Mounting devices.
------------------
+Mounting devices as user.
+-------------------------
 
 To mount the device as root you can of course use the :man:`mount`
 command, for removable devices, usually you prefer to mount them as
@@ -240,17 +239,25 @@ The old way is to use :man:`pmount`, but if you have
 
     $ udisksctl mount -b /dev/sdd1
     $ udisksctl mount -b /dev/disk/by-label/key64G001
+    $ udisksctl mount -b /dev/disk/by-uuid/77e19bbf-84ac-4336-a738-e6563a538f7d
     $ udisksctl unmount -b /dev/sdd1
     $ udisksctl power-off -b /dev/sdd1
 
 The *udisks* daemon mount your block device in a directory
-``/media/<user>`` that it creates if necessary. If ther is a label it is
+``/media/<user>`` that it creates if necessary. If there is a label it is
 used; so the device above *key64G001* is mounted as
 ``/media/<user>/key64G001``.
 
 The directory ``/media/<user>`` belongs to root, but has an ACL giving
 you the ``r-x`` access. The directory ``/media/<user>/key64G001`` and
 its content belongs to to you with ``rwx`` access.
+
+The mount directory is shown in the output of udisksctl, but if you don't remember it,
+or you want to use it in a script, you can get it with the command :man:`findmnt`:
+
+::
+
+    findmnt -no TARGET /dev/disk/by-uuid/77e19bbf-84ac-4336-a738-e6563a538f7d
 
 You can also use `udisksctl`_ to mount a loop device:
 
@@ -266,7 +273,7 @@ Mounting a partition in a FileManager
 -------------------------------------
 
 The modern file managers like *Nautilus*, *Thunar*, *Pcmanfm* use
-*gvfs* and *udisk2* to mount removabele media. They accept that you
+*gvfs* and *udisk2* to mount removable media. They accept that you
 give them a *gvfs* mountpoint.
 
 They also list a list of partition, either yet mounted, or unmouted,
@@ -452,3 +459,7 @@ no extra option is needed.
     http://udisks.freedesktop.org/docs/latest/
 ..  _udisdk daemon:
     http://udisks.freedesktop.org/docs/latest/udiskd.8.html
+..  _parted:
+    https://www.gnu.org/software/parted/manual/html_node/index.html
+..  _gparted:
+    https://gparted.org/display-doc.php?name=help-manual
